@@ -3,11 +3,13 @@
         xmlns:vm="using:zennplay_launcher.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" Width="500" Height="250"
         x:Class="zennplay_launcher.Views.MainWindow"
         x:DataType="vm:MainViewModel"
         Icon="/Assets/zenn-icon.ico"
-        Title="ZennPlay">
+        Title="ZennPlay"
+        Background="#151124"
+        WindowStartupLocation="CenterScreen">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -15,10 +17,11 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <TextBox Text="{Binding Greeting}"
-             HorizontalAlignment="Center"
-             VerticalAlignment="Center"
-             BorderThickness="1"
-             BorderBrush="#FF594D7B"/>
+    <TextBlock Text="{Binding Zennplay_greeting}"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center"
+               FontFamily="Segoe UI"
+               FontSize="18"
+               Foreground="#968BB4"/>
 
 </Window>

@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using zennplay_launcher.Services;
 using zennplay_launcher.ViewModels;
 using zennplay_launcher.Views;
 
@@ -22,6 +23,9 @@ public partial class App : Application
                 DataContext = new MainViewModel(),
             };
         }
+
+        var dbInitializer = new DatabaseInitializer();
+        dbInitializer.Initialize();
 
         base.OnFrameworkInitializationCompleted();
     }
