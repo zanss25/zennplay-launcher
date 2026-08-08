@@ -52,7 +52,7 @@ namespace zennplay_launcher.Services
 
         public static string GetAssetsDataPath()
         {
-            string assetsFolderPath = Path.Combine(GetDatabaseDir(), "user_assets");
+            string assetsFolderPath = Path.Combine(GetDatabaseDir(), "UserAssets");
 
             if (!Directory.Exists(assetsFolderPath))
             {
@@ -62,9 +62,61 @@ namespace zennplay_launcher.Services
             return assetsFolderPath;
         }
 
+        public static string GetIconAssetsDataPath()
+        {
+            string dir = GetAssetsDataPath();
+            string iconsFolderPath = Path.Combine(dir, "Icons");
+
+            if (!Directory.Exists(iconsFolderPath))
+            {
+                Directory.CreateDirectory(iconsFolderPath);
+            }
+
+            return iconsFolderPath;
+        }
+
+        public static string GetCoverAssetsDataPath()
+        {
+            string dir = GetAssetsDataPath();
+            string coversFolderPath = Path.Combine(dir, "Cover");
+
+            if (!Directory.Exists(coversFolderPath))
+            {
+                Directory.CreateDirectory(coversFolderPath);
+            }
+
+            return coversFolderPath;
+        }
+
+        public static string GetBackgroundAssetsDataPath()
+        {
+            string dir = GetAssetsDataPath();
+            string backgroundFolderPath = Path.Combine(dir, "Background");
+
+            if (!Directory.Exists(backgroundFolderPath))
+            {
+                Directory.CreateDirectory(backgroundFolderPath);
+            }
+
+            return backgroundFolderPath;
+        }
+
+        public static string GetSectionIconsDataPath()
+        {
+            string dir = GetAssetsDataPath();
+            string sectionIconsFolderPath = Path.Combine(dir, "SectionIcons");
+
+            if (!Directory.Exists(sectionIconsFolderPath))
+            {
+                Directory.CreateDirectory(sectionIconsFolderPath);
+            }
+
+            return sectionIconsFolderPath;
+        }
+
         public static string GetThemesDataPath()
         {
-            string themesFolderPath = Path.Combine(GetDatabaseDir(), "user_assets");
+            string themesFolderPath = Path.Combine(GetDatabaseDir(), "CustomThemes");
 
             if (!Directory.Exists(themesFolderPath))
             {
@@ -72,6 +124,38 @@ namespace zennplay_launcher.Services
             }
 
             return themesFolderPath;
+        }
+
+        private static bool IsTableEmpty(SqliteConnection connection, string tableName)
+        {
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = $"SELECT COUNT(*) FROM {tableName}";
+            return Convert.ToInt32(cmd.ExecuteScalar()) == 0;
+        }
+
+        public static bool IsColumnExists(string conn, string tableName, string columnName)
+        {
+            bool exists = false;
+            using (var connection = new SqliteConnection(conn))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                command.CommandText = $"PRAGMA table_info({tableName})";
+
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string currentColumnName = reader.GetString(1);
+                        if (currentColumnName.Equals(columnName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            exists = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return exists;
         }
 
         public static SqliteConnection GetOpenConnection()
@@ -97,5 +181,15 @@ namespace zennplay_launcher.Services
 
             return connection;
         }
+
+        public static void CloseAllConnections()
+        {
+            SqliteConnection.ClearAllPools();
+
+            GC.Collect();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
     }
 }

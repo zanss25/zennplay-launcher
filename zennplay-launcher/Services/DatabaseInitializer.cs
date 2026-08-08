@@ -8,6 +8,7 @@ namespace zennplay_launcher.Services
         public void Initialize()
         {
             // 1. Buat Semua Tabel Database
+            GenerateMetadataTable();
             GenerateAppsTable();
             GenerateAppLinksTable();
             GenerateAppActionsTable();
@@ -26,6 +27,19 @@ namespace zennplay_launcher.Services
         }
 
         #region DDL Table Generators
+
+        public void GenerateMetadataTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS db_metadata (
+                                        key TEXT PRIMARY KEY,
+                                        value TEXT NOT NULL
+                                        );";
+                command.ExecuteNonQuery();
+            }
+        }
 
         public void GenerateAppsTable()
         {
@@ -97,6 +111,7 @@ namespace zennplay_launcher.Services
                                             target TEXT NOT NULL,
                                             launch_options TEXT,
                                             action_icon_path TEXT,
+                                            is_game INTEGER DEFAULT 1,
                                             is_primary INTEGER DEFAULT 0
                                             );";
                 command.ExecuteNonQuery();
@@ -227,18 +242,36 @@ namespace zennplay_launcher.Services
             };
 
             using (var connection = DatabaseHelper.GetOpenConnection())
-            using (var command = connection.CreateCommand())
             {
-                // Gunakan INSERT OR IGNORE agar tidak bentrok jika genre sudah ada
-                command.CommandText = "INSERT OR IGNORE INTO genres (name) VALUES (@name);";
-                var param = command.CreateParameter();
-                param.ParameterName = "@name";
-                command.Parameters.Add(param);
-
-                foreach (var genreName in defaultGenres)
+                using (var checkCmd = connection.CreateCommand())
                 {
-                    param.Value = genreName;
-                    command.ExecuteNonQuery();
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_genres_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+
+                    // Jika penanda sudah ada, batalkan seeding! 
+                    // Meskipun tabel 'tags' sekarang kosong karena dihapus player.
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    // Gunakan INSERT OR IGNORE agar tidak bentrok jika genre sudah ada
+                    command.CommandText = "INSERT OR IGNORE INTO genres (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var genreName in defaultGenres)
+                    {
+                        param.Value = genreName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_genres_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
                 }
             }
             Console.WriteLine("Default genres seeded successfully.");
@@ -254,17 +287,36 @@ namespace zennplay_launcher.Services
             };
 
             using (var connection = DatabaseHelper.GetOpenConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = "INSERT OR IGNORE INTO tags (name) VALUES (@name);";
-                var param = command.CreateParameter();
-                param.ParameterName = "@name";
-                command.Parameters.Add(param);
-
-                foreach (var tagName in defaultTags)
+                using (var checkCmd = connection.CreateCommand())
                 {
-                    param.Value = tagName;
-                    command.ExecuteNonQuery();
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_tags_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+
+                    // Jika penanda sudah ada, batalkan seeding! 
+                    // Meskipun tabel 'tags' sekarang kosong karena dihapus player.
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    // Gunakan INSERT OR IGNORE agar tidak bentrok jika genre sudah ada
+                    command.CommandText = "INSERT OR IGNORE INTO tags (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var tagName in defaultTags)
+                    {
+                        param.Value = tagName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_tags_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
                 }
             }
             Console.WriteLine("Default tags seeded successfully.");
@@ -272,38 +324,56 @@ namespace zennplay_launcher.Services
 
         private void SeedDefaultSections()
         {
-            // Menyiapkan 3 Section Bawaan ZennPlay
-            var defaultSections = new[]
-            {
-                new { Name = "Games", Desc = "Main game collection", Icon = "gamepad", IsGame = 1, IsExcluded = 0 },
-                new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", Icon = "wrench", IsGame = 0, IsExcluded = 0 },
-                new { Name = "Emulators", Desc = "Console and handheld emulators", Icon = "cpu", IsGame = 1, IsExcluded = 0 }
-            };
-
             using (var connection = DatabaseHelper.GetOpenConnection())
-            using (var command = connection.CreateCommand())
             {
-                command.CommandText = @"INSERT OR IGNORE INTO sections (name, desc, icon, is_game_by_default, is_excluded_by_default) 
-                                        VALUES (@name, @desc, @icon, @isGame, @isExcluded);";
-
-                var nameParam = command.Parameters.Add("@name", SqliteType.Text);
-                var descParam = command.Parameters.Add("@desc", SqliteType.Text);
-                var iconParam = command.Parameters.Add("@icon", SqliteType.Text);
-                var isGameParam = command.Parameters.Add("@isGame", SqliteType.Integer);
-                var isExcludedParam = command.Parameters.Add("@isExcluded", SqliteType.Integer);
-
-                foreach (var sec in defaultSections)
+                // 1. Cek apakah seeding section v1 sudah pernah dijalankan sebelumnya
+                using (var checkCmd = connection.CreateCommand())
                 {
-                    nameParam.Value = sec.Name;
-                    descParam.Value = sec.Desc;
-                    iconParam.Value = sec.Icon;
-                    isGameParam.Value = sec.IsGame;
-                    isExcludedParam.Value = sec.IsExcluded;
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_sections_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
 
-                    command.ExecuteNonQuery();
+                    // JIKA SUDAH PERNAH DI-SEED, LANGSUNG HENTIKAN (Meskipun dipanggil 100x oleh UI)
+                    if (count > 0) return;
+                }
+
+                // 2. Eksekusi Insert Section Bawaan jika DB benar-benar baru
+                var defaultSections = new[]
+                {
+                    new { Name = "Games", Desc = "Main game collection", Icon = "gamepad", IsGame = 1, IsExcluded = 0 },
+                    new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", Icon = "wrench", IsGame = 0, IsExcluded = 1 },
+                    new { Name = "Emulators", Desc = "Console and handheld emulators", Icon = "cpu", IsGame = 0, IsExcluded = 1 }
+        };
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = @"INSERT OR IGNORE INTO sections (name, desc, icon, is_game_by_default, is_excluded_by_default) 
+                                    VALUES (@name, @desc, @icon, @isGame, @isExcluded);";
+
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
+                    var descParam = command.Parameters.Add("@desc", SqliteType.Text);
+                    var iconParam = command.Parameters.Add("@icon", SqliteType.Text);
+                    var isGameParam = command.Parameters.Add("@isGame", SqliteType.Integer);
+                    var isExcludedParam = command.Parameters.Add("@isExcluded", SqliteType.Integer);
+
+                    foreach (var sec in defaultSections)
+                    {
+                        nameParam.Value = sec.Name;
+                        descParam.Value = sec.Desc;
+                        iconParam.Value = sec.Icon;
+                        isGameParam.Value = sec.IsGame;
+                        isExcludedParam.Value = sec.IsExcluded;
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                // 3. Catat di db_metadata bahwa seeding selesai
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_sections_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
                 }
             }
-            Console.WriteLine("Default sections seeded successfully.");
         }
 
         #endregion
