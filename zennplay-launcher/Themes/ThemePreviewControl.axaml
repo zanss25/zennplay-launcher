@@ -6,204 +6,247 @@
              x:Class="zennplay_launcher.Themes.ThemePreviewControl"
              Background="{DynamicResource BackgroundBrush}">
   
-    <ScrollViewer Padding="20" Background="{DynamicResource WindowBackgroundBrush}">
-    <StackPanel Spacing="25" MaxWidth="750" HorizontalAlignment="Center">
+
+    <Border HorizontalAlignment="Stretch" 
+            VerticalAlignment="Stretch" 
+            Background="{DynamicResource WindowBackgroundBrush}"
+            IsVisible="False">
+
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="ZENN"
+                       Grid.Column="0"
+                       Grid.Row="0"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Classes="LogoText"
+                       FontSize="24">
+
+            </TextBlock>
+
+            <TextBlock Text="A really good game launcher"
+                       Grid.Column="1"
+                       Grid.Row="0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       Margin="12,6,0,0"
+                       Foreground="{DynamicResource TextWindowBrighterBrush}"
+                       FontFamily="{DynamicResource FontCommon}"
+                       FontWeight="Regular"
+                       FontSize="14">
+
+            </TextBlock>
+
+            <Grid Grid.ColumnSpan="2" Grid.Row="1">
+                <ScrollViewer Padding="20" Background="{DynamicResource WindowBackgroundBrush}">
+                    <StackPanel Spacing="25" MaxWidth="750" HorizontalAlignment="Center">
         
-        <StackPanel Spacing="5">
-            <TextBlock Text="🎨 Theme &amp; Style Previewer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-            <TextBlock Text="Kumpulan komponen UI dasar untuk menguji skema warna dan gaya tema ZennPlay." FontSize="13" Foreground="{DynamicResource TextWindowBrush}"/>
-        </StackPanel>
-
-        <Border Background="{DynamicResource BarBackgroundBrush}" 
-                BorderBrush="{DynamicResource BarBorderBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                Padding="15">
-            <StackPanel Spacing="12">
-                <TextBlock Text="1. Buttons &amp; Clickables" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                <Separator Background="{DynamicResource BorderCommonBrush}"/>
-                
-                <WrapPanel ItemWidth="160" ItemHeight="45">
-                    <Button Content="Primary / Play" 
-                            Classes="ButtonPrimary"
-                            CornerRadius="6" 
-                            Margin="4"/>
-
-                    <Button Content="Secondary Button" 
-                            Background="{DynamicResource BtnSecondaryBrush}" 
-                            BorderBrush="{DynamicResource BtnSecondaryBorderHoverBrush}"
-                            BorderThickness="1"
-                            Foreground="{DynamicResource TextCommonBrighterBrush}" 
-                            CornerRadius="6" 
-                            Margin="4"/>
-
-                    <Button Content="Common Button" 
-                            Background="{DynamicResource BtnCommonBrush}" 
-                            BorderBrush="{DynamicResource BtnCommonBorderHoverBrush}"
-                            BorderThickness="1"
-                            Foreground="{DynamicResource TextCommonBrush}" 
-                            CornerRadius="6" 
-                            Margin="4"/>
-
-                    <Button Content="Control Button" 
-                            Background="{DynamicResource BtnTertiaryBrush}" 
-                            Foreground="{DynamicResource TextCommonBrush}" 
-                            CornerRadius="6" 
-                            Margin="4"/>
-
-                    <Button Content="Disabled" 
-                            IsEnabled="False" 
-                            Background="{DynamicResource BtnDisabledBrush}" 
-                            Foreground="{DynamicResource TextCommonDisabledBrush}" 
-                            CornerRadius="6" 
-                            Margin="4"/>
-                </WrapPanel>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource BarBackgroundBrush}" 
-                BorderBrush="{DynamicResource BarBorderBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                Padding="15">
-            <StackPanel Spacing="12">
-                <TextBlock Text="2. Input &amp; Selection Controls" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                <Separator Background="{DynamicResource BorderCommonBrush}"/>
-
-                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
-                    
-                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="5">
-                        <TextBlock Text="Text Field" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
-                        <TextBox PlaceholderText="Ketik sesuatu di sini..." 
-                                 Background="{DynamicResource TextBoxBackgroundBrush}" 
-                                 BorderBrush="{DynamicResource TextBoxBorderBrush}" 
-                                 Foreground="{DynamicResource TextCommonBrighterBrush}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="5">
-                        <TextBlock Text="Search Field" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
-                        <TextBox PlaceholderText="🔍 Cari game..." 
-                                 Background="{DynamicResource TextBoxBackgroundBrush}" 
-                                 BorderBrush="{DynamicResource TextBoxBorderActiveBrush}" 
-                                 Foreground="{DynamicResource TextCommonBrighterBrush}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="5">
-                        <TextBlock Text="Dropdown / ComboBox" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
-                        <ComboBox SelectedIndex="0" 
-                                  HorizontalAlignment="Stretch"
-                                  Background="{DynamicResource ComboBoxCommonBrush}"
-                                  BorderBrush="{DynamicResource ComboBoxCommonBorderBrush}"
-                                  Foreground="{DynamicResource TextCommonBrighterBrush}">
-                            <ComboBoxItem Content="Urutkan: Nama (A-Z)"/>
-                            <ComboBoxItem Content="Urutkan: Terakhir Dimainkan"/>
-                            <ComboBoxItem Content="Urutkan: Rating User"/>
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8" VerticalAlignment="Center">
-                        <CheckBox Content="Opsi Checkbox (Active)" 
-                                  IsChecked="True" 
-                                  Foreground="{DynamicResource TextCommonBrighterBrush}"/>
-                        <ToggleSwitch Content="Fitur Mod Auto-Sync" 
-                                      IsChecked="True" 
-                                      Foreground="{DynamicResource TextCommonBrighterBrush}"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="5">
-                        <TextBlock Text="Slider (Volume / Scale)" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
-                        <Slider Value="70" Maximum="100"/>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource BarBackgroundBrush}" 
-                BorderBrush="{DynamicResource BarBorderBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                Padding="15">
-            <StackPanel Spacing="12">
-                <TextBlock Text="3. Tags &amp; Genre Badges" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                <Separator Background="{DynamicResource BorderCommonBrush}"/>
-
-                <WrapPanel Margin="0,5">
-                    <Border Background="{DynamicResource BtnPrimaryBorderHoverBrush}" CornerRadius="12" Padding="10,4" Margin="3">
-                        <TextBlock Text="RPG" FontSize="11" Foreground="{DynamicResource TextCommonActiveBrighterBrush}" FontWeight="Bold"/>
-                    </Border>
-                    
-                    <Border Background="{DynamicResource BtnPrimaryBorderHoverBrush}" CornerRadius="12" Padding="10,4" Margin="3">
-                        <TextBlock Text="Open World" FontSize="11" Foreground="{DynamicResource TextCommonActiveBrighterBrush}" FontWeight="Bold"/>
-                    </Border>
-
-                    <Border Background="{DynamicResource BtnSecondaryBrush}" BorderBrush="{DynamicResource IconAndAvatarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="3">
-                        <TextBlock Text="#MustPlay" FontSize="11" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                    </Border>
-                    
-                    <Border Background="{DynamicResource BtnSecondaryBrush}" BorderBrush="{DynamicResource IconAndAvatarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="3">
-                        <TextBlock Text="#HeavyModded" FontSize="11" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                    </Border>
-                </WrapPanel>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource BarBackgroundBrush}" 
-                BorderBrush="{DynamicResource BarBorderBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                Padding="15">
-            <StackPanel Spacing="12">
-                <TextBlock Text="4. Progress &amp; Indicators" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                <Separator Background="{DynamicResource BorderCommonBrush}"/>
-
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Proses Download Game (65%)" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
-                    <ProgressBar Value="65" Maximum="100" Height="8" CornerRadius="4" Foreground="{DynamicResource SelectionRectBorderBrush}"/>
-                    <ProgressBar IsIndeterminate="True" Height="4" CornerRadius="2" Foreground="{DynamicResource SelectionRectBorderBrush}"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-
-        <Border Background="{DynamicResource BarBackgroundBrush}" 
-                BorderBrush="{DynamicResource BarBorderBrush}" 
-                BorderThickness="1" 
-                CornerRadius="10" 
-                Padding="15">
-            <StackPanel Spacing="12">
-                <TextBlock Text="5. Component Preview (Mini Game Card)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
-                <Separator Background="{DynamicResource BorderCommonBrush}"/>
-
-                <Border Width="220" 
-                        Height="290" 
-                        Background="{DynamicResource CoverGridBrush}" 
-                        BorderBrush="{DynamicResource IconAndAvatarBorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="12" 
-                        HorizontalAlignment="Left" 
-                        ClipToBounds="True">
-                    <Grid RowDefinitions="*,Auto">
-                        <Rectangle Grid.Row="0" Fill="{DynamicResource TextBoxBackgroundBrush}" Opacity="0.6"/>
-                        <TextBlock Grid.Row="0" Text="COVER IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextWindowBrush}" FontSize="12" FontWeight="Bold"/>
-                        
-                        <StackPanel Grid.Row="1" Spacing="6" Background="{DynamicResource MainWindowBackgroundBrushC}">
-                            <TextBlock Text="Cyberpunk 2077" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextCommonBrighterBrush}"/>
-                            <TextBlock Text="Playtime: 42 Hours" FontSize="11" Foreground="{DynamicResource TextWindowBrush}"/>
-                            
-                            <Button Content="▶ PLAY" 
-                                    Background="{DynamicResource BtnPrimaryBorderHoverBrush}" 
-                                    Foreground="{DynamicResource TextCommonActiveBrighterBrush}"
-                                    FontWeight="Bold"
-                                    CornerRadius="6"
-                                    HorizontalAlignment="Stretch" 
-                                    HorizontalContentAlignment="Center" 
-                                    Margin="0,4,0,0"/>
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="🎨 Theme &amp; Style Previewer" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                            <TextBlock Text="Kumpulan komponen UI dasar untuk menguji skema warna dan gaya tema ZennPlay." FontSize="13" Foreground="{DynamicResource TextWindowBrush}"/>
                         </StackPanel>
-                    </Grid>
-                </Border>
-            </StackPanel>
-        </Border>
 
-    </StackPanel>
-</ScrollViewer>
+                        <Border Background="{DynamicResource BarBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BarBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="10" 
+                                Padding="15">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="1. Buttons &amp; Clickables" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                <Separator Background="{DynamicResource BorderCommonBrush}"/>
+                
+                                <WrapPanel ItemWidth="160" ItemHeight="45">
+                                    <Button Content="Primary Button" 
+                                            Classes="ButtonPrimary"
+                                            Margin="4"/>
+
+                                    <Button Content="Secondary Button" 
+                                            Background="{DynamicResource BtnSecondaryBrush}" 
+                                            BorderBrush="{DynamicResource BtnSecondaryBorderHoverBrush}"
+                                            BorderThickness="1"
+                                            Foreground="{DynamicResource TextCommonBrighterBrush}" 
+                                            Margin="4"/>
+
+                                    <Button Content="Common Button" 
+                                            Background="{DynamicResource BtnCommonBrush}" 
+                                            BorderBrush="{DynamicResource BtnCommonBorderHoverBrush}"
+                                            BorderThickness="1"
+                                            Foreground="{DynamicResource TextCommonBrush}" 
+                                            Margin="4"/>
+
+                                    <Button Content="Control Button" 
+                                            Background="{DynamicResource BtnTertiaryBrush}" 
+                                            Foreground="{DynamicResource TextCommonBrush}" 
+                                            Margin="4"/>
+
+                                    <Button Content="Disabled" 
+                                            IsEnabled="False" 
+                                            Background="{DynamicResource BtnDisabledBrush}" 
+                                            Foreground="{DynamicResource TextCommonDisabledBrush}" 
+                                            Margin="4"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BarBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BarBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="10" 
+                                Padding="15">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="2. Input &amp; Selection Controls" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                <Separator Background="{DynamicResource BorderCommonBrush}"/>
+
+                                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" RowSpacing="12" ColumnSpacing="12">
+                    
+                                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="5">
+                                        <TextBlock Text="Text Field" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
+                                        <TextBox PlaceholderText="Ketik sesuatu di sini..." 
+                                                 Background="{DynamicResource TextBoxBackgroundBrush}" 
+                                                 BorderBrush="{DynamicResource TextBoxBorderBrush}" 
+                                                 Foreground="{DynamicResource TextCommonBrighterBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="5">
+                                        <TextBlock Text="Search Field" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
+                                        <TextBox PlaceholderText="🔍 Cari game..." 
+                                                 Background="{DynamicResource TextBoxBackgroundBrush}" 
+                                                 BorderBrush="{DynamicResource TextBoxBorderActiveBrush}" 
+                                                 Foreground="{DynamicResource TextCommonBrighterBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="5">
+                                        <TextBlock Text="Dropdown / ComboBox" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
+                                        <ComboBox SelectedIndex="0" 
+                                                  HorizontalAlignment="Stretch"
+                                                  Background="{DynamicResource ComboBoxCommonBrush}"
+                                                  BorderBrush="{DynamicResource ComboBoxCommonBorderBrush}"
+                                                  Foreground="{DynamicResource TextCommonBrighterBrush}">
+                                            <ComboBoxItem Content="Urutkan: Nama (A-Z)"/>
+                                            <ComboBoxItem Content="Urutkan: Terakhir Dimainkan"/>
+                                            <ComboBoxItem Content="Urutkan: Rating User"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="1" Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                                        <CheckBox Content="Opsi Checkbox (Active)" 
+                                                  IsChecked="True" 
+                                                  Foreground="{DynamicResource TextCommonBrighterBrush}"/>
+                                        <ToggleSwitch Content="Fitur Mod Auto-Sync" 
+                                                      IsChecked="True" 
+                                                      Foreground="{DynamicResource TextCommonBrighterBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="5">
+                                        <TextBlock Text="Slider (Volume / Scale)" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
+                                        <Slider Value="70" Maximum="100"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BarBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BarBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="10" 
+                                Padding="15">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="3. Tags &amp; Genre Badges" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                <Separator Background="{DynamicResource BorderCommonBrush}"/>
+
+                                <WrapPanel Margin="0,5">
+                                    <Border Background="{DynamicResource BtnPrimaryBorderHoverBrush}" CornerRadius="12" Padding="10,4" Margin="3">
+                                        <TextBlock Text="RPG" FontSize="11" Foreground="{DynamicResource TextCommonActiveBrighterBrush}" FontWeight="Bold"/>
+                                    </Border>
+                    
+                                    <Border Background="{DynamicResource BtnPrimaryBorderHoverBrush}" CornerRadius="12" Padding="10,4" Margin="3">
+                                        <TextBlock Text="Open World" FontSize="11" Foreground="{DynamicResource TextCommonActiveBrighterBrush}" FontWeight="Bold"/>
+                                    </Border>
+
+                                    <Border Background="{DynamicResource BtnSecondaryBrush}" BorderBrush="{DynamicResource IconAndAvatarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="3">
+                                        <TextBlock Text="#MustPlay" FontSize="11" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                    </Border>
+                    
+                                    <Border Background="{DynamicResource BtnSecondaryBrush}" BorderBrush="{DynamicResource IconAndAvatarBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="10,4" Margin="3">
+                                        <TextBlock Text="#HeavyModded" FontSize="11" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                    </Border>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BarBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BarBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="10" 
+                                Padding="15">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="4. Progress &amp; Indicators" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                <Separator Background="{DynamicResource BorderCommonBrush}"/>
+
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="Proses Download Game (65%)" FontSize="12" Foreground="{DynamicResource TextWindowBrush}"/>
+                                    <ProgressBar Value="65" Maximum="100" Height="8" CornerRadius="4" Foreground="{DynamicResource SelectionRectBorderBrush}"/>
+                                    <ProgressBar IsIndeterminate="True" Height="4" CornerRadius="2" Foreground="{DynamicResource SelectionRectBorderBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Background="{DynamicResource BarBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BarBorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="10" 
+                                Padding="15">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="5. Component Preview (Mini Game Card)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource TextWindowBrighterBrush}"/>
+                                <Separator Background="{DynamicResource BorderCommonBrush}"/>
+
+                                <Border Width="220" 
+                                        Height="290" 
+                                        Background="{DynamicResource CoverGridBrush}" 
+                                        BorderBrush="{DynamicResource IconAndAvatarBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="12" 
+                                        HorizontalAlignment="Left" 
+                                        ClipToBounds="True">
+                                    <Grid RowDefinitions="*,Auto">
+                                        <Rectangle Grid.Row="0" Fill="{DynamicResource TextBoxBackgroundBrush}" Opacity="0.6"/>
+                                        <TextBlock Grid.Row="0" Text="COVER IMAGE" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TextWindowBrush}" FontSize="12" FontWeight="Bold"/>
+                        
+                                        <StackPanel Grid.Row="1" Spacing="6" Background="{DynamicResource MainWindowBackgroundBrushC}">
+                                            <TextBlock Text="Cyberpunk 2077" FontWeight="Bold" FontSize="14" Foreground="{DynamicResource TextCommonBrighterBrush}"/>
+                                            <TextBlock Text="Playtime: 42 Hours" FontSize="11" Foreground="{DynamicResource TextWindowBrush}"/>
+                            
+                                            <Button Content="▶ PLAY" 
+                                                    Background="{DynamicResource BtnPrimaryBorderHoverBrush}" 
+                                                    Foreground="{DynamicResource TextCommonActiveBrighterBrush}"
+                                                    FontWeight="Bold"
+                                                    CornerRadius="6"
+                                                    HorizontalAlignment="Stretch" 
+                                                    HorizontalContentAlignment="Center" 
+                                                    Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+        </Grid>
+
+    </Border>
+
+
 
 </UserControl>

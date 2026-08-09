@@ -3,8 +3,8 @@
 
     <FontFamily x:Key="FontLogo">Segoe UI</FontFamily>
     <FontFamily x:Key="FontTitle">Segoe UI</FontFamily>
-    <FontFamily x:Key="FontPrimary">./Assets/Fonts/#Rajdhani</FontFamily>
-    <FontFamily x:Key="FontSidebar">./Assets/Fonts/#Rajdhani</FontFamily>
+    <FontFamily x:Key="FontPrimary">Segoe UI</FontFamily>
+    <FontFamily x:Key="FontSidebar">Segoe UI</FontFamily>
     <FontFamily x:Key="FontCommon">Segoe UI</FontFamily>
 
 </ResourceDictionary>

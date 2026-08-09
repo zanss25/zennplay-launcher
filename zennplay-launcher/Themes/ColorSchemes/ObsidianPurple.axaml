@@ -10,23 +10,25 @@
     <Color x:Key="TitleColor">#9A8FB9</Color>
     <Color x:Key="BorderColorA">#FF2A243B</Color>
     <Color x:Key="BorderColorB">#FF2E2741</Color>
-    <Color x:Key="TitleBackgroundA">#FF2D223E</Color>
-    <Color x:Key="TitleBackgroundB">#FF312544</Color>
+    <Color x:Key="TitleBackgroundA">#2D223E</Color>
+    <Color x:Key="TitleBackgroundB">#312544</Color>
 
     <!-- Backgrounds -->
     <Color x:Key="WindowBackground">#151124</Color>
-    <Color x:Key="MainWindowBackgroundA">#FF221A2D</Color>
-    <Color x:Key="MainWindowBackgroundB">#FF251A39</Color>
+    <Color x:Key="MainWindowBackgroundA">#2B2146</Color>
+    <Color x:Key="MainWindowBackgroundB">#0E0B19</Color>
     <Color x:Key="MainWindowBackgroundC">#F22B1E45</Color>
+    <Color x:Key="SidebarBackground">#20000000</Color>
     
     <!-- GameView/ToolView Bars -->
-    <Color x:Key="BarBackGradient">#FF362B49</Color>
+    <Color x:Key="BarBackGradientA">#241C3A</Color>
+    <Color x:Key="BarBackGradientB">#001F1B2C</Color>
     <Color x:Key="BarBackground">#CF372D51</Color>
     <Color x:Key="BarBorder">#CC574D71</Color>
 
     <!-- Texts -->
-    <Color x:Key="TextColorCommon">#CCF5F5F5</Color>
-    <Color x:Key="TextColorCommonBrighter">#EEF5F5F5</Color>
+    <Color x:Key="TextColorCommon">#DDF5F5F5</Color>
+    <Color x:Key="TextColorCommonBrighter">#FFF5F5F5</Color>
     <Color x:Key="TextColorCommonActive">#FFF5F5F5</Color>
     <Color x:Key="TextColorCommonActiveBrighter">#FFFFFFFF</Color>
     <Color x:Key="TextColorPressed">#AAF5F5F5</Color>
@@ -193,12 +195,13 @@
     <!-- Background Brushes -->
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{DynamicResource WindowBackground}"/>
 
-    <LinearGradientBrush x:Key="MainWindowBackgroundBrushA" StartPoint="0.5,0" EndPoint="0.5,1">
+    <LinearGradientBrush x:Key="MainWindowBackgroundBrush" StartPoint="0.5,0" EndPoint="0.5,1">
         <GradientStop Color="{DynamicResource WindowBackgroundA}" Offset="0"/>
         <GradientStop Color="{DynamicResource WindowBackgroundB}" Offset="1"/>
     </LinearGradientBrush>
 
     <SolidColorBrush x:Key="MainWindowBackgroundBrushC" Color="{DynamicResource MainWindowBackgroundC}"/>
+    <SolidColorBrush x:Key="SidebarBacgkroundBrush" Color="{DynamicResource SidebarBacgkround}"/>
 
     <!-- GameView/ToolView Bar Brushes-->
     <SolidColorBrush x:Key="BarBackgroundBrush" Color="{DynamicResource BarBackground}"/>

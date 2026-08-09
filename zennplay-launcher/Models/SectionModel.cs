@@ -12,6 +12,7 @@ namespace zennplay_launcher.Models
         public string Name { get; set; } = string.Empty;
         public string? Desc { get; set; }
         public string? Icon { get; set; }
+        public string? AppType { get; set; }
         public bool IsGameByDefault { get; set; } = true;
         public bool IsExcludedByDefault { get; set; } = false;
         public string? CreatedAt { get; set; }

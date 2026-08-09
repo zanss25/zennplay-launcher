@@ -204,6 +204,7 @@ namespace zennplay_launcher.Services
                                             name TEXT NOT NULL UNIQUE,
                                             desc TEXT,
                                             icon TEXT,
+                                            app_type TEXT,
                                             is_game_by_default INTEGER DEFAULT 1,
                                             is_excluded_by_default INTEGER DEFAULT 0,
                                             created_at TEXT DEFAULT (datetime('now', 'localtime'))
@@ -339,27 +340,29 @@ namespace zennplay_launcher.Services
                 // 2. Eksekusi Insert Section Bawaan jika DB benar-benar baru
                 var defaultSections = new[]
                 {
-                    new { Name = "Games", Desc = "Main game collection", Icon = "gamepad", IsGame = 1, IsExcluded = 0 },
-                    new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", Icon = "wrench", IsGame = 0, IsExcluded = 1 },
-                    new { Name = "Emulators", Desc = "Console and handheld emulators", Icon = "cpu", IsGame = 0, IsExcluded = 1 }
+                    new { Name = "Games", Desc = "Main game collection", Icon = "gamepad", AppType="Game", IsGame = 1, IsExcluded = 0 },
+                    new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", Icon = "wrench", AppType="Tool", IsGame = 0, IsExcluded = 1 },
+                    new { Name = "Emulators", Desc = "Console and handheld emulators", Icon = "cpu", AppType = "Emulator", IsGame = 0, IsExcluded = 1 }
         };
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"INSERT OR IGNORE INTO sections (name, desc, icon, is_game_by_default, is_excluded_by_default) 
-                                    VALUES (@name, @desc, @icon, @isGame, @isExcluded);";
+                    command.CommandText = @"INSERT OR IGNORE INTO sections (name, desc, icon, app_type, is_game_by_default, is_excluded_by_default) 
+                                    VALUES (@name, @desc, @icon, @appType, @isGameByDefault, @isExcludedByDefault);";
 
                     var nameParam = command.Parameters.Add("@name", SqliteType.Text);
                     var descParam = command.Parameters.Add("@desc", SqliteType.Text);
                     var iconParam = command.Parameters.Add("@icon", SqliteType.Text);
-                    var isGameParam = command.Parameters.Add("@isGame", SqliteType.Integer);
-                    var isExcludedParam = command.Parameters.Add("@isExcluded", SqliteType.Integer);
+                    var appTypeParam = command.Parameters.Add("@appType", SqliteType.Text);
+                    var isGameParam = command.Parameters.Add("@isGameByDefault", SqliteType.Integer);
+                    var isExcludedParam = command.Parameters.Add("@isExcludedByDefault", SqliteType.Integer);
 
                     foreach (var sec in defaultSections)
                     {
                         nameParam.Value = sec.Name;
                         descParam.Value = sec.Desc;
                         iconParam.Value = sec.Icon;
+                        appTypeParam.Value = sec.AppType;
                         isGameParam.Value = sec.IsGame;
                         isExcludedParam.Value = sec.IsExcluded;
 

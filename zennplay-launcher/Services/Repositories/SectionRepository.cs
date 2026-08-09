@@ -92,8 +92,8 @@ namespace zennplay_launcher.Services.Repositories
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                string sql = @"INSERT INTO sections (name, desc, icon, is_game_by_default, is_excluded_by_default)
-                               VALUES (@Name, @Desc, @Icon, @IsGameByDefault, @IsExcludedByDefault);
+                string sql = @"INSERT INTO sections (name, desc, icon, app_type, is_game_by_default, is_excluded_by_default)
+                               VALUES (@Name, @Desc, @Icon, @AppType, @IsGameByDefault, @IsExcludedByDefault);
                                SELECT last_insert_rowid();";
 
                 return conn.ExecuteScalar<int>(sql, section);
@@ -111,6 +111,7 @@ namespace zennplay_launcher.Services.Repositories
                                name = @Name,
                                desc = @Desc,
                                icon = @Icon,
+                               app_type = @AppType,
                                is_game_by_default = @IsGameByDefault,
                                is_excluded_by_default = @IsExcludedByDefault
                                WHERE id = @Id;";

@@ -1,6 +1,15 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+     <Style Selector="WindowDrawnDecorations /template/ Panel#PART_TitleTextPanel > TextBlock">
+        <Setter Property="IsVisible" Value="False" />
+      </Style>
+
+      <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton">
+        <Setter Property="IsVisible" Value="False" />
+        <Setter Property="Width" Value="0" />
+      </Style>
+
     <!-- ZENN Logo Text -->
     <Style Selector="TextBlock.LogoText">
         <Setter Property="FontFamily" Value="{DynamicResource FontLogo}"/>
@@ -35,13 +44,13 @@
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="Padding" Value="0"/>
         
-        <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnControlHoverBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderHoverBrush}"/>
         </Style>
 
-        <Style Selector="^:pressed /template/ ContentPresenter">
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnControlPressedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderPressedBrush}"/>
@@ -83,56 +92,49 @@
     <!-- Button Primary -->
     <Style Selector="Button.ButtonPrimary">
 
-        <Setter Property="Background">
-            <Setter.Value>
-                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-                    <GradientStop Color="{DynamicResource BtnPrimaryA}" Offset="0"/>
-                    <GradientStop Color="{DynamicResource BtnPrimaryB}" Offset="1"/>
-                </LinearGradientBrush>
-            </Setter.Value>
-        </Setter>
+        <Style.Resources>
+            <LinearGradientBrush x:Key="PrimaryGradNormal" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Color="{DynamicResource BtnPrimaryA}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BtnPrimaryB}" Offset="1"/>
+            </LinearGradientBrush>
 
+            <LinearGradientBrush x:Key="PrimaryGradHover" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Color="{DynamicResource BtnPrimaryHoverA}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BtnPrimaryHoverB}" Offset="1"/>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="PrimaryGradPressed" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Color="{DynamicResource BtnPrimaryPressedA}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BtnPrimaryPressedB}" Offset="1"/>
+            </LinearGradientBrush>
+        </Style.Resources>
+
+        <Setter Property="Background" Value="{StaticResource PrimaryGradNormal}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBorderBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Padding" Value="15,8"/>
         <Setter Property="MinWidth" Value="125"/>
-        <Setter Property="Margin" Value="0,5"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Bottom"/>
 
-        <Style Selector="^:pointerover /template/ ContentPresenter">            
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-                        <GradientStop Color="{DynamicResource BtnPrimaryHoverA}" Offset="0"/>
-                        <GradientStop Color="{DynamicResource BtnPrimaryHoverB}" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PrimaryGradHover}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBorderHoverBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <Style Selector="^:pressed /template/ ContentPresenter">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
-                        <GradientStop Color="{DynamicResource BtnPrimaryPressedA}" Offset="0"/>
-                        <GradientStop Color="{DynamicResource BtnPrimaryPressedB}" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PrimaryGradPressed}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBorderPressedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonPressedBrush}"/>
         </Style>
 
-        <Style Selector="^:disabled /template/ ContentPresenter">
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnDisabledBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnDisabledBorderBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonDisabledBrush}"/>
@@ -156,20 +158,20 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Bottom"/>
 
-        <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnSecondaryHoverBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnSecondaryBorderHoverBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <Style Selector="^:pressed /template/ ContentPresenter">
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnSecondaryPressedBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnSecondaryBorderPressedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonPressedBrush}"/>
         </Style>
 
-        <Style Selector="^:disabled /template/ ContentPresenter">
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnDisabledBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnDisabledBorderBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonDisabledBrush}"/>
@@ -191,20 +193,20 @@
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
 
-        <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnPopupHoverBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnPopupPressedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrighterBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <Style Selector="^:pressed /template/ ContentPresenter">
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnPopupPressedBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource BtnPopupBorderPressedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
         </Style>
 
-        <Style Selector="^:disabled /template/ ContentPresenter">
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="BorderBrush" Value="{DynamicResource BtnDisabledBorderBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonDisabledBrush}"/>
             <Setter Property="Opacity" Value="0.5"/>
@@ -224,16 +226,16 @@
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
 
-        <Style Selector="^:pointerover /template/ ContentPresenter">
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <Style Selector="^:pressed /template/ ContentPresenter">
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Foreground" Value="{DynamicResource TextCommonPressedBrush}"/>
         </Style>
 
-        <Style Selector="^:disabled /template/ ContentPresenter">
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Foreground" Value="{DynamicResource TextCommonDisabledBrush}"/>
             <Setter Property="Opacity" Value="0.5"/>
         </Style>
@@ -341,9 +343,12 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="20"/>
         <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Margin" Value="2,2,2,0"/>
+        <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
+
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ListBoxItemBackgroundHoverBrush}"/>
@@ -358,25 +363,33 @@
         </Style>
     </Style>
 
-    <Style Selector="ListBoxItem.ListItemPrimary">
+    <!-- List Box Primary -->
+    <Style Selector="ListBox.ListBoxPrimary">
+        <Setter Property="Background" Value="{DynamicResource ListBoxBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ListBoxBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+    <Style Selector="ListBox.ListBoxPrimary ListBoxItem">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource TextListBoxItemBrush}"/>
-        <Setter Property="FontFamily" Value="{DynamicResource FontSidebar}"/>
-        <Setter Property="FontSize" Value="17"/>
+        <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+        <Setter Property="FontWeight" Value="Regular"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="MinHeight" Value="20"/>
         <Setter Property="Padding" Value="10,8"/>
-        <Setter Property="Margin" Value="0,2,0,1"/>
-        <Setter Property="MinHeight" Value="40"/>
+        <Setter Property="Margin" Value="2,2,2,0"/>
+        <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ListBoxItemBackgroundHoverBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
         <Style Selector="^:selected /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource ListBoxItemBackgroundHoverBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource ListBoxItemBorderSelectedBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
         </Style>
     </Style>
@@ -441,12 +454,12 @@
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="BorderThickness" Value="0.7"/>
 
-        <Style Selector="^:pointerover">
+        <Style Selector="^:pointerover#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ComboBoxCommonHoverBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxCommonBorderHoverBrush}"/>
         </Style>
 
-        <Style Selector="^:dropdownopen">
+        <Style Selector="^:dropdownopen#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ComboBoxCommonActiveBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxCommonBorderActiveBrush}"/>
         </Style>

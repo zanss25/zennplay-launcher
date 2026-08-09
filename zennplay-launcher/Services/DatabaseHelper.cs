@@ -46,8 +46,14 @@ namespace zennplay_launcher.Services
 
         public static string GetConfigDataPath()
         {
-            string configDataPath = Path.Combine(GetDatabaseDir(), "config_data.db");
+            string configDataPath = Path.Combine(GetDatabaseDir(), "settings.json");
             return configDataPath;
+        }
+
+        public static string GetOverridesDataPath()
+        {
+            string overridesDataPath = Path.Combine(GetDatabaseDir(), "overrides.json");
+            return overridesDataPath;
         }
 
         public static string GetAssetsDataPath()
