@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="zennplay_launcher.Views.TextBannerView">
+  
+    <Border x:Name="TextBanner"
+                Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Height="50" MinWidth="500" Margin="0,100"
+                CornerRadius="5" BorderThickness="1">
+
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="{DynamicResource BannerBackgroundA}" Offset="0"/>
+                    <GradientStop Color="{DynamicResource BannerBackgroundA}" Offset="0.1"/>
+                    <GradientStop Color="{DynamicResource BannerBackgroundB}" Offset="0.4"/>
+                    <GradientStop Color="{DynamicResource BannerBackgroundB}" Offset="0.6"/>
+                    <GradientStop Color="{DynamicResource BannerBackgroundA}" Offset="0.9"/>
+                    <GradientStop Color="{DynamicResource BannerBackgroundA}" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="{DynamicResource BannerBorderA}" Offset="0"/>
+                    <GradientStop Color="{DynamicResource BannerBorderA}" Offset="0.1"/>
+                    <GradientStop Color="{DynamicResource BannerBorderB}" Offset="0.5"/>
+                    <GradientStop Color="{DynamicResource BannerBorderA}" Offset="0.9"/>
+                    <GradientStop Color="{DynamicResource BannerBorderA}" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+
+            <TextBlock x:Name="BannerText" Text="Put your text here" FontSize="14" FontWeight="Regular"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontFamily="{StaticResource FontCommon}" Foreground="{DynamicResource TextBannerBrush}"/>
+        </Border>
+
+</UserControl>

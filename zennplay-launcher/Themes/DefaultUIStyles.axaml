@@ -3,12 +3,26 @@
 
      <Style Selector="WindowDrawnDecorations /template/ Panel#PART_TitleTextPanel > TextBlock">
         <Setter Property="IsVisible" Value="False" />
-      </Style>
+     </Style>
 
-      <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton">
+     <Style Selector="WindowDrawnDecorations /template/ Button#PART_FullScreenButton">
         <Setter Property="IsVisible" Value="False" />
         <Setter Property="Width" Value="0" />
-      </Style>
+     </Style>
+
+    <Style Selector="WindowDrawnDecorations /template/ Panel#PART_OverlayWrapper">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    
+    <Style Selector="WindowDrawnDecorations /template/ Button#PART_CloseButton">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="WindowDrawnDecorations /template/ Button#PART_MinimizeButton">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="WindowDrawnDecorations /template/ Button#PART_MaximizeButton">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
 
     <!-- ZENN Logo Text -->
     <Style Selector="TextBlock.LogoText">
@@ -29,32 +43,11 @@
     <Style Selector="TextBlock.TitleText">
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{StaticResource TitleBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource TitleTextBrush}" />
         <Setter Property="FontFamily" Value="{StaticResource FontTitle}"/>
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="Margin" Value="0,1,0,0" />
-    </Style>
-
-    <!-- Window Control Button (Close, Minimize, Maximize) -->
-    <Style Selector="Button.ControlButton">
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
-        <Setter Property="BorderBrush" Value="Transparent"/>
-        <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="Padding" Value="0"/>
-        
-        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource BtnControlHoverBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderHoverBrush}"/>
-        </Style>
-
-        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource BtnControlPressedBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderPressedBrush}"/>
-        </Style>
     </Style>
 
     <!-- Button Common -->
@@ -151,7 +144,7 @@
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Padding" Value="15,8"/>
-        <Setter Property="MinWidth" Value="125"/>
+        <Setter Property="MinWidth" Value="100"/>
         <Setter Property="Margin" Value="0,5"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
@@ -238,6 +231,35 @@
         <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Foreground" Value="{DynamicResource TextCommonDisabledBrush}"/>
             <Setter Property="Opacity" Value="0.5"/>
+        </Style>
+    </Style>
+
+    <!-- Window Control Button (Close, Minimize, Maximize) -->
+    <Style Selector="Button.ControlButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="MinHeight" Value="30"/>
+        <Setter Property="MinWidth" Value="35"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BtnControlHoverBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderHoverBrush}"/>
+        </Style>
+
+        <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource BtnControlPressedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource BtnControlBorderPressedBrush}"/>
         </Style>
     </Style>
 

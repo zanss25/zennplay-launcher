@@ -144,7 +144,7 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Query filter lanjutan berdasarkan pencarian, favorit, atau section tertentu.
         /// </summary>
-        public IEnumerable<AppModel> GetAppsFiltered(string? searchQuery = null, int? sectionId = null, bool? onlyFavorites = null)
+        public IEnumerable<AppModel> GetAppsFiltered(int? sectionId = null, string ? searchQuery = null, bool? onlyFavorites = null)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {

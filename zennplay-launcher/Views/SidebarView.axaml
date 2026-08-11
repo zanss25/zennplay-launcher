@@ -1,0 +1,82 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:zennplay_launcher.ViewModels"
+             xmlns:models="using:zennplay_launcher.Models"
+             mc:Ignorable="d"
+             x:Class="zennplay_launcher.Views.SidebarView"
+             x:DataType="vm:MainViewModel"> 
+    
+    <Border Width="220"
+            Background="#20000000"
+            BorderBrush="{DynamicResource BorderCommonBrush}"
+            BorderThickness="0,0,1,0">
+        
+        <Grid RowDefinitions="Auto, *, Auto" Margin="16">
+            
+            <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="10,0,0,20">
+                <TextBlock Text="ZENN" 
+                           Grid.Column="0" 
+                           Classes="LogoText" 
+                           FontSize="22" 
+                           FontWeight="Bold" 
+                           VerticalAlignment="Center"/>
+                
+                <Button Grid.Column="1" 
+                        Content="☰" 
+                        Classes="ControlButton" 
+                        FontSize="16" 
+                        Background="Transparent"/>
+            </Grid>
+
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Spacing="15">
+                    
+                    <ListBox x:Name="SidebarSections"
+                             Classes="ListBoxPrimary"
+                             ItemsSource="{Binding Sections}"
+                             SelectedItem="{Binding SelectedSection}"
+                             Background="Transparent" 
+                             BorderBrush="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="models:SectionModel"> 
+                                <StackPanel Orientation="Horizontal" Spacing="10"> 
+                                    <TextBlock Text="{Binding Name}"/> 
+                                </StackPanel>  
+                            </DataTemplate> 
+                        </ListBox.ItemTemplate> 
+                    </ListBox>
+
+                    <Separator Background="{DynamicResource BorderCommonBrush}" Margin="4,0"/>
+
+                    <ListBox x:Name="SidebarTabs"
+                             Classes="ListBoxPrimary"
+                             ItemsSource="{Binding SidebarTabs}"
+                             SelectedItem="{Binding SelectedSidebarTab}"
+                             Background="Transparent" 
+                             BorderBrush="Transparent">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="models:SidebarTabModel"> 
+                                <StackPanel Orientation="Horizontal" Spacing="10"> 
+                                    <TextBlock Text="{Binding Name}"/> 
+                                </StackPanel>  
+                            </DataTemplate> 
+                        </ListBox.ItemTemplate> 
+                    </ListBox>
+
+                </StackPanel>
+            </ScrollViewer>
+
+            <Button x:Name="SettingsBtn"
+                    Grid.Row="2"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    FontSize="13"
+                    Content="Settings"
+                    Padding="10,8"
+                    Click="SettingsBtn_Click"/>
+
+        </Grid>
+    </Border>
+</UserControl>

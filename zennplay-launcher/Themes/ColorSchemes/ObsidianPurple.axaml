@@ -7,11 +7,12 @@
     <!-- Title Bar -->
     <Color x:Key="LogoColorA">#8074A0</Color>
     <Color x:Key="LogoColorB">#A18DD2</Color>
-    <Color x:Key="TitleColor">#9A8FB9</Color>
+    <Color x:Key="TitleTextColor">#9A8FB9</Color>
     <Color x:Key="BorderColorA">#FF2A243B</Color>
     <Color x:Key="BorderColorB">#FF2E2741</Color>
     <Color x:Key="TitleBackgroundA">#2D223E</Color>
     <Color x:Key="TitleBackgroundB">#312544</Color>
+    <Color x:Key="CommonTitleBackground">#241C3A</Color>
 
     <!-- Backgrounds -->
     <Color x:Key="WindowBackground">#151124</Color>
@@ -36,6 +37,8 @@
     <Color x:Key="TextColorWindow">#A89A8FB9</Color>
     <Color x:Key="TextColorWindowBrighter">#9A8FB9</Color>
     <Color x:Key="TextListBoxItem">#99FFFFFF</Color>
+    <Color x:Key="TextBanner">#AAF5F5F5</Color>
+    <SolidColorBrush x:Key="TextBannerBrush" Color="{DynamicResource TextBanner}"/>
 
     <!-- TextBoxes -->
     <Color x:Key="TextBoxBackground">#FF272237</Color>
@@ -47,11 +50,6 @@
     <Color x:Key="TextBoxBorderActive">#FF937BD1</Color>
 
     <!-- Buttons -->
-    <Color x:Key="BtnControlHover">#AA3D3454</Color>
-    <Color x:Key="BtnControlPressed">#803D3454</Color>
-    <Color x:Key="BtnControlBorderHover">#00000000</Color>
-    <Color x:Key="BtnControlBorderPressed">#00000000</Color>
-
     <Color x:Key="BtnPrimaryA">#DFF49348</Color>
     <Color x:Key="BtnPrimaryB">#DFEB6337</Color>
     <Color x:Key="BtnPrimaryHoverA">#FFF49348</Color>
@@ -86,6 +84,11 @@
     <Color x:Key="BtnPopupBorderHover">#80594D7B</Color>
     <Color x:Key="BtnPopupBorderPressed">#FF594D7B</Color>
     
+    <Color x:Key="BtnControlHover">#AA3D3454</Color>
+    <Color x:Key="BtnControlPressed">#202020</Color>
+    <Color x:Key="BtnControlBorderHover">#00000000</Color>
+    <Color x:Key="BtnControlBorderPressed">#00000000</Color>
+
     <Color x:Key="BtnCommon">#FF221E2F</Color>
     <Color x:Key="BtnCommonHover">#AA3D3454</Color>
     <Color x:Key="BtnCommonPressed">#FF221E2C</Color>
@@ -171,7 +174,13 @@
     <Color x:Key="CoverButtonBorderPressedA">#00000000</Color>
     <Color x:Key="CoverButtonBorderPressedB">#00000000</Color>
     
-    <!-- Miscellanious -->
+    <!-- Text Banner -->
+    <Color x:Key="BannerBackgroundA">#0016141C</Color>
+    <Color x:Key="BannerBackgroundB">#FF19171f</Color>
+    <Color x:Key="BannerBorderA">#00342D47</Color>
+    <Color x:Key="BannerBorderB">#DD453C5F</Color>
+
+    <!-- Miscellaneous -->
     <Color x:Key="SelectionRect">#33937BD1</Color>
     <Color x:Key="SelectionRectBorder">#FF937BD1</Color>
 
@@ -185,7 +194,7 @@
         <GradientStop Color="{DynamicResource LogoColorB}" Offset="1"/>
     </LinearGradientBrush>
 
-    <SolidColorBrush x:Key="TitleBrush" Color="{DynamicResource TitleColor}"/>
+    <SolidColorBrush x:Key="TitleTextBrush" Color="{DynamicResource TitleTextColor}"/>
 
     <LinearGradientBrush x:Key="BorderBrushCommon" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="{DynamicResource BorderColorA}" Offset="0"/>
@@ -202,6 +211,7 @@
 
     <SolidColorBrush x:Key="MainWindowBackgroundBrushC" Color="{DynamicResource MainWindowBackgroundC}"/>
     <SolidColorBrush x:Key="SidebarBacgkroundBrush" Color="{DynamicResource SidebarBacgkround}"/>
+    <SolidColorBrush x:Key="CommonTitleBackgroundBrush" Color="{DynamicResource CommonTitleBackground}"/>
 
     <!-- GameView/ToolView Bar Brushes-->
     <SolidColorBrush x:Key="BarBackgroundBrush" Color="{DynamicResource BarBackground}"/>

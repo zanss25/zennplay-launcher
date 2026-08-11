@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="720"
+             x:Class="zennplay_launcher.Views.Tabs.WorkInProgress"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:views="using:zennplay_launcher.Views">
+  
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Top">
+
+        <views:TextBannerView x:Name="WipInfo" Margin="0,120,0,0"/>
+
+    </Grid>
+
+</UserControl>

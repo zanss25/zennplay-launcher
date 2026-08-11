@@ -23,6 +23,11 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        var dbInitializer = new DatabaseInitializer();
+        dbInitializer.Initialize();
+
+        ConfigServices.CreateDefaultConfig();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
@@ -30,11 +35,6 @@ public partial class App : Application
                 DataContext = new MainViewModel(),
             };
         }
-
-        var dbInitializer = new DatabaseInitializer();
-        dbInitializer.Initialize();
-
-        ConfigServices.CreateDefaultConfig();
 
         base.OnFrameworkInitializationCompleted();
     }

@@ -1,0 +1,63 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:viewmodels="using:zennplay_launcher.ViewModels"
+             xmlns:views="using:zennplay_launcher.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="zennplay_launcher.Views.SectionView"
+             x:DataType="viewmodels:MainViewModel">
+  
+                    <Grid RowDefinitions="Auto,*">
+                        
+                        <Border Grid.Row="0" Padding="40,50,40,0">
+                            <Grid ColumnDefinitions="Auto, Auto, *, Auto"
+                                  MaxHeight="30">
+                            
+                                <TextBox Grid.Column="0" 
+                                         Width="260"
+                                         PlaceholderText="Search.." 
+                                         Classes="TextBox"/>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="20,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Sort by" VerticalAlignment="Center" Foreground="{DynamicResource TextWindowBrush}" FontSize="13"/>
+                                    <ComboBox SelectedIndex="0" Classes="ComboBox" Width="140">
+                                        <ComboBoxItem Content="Alphabetical"/>
+                                        <ComboBoxItem Content="Last Played"/>
+                                        <ComboBoxItem Content="Rating"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <Button Grid.Column="3" 
+                                        Content="+ Add Game" 
+                                        Classes="ButtonPrimary" 
+                                        VerticalAlignment="Stretch"/>
+                            </Grid>
+                        </Border>
+
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding DisplayedApps}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="models:AppModel">
+                    
+                                        <Border Margin="10,5" 
+                                                Padding="12" 
+                                                Background="#1AFFFFFF" 
+                                                CornerRadius="6">
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <TextBlock Text="{Binding Id}" Foreground="Gray" VerticalAlignment="Center"/>
+                                                <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Title}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                    </Grid>
+
+</UserControl>

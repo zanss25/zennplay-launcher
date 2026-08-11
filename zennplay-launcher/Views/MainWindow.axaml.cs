@@ -18,12 +18,13 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        var repo = new SectionRepository();
+        var sectionRepo = new SectionRepository();
+        var appRepo = new AppRepository();
 
-        //repo.AddSection(new SectionModel { Name = "Modding", Desc = "Modding Tools", Icon = "console" });
-        //repo.AddSection(new SectionModel { Name = "Single Player", Desc = "Single Player Games", Icon = "gamepad" });
-        //repo.AddSection(new SectionModel { Name = "Multiplayer", Desc = "Multiplayer Games", Icon = "tool" });
-        
+        //sectionRepo.AddSection(new SectionModel { Name = "Modding", Desc = "Modding Tools", Icon = "console" });
+        //sectionRepo.AddSection(new SectionModel { Name = "Single Player", Desc = "Single Player Games", Icon = "gamepad" });
+        //sectionRepo.AddSection(new SectionModel { Name = "Multiplayer", Desc = "Multiplayer Games", Icon = "tool" });
+
     }
 
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -58,4 +59,5 @@ public partial class MainWindow : Window
     {
         Close();
     }
+
 }
