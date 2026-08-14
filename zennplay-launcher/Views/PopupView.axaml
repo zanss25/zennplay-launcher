@@ -30,7 +30,7 @@
         <views:TitleBarView Grid.Row="0"/>
 
         <!-- Contents -->
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="30,30"
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="30"
                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     >
             <TextBlock x:Name="Message" Foreground="{DynamicResource TextWindowBrush}"

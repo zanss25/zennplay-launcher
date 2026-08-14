@@ -19,7 +19,7 @@ namespace zennplay_launcher.Models
         [
             new BasicTabModel { Id = "metadata", Name = "Metadata" },
             new BasicTabModel { Id = "folders", Name = "Folders & Actions" },
-            new BasicTabModel { Id = "media", Name = "Media" }
+            new BasicTabModel { Id = "media", Name = "Customizations" }
         ];
 
     }

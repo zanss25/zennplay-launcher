@@ -16,14 +16,11 @@ namespace zennplay_launcher.Models
         public int UserRating { get; set; } = -1;
         public bool IsFavorite { get; set; }
         public bool IsPinned { get; set; }
-        public string? Series { get; set; }
         public string? Notes { get; set; }
         public string? FirstLaunched { get; set; }
         public string? LastLaunched { get; set; }
         public int LaunchTimes { get; set; } = 0;
         public string? CompletionStatus { get; set; } = "Not Completed";
-        public string? Developer { get; set; }
-        public string? Publisher { get; set; }
         public string? ReleaseDate { get; set; }
         public string? AgeRating { get; set; }
         public bool IsInstalled { get; set; } = true;
@@ -31,16 +28,22 @@ namespace zennplay_launcher.Models
         // Tri-state override (null = ikuti Section, true = Game, false = App)
         public bool? IsGame { get; set; }
         public bool? IsExcluded { get; set; }
-
         public string? Version { get; set; }
         public string? AppDir { get; set; }
-        public string? SourcePlatform { get; set; }
         public string? ExternalId { get; set; }
         public string? CoverPath { get; set; }
         public string? BackgroundPath { get; set; }
         public string? IconPath { get; set; }
         public string? CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
+
+        // Daftar ID relasi yang dipilih dari UI / Form Edit
+        public List<long> SeriesIds { get; set; } = new();
+        public List<long> GenreIds { get; set; } = new();
+        public List<long> TagIds { get; set; } = new();
+        public List<long> DeveloperIds { get; set; } = new();
+        public List<long> PublisherIds { get; set; } = new();
+        public List<long> PlatformIds { get; set; } = new();
     }
 
 }

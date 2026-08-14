@@ -9,31 +9,70 @@
              x:Class="zennplay_launcher.Views.Controls.PropertiesMetadataView">
   
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
-        <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-            <controls:PropertyInputView Label="Title"/>
-            <controls:PropertyInputView Label="Sorting Title"/>
-            <controls:PropertyInputView Label="Platform"/>
-            <controls:PropertyInputView Label="Genres"/>
-            <controls:PropertyInputView Label="Developer"/>
-            <controls:PropertyInputView Label="Publisher"/>
-            <controls:PropertyInputView Label="Section"/>
-            <controls:PropertyInputView Label="Tags"/>
-        </StackPanel>
-        <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
-            <controls:PropertyInputView Label="Series"/>
-            <controls:PropertyInputView Label="Release Date"/>
-            <controls:PropertyInputView Label="Age Rating"/>
-            <controls:PropertyInputView Label="Source"/>
-            <controls:PropertyInputView Label="Completion Status"/>
-            <controls:PropertyInputView Label="User Rating"/>
-            <controls:PropertyInputView Label="Favorite"/>
-            <controls:PropertyInputView Label="Pinned"/>
-        </StackPanel>
-        <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
-            <controls:PropertyInputView Label="Description"/>
-        </StackPanel>
-    </Grid>  
+        <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Details -->
+            <StackPanel Grid.Row="0">
+                <controls:OptionHeaderView Label="General"/>
+                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
+                      Grid.Row="1">
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                        <controls:PropertyInputView Label="Title"/>
+                        <controls:PropertyInputView Label="Series"/>
+                        <controls:PropertyInputView Label="Platforms"/>
+                        <controls:PropertyInputView Label="Developers"/>
+                        <controls:PropertyInputView Label="Publishers"/>
+                        <controls:PropertyInputView Label="Release Date"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
+                        <controls:PropertyInputView Label="Age Rating"/>
+                        <controls:PropertyInputView Label="Genres"/>
+                        <controls:PropertyInputView Label="Tags"/>
+                        <controls:PropertyInputView Label="Source"/>
+                        <controls:PropertyInputView Label="Installation"/>
+                        <controls:PropertyInputView Label="User Rating"/>
+                    </StackPanel>
+                    <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
+                        <controls:PropertyInputView Label="Description"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Other Details -->
+            <StackPanel Grid.Row="1">
+                <controls:OptionHeaderView Label="Other Details"/>
+                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
+                      Grid.Row="1">
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                        <controls:PropertyInputView Label="Sorting Title"/>
+                        <controls:PropertyInputView Label="Is Game"/>
+                        <controls:PropertyInputView Label="Is Excluded"/>
+                        <controls:PropertyInputView Label="Is Pinned"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
+                        <controls:PropertyInputView Label="First Launched"/>
+                        <controls:PropertyInputView Label="Last Launched"/>
+                        <controls:PropertyInputView Label="Launch Times"/>
+                        <controls:PropertyInputView Label="Completion Status"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Section Options -->
+            <StackPanel Grid.Row="2">
+                <controls:OptionHeaderView Label="Section Options"/>
+                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
+                      Grid.Row="1">
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                        <controls:PropertyInputView Label="Section"/>
+                        <controls:PropertyInputView Label="Is Game"/>
+                        <controls:PropertyInputView Label="Is Excluded"/>
+                        <controls:PropertyInputView Label="Is Pinned"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+        </Grid>  
     </ScrollViewer>
 
 </UserControl>

@@ -521,7 +521,7 @@
 
     <!-- Text Box Common -->
     <Style Selector="TextBox">
-        <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderBrush}"/>
         <Setter Property="CaretBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
@@ -559,19 +559,18 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="8,5"/>
-        <Setter Property="Height" Value="30"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
 
         <Style Selector="^:pointerover /template/ Border#PART_BorderElement">
-            <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundHoverBrushB}"/>
+            <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundHoverBrushA}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderHoverBrush}"/>
         </Style>
 
         <Style Selector="^:focus /template/ Border#PART_BorderElement">
             <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundActiveBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="1.1"/>
         </Style>
 
         <Style Selector="^:disabled">

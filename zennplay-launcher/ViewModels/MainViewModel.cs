@@ -109,7 +109,9 @@ public partial class MainViewModel : ViewModelBase
 
         Debug.WriteLine("Selected Section ID: " + value.Id);
 
-        IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(value.Id);
+        var criteria = new AppFilterCriteria { SectionIds = new List<long> { value.Id } };
+
+        IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(criteria);
         DisplayedApps = new ObservableCollection<AppModel>(apps);
         CurrentView = _sectionView;
     }

@@ -24,11 +24,12 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
+                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/OptionHeaderView.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid ColumnDefinitions="*" RowDefinitions="Auto, *">
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto, *, Auto">
         
         <!-- Title Bar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" MinHeight="35"
@@ -42,7 +43,7 @@
         <views:TitleBarView Grid.Row="0"/>
 
         <!-- Content Slot -->
-        <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, *">
+        <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, *" Margin="8">
             <Grid Grid.Row="1" RowDefinitions="Auto,*">
 
                 <ListBox Grid.Row="0" Background="Transparent" 
@@ -69,6 +70,13 @@
 
             </Grid>
         </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
+            <Button x:Name="SaveBtn" Classes="ButtonSecondary" Click="SaveBtn_Click"
+                    Content="Save" Margin="10,0,0,0"/>
+            <Button x:Name="CancelBtn" Classes="ButtonSecondary" Click="CancelBtn_Click"
+                    Content="Cancel" Margin="10,0,0,0"/>
+        </StackPanel>
 
     </Grid>
 

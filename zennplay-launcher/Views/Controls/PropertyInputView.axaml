@@ -10,7 +10,7 @@
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
                                VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextWindowBrighterBrush}"
+                               Foreground="{DynamicResource TextCommonBrush}"
                                FontSize="13"/>
 
                     <TextBox Grid.Column="1" 

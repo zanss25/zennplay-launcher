@@ -13,17 +13,29 @@ namespace zennplay_launcher.Services
             GenerateAppLinksTable();
             GenerateAppActionsTable();
             GenerateLaunchSessionsTable();
+            GenerateSeriesTable();
+            GenerateAppSeriesTable();
             GenerateGenresTable();
             GenerateAppGenresTable();
             GenerateTagsTable();
             GenerateAppTagsTable();
             GenerateSectionsTable();
             GenerateAppSectionsTable();
+            GenerateDevelopersTable();
+            GenerateAppDevelopersTable();
+            GeneratePublishersTable();
+            GenerateAppPublishersTable();
+            GeneratePlatformsTable();
+            GenerateAppPlatformsTable();
 
             // 2. Isi Data Awal (Seed Data)
+            SeedDefaultSeries();
             SeedDefaultGenres();
             SeedDefaultTags();
             SeedDefaultSections();
+            SeedDefaultDevelopers();
+            SeedDefaultPublishers();
+            SeedDefaultPlatforms();
         }
 
         #region DDL Table Generators
@@ -55,14 +67,11 @@ namespace zennplay_launcher.Services
                                             user_rating INTEGER DEFAULT -1,
                                             is_favorite INTEGER DEFAULT 0,
                                             is_pinned INTEGER DEFAULT 0,
-                                            series TEXT,
                                             notes TEXT,
                                             first_launched TEXT,
                                             last_launched TEXT,
                                             launch_times INTEGER DEFAULT 0,
                                             completion_status TEXT DEFAULT 'Not Completed',
-                                            developer TEXT,
-                                            publisher TEXT,
                                             release_date TEXT,
                                             age_rating TEXT,
                                             is_installed INTEGER DEFAULT 1,
@@ -70,7 +79,7 @@ namespace zennplay_launcher.Services
                                             is_excluded INTEGER DEFAULT NULL,
                                             version TEXT,
                                             app_dir TEXT,
-                                            source_platform TEXT,
+                                            source TEXT,
                                             external_id TEXT,
                                             cover_path TEXT,
                                             background_path TEXT,
@@ -130,6 +139,36 @@ namespace zennplay_launcher.Services
                                             session_end TEXT,
                                             duration_seconds INTEGER
                                             );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateSeriesTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS series (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name TEXT NOT NULL UNIQUE,
+                                    desc TEXT,
+                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAppSeriesTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS app_series (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                    series_id INTEGER NOT NULL REFERENCES series(id) ON DELETE CASCADE,
+                                    UNIQUE(app_id, series_id)
+                                );";
                 command.ExecuteNonQuery();
             }
         }
@@ -228,9 +267,141 @@ namespace zennplay_launcher.Services
             }
         }
 
+        public void GenerateDevelopersTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS developers (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name TEXT NOT NULL UNIQUE,
+                                    desc TEXT,
+                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAppDevelopersTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS app_developers (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                    developer_id INTEGER NOT NULL REFERENCES developers(id) ON DELETE CASCADE,
+                                    UNIQUE(app_id, developer_id)
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GeneratePublishersTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS publishers (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name TEXT NOT NULL UNIQUE,
+                                    desc TEXT,
+                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAppPublishersTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS app_publishers (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                    publisher_id INTEGER NOT NULL REFERENCES publishers(id) ON DELETE CASCADE,
+                                    UNIQUE(app_id, publisher_id)
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GeneratePlatformsTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS platforms (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name TEXT NOT NULL UNIQUE,
+                                    desc TEXT,
+                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAppPlatformsTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS app_platforms (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                    platform_id INTEGER NOT NULL REFERENCES platforms(id) ON DELETE CASCADE,
+                                    UNIQUE(app_id, platform_id)
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
         #endregion
 
         #region Seed Data Methods (Memasukkan Data Awal)
+
+        private void SeedDefaultSeries()
+        {
+            string[] defaultSeries = new string[]
+            {
+        "Grand Theft Auto", "The Witcher", "Final Fantasy", "Resident Evil",
+        "Assassin's Creed", "Call of Duty", "Dark Souls", "The Elder Scrolls",
+        "Fallout", "Monster Hunter", "Persona", "Far Cry",
+        "Need for Speed", "Yakuza / Like a Dragon", "Tomb Raider", "Half-Life"
+            };
+
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            {
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_series_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO series (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var seriesName in defaultSeries)
+                    {
+                        param.Value = seriesName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_series_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
+                }
+            }
+            Console.WriteLine("Default series seeded successfully.");
+        }
 
         private void SeedDefaultGenres()
         {
@@ -377,6 +548,133 @@ namespace zennplay_launcher.Services
                     markCmd.ExecuteNonQuery();
                 }
             }
+        }
+
+        private void SeedDefaultDevelopers()
+        {
+            string[] defaultDevelopers = new string[]
+            {
+                "CD Projekt Red", "Valve", "FromSoftware", "Rockstar Games",
+                "Capcom", "Square Enix", "Bethesda Game Studios", "BioWare",
+                "Ubisoft Montreal", "Naughty Dog", "Insomniac Games", "Larian Studios",
+                "Kojima Productions", "Remedy Entertainment", "Supergiant Games", "Techland"
+            };
+
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            {
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_developers_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO developers (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var devName in defaultDevelopers)
+                    {
+                        param.Value = devName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_developers_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
+                }
+            }
+            Console.WriteLine("Default developers seeded successfully.");
+        }
+
+        private void SeedDefaultPublishers()
+        {
+            string[] defaultPublishers = new string[]
+            {
+                "Electronic Arts", "Ubisoft", "Sony Interactive Entertainment", "Xbox Game Studios",
+                "Square Enix", "Capcom", "Bandai Namco Entertainment", "Take-Two Interactive",
+                "2K Games", "Sega", "Bethesda Softworks", "Warner Bros. Games",
+                "Devolver Digital", "Focus Entertainment", "THQ Nordic", "505 Games"
+            };
+
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            {
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_publishers_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO publishers (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var pubName in defaultPublishers)
+                    {
+                        param.Value = pubName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_publishers_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
+                }
+            }
+            Console.WriteLine("Default publishers seeded successfully.");
+        }
+
+        private void SeedDefaultPlatforms()
+        {
+            string[] defaultPlatforms = new string[]
+            {
+                "PC (Windows)", "Steam", "Epic Games Store", "GOG",
+                "Ubisoft Connect", "EA App", "Battle.net", "Xbox App (Game Pass)",
+                "PlayStation 1", "PlayStation 2", "PlayStation 3", "PlayStation 4",
+                "Nintendo Switch", "Nintendo GameCube", "Nintendo Wii", "Nintendo 3DS",
+                "PlayStation Portable (PSP)", "PlayStation Vita", "Xbox 360", "RetroArch"
+            };
+
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            {
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_platforms_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+                    if (count > 0) return;
+                }
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = "INSERT OR IGNORE INTO platforms (name) VALUES (@name);";
+                    var param = command.CreateParameter();
+                    param.ParameterName = "@name";
+                    command.Parameters.Add(param);
+
+                    foreach (var platformName in defaultPlatforms)
+                    {
+                        param.Value = platformName;
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                using (var markCmd = connection.CreateCommand())
+                {
+                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_platforms_v1', 'completed');";
+                    markCmd.ExecuteNonQuery();
+                }
+            }
+            Console.WriteLine("Default platforms seeded successfully.");
         }
 
         #endregion

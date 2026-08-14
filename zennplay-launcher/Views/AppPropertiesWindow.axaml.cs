@@ -29,5 +29,14 @@ namespace zennplay_launcher.Views
             TitleText.Text = Title.ToUpper();
         }
 
+        private void SaveBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+
+        }
+
+        private void CancelBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+  
+    <ControlTheme x:Key="{x:Type controls:OptionHeaderView}" TargetType="controls:OptionHeaderView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border HorizontalAlignment="Stretch" MinHeight="35"
+                        Background="#20101010" BorderBrush="{DynamicResource BorderCommonBrush}" 
+                        CornerRadius="4" Margin="5" BorderThickness="0,0,0,2">
+                    <TextBlock Text="{TemplateBinding Label}" 
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Foreground="{DynamicResource TextWindowBrighterBrush}" 
+                               FontFamily="{DynamicResource FontCommon}"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>
