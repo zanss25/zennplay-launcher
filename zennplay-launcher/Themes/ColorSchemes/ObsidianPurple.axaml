@@ -34,8 +34,8 @@
     <Color x:Key="TextColorCommonActiveBrighter">#FFFFFFFF</Color>
     <Color x:Key="TextColorPressed">#AAF5F5F5</Color>
     <Color x:Key="TextColorDisabled">#DDF5F5F5</Color>
-    <Color x:Key="TextColorWindow">#A89A8FB9</Color>
-    <Color x:Key="TextColorWindowBrighter">#9A8FB9</Color>
+    <Color x:Key="TextColorWindow">#9A8FB9</Color>
+    <Color x:Key="TextColorWindowBrighter">#CAC5E9</Color>
     <Color x:Key="TextListBoxItem">#99FFFFFF</Color>
     <Color x:Key="TextBanner">#AAF5F5F5</Color>
     <SolidColorBrush x:Key="TextBannerBrush" Color="{DynamicResource TextBanner}"/>

@@ -6,10 +6,22 @@ using System.Threading.Tasks;
 
 namespace zennplay_launcher.Models
 {
-    public class BasicTabModel
+    public partial class BasicTabModel
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Icon { get; set; }
+        public required string Id { get; set; }
+        public required string Name { get; set; }
+        public string? Icon { get; set; }
     }
+
+    public partial class PropertiesTabsList
+    {
+        public static List<BasicTabModel> PropertiesTabs =>
+        [
+            new BasicTabModel { Id = "metadata", Name = "Metadata" },
+            new BasicTabModel { Id = "folders", Name = "Folders & Actions" },
+            new BasicTabModel { Id = "media", Name = "Media" }
+        ];
+
+    }
+
 }

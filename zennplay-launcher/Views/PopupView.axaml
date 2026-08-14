@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="200"
-        Width="550" SizeToContent="Height" MaxHeight="600"
         xmlns:models="using:zennplay_launcher.Models"
         xmlns:views="using:zennplay_launcher.Views"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="200"
+        Width="550" SizeToContent="Height" MaxHeight="600"
         x:Class="zennplay_launcher.Views.PopupView"
         Title="PopupView"
         WindowStartupLocation="CenterOwner"
@@ -33,7 +33,7 @@
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="30,30"
                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     >
-            <TextBlock x:Name="Message" Foreground="{DynamicResource TextWindowBrighterBrush}"
+            <TextBlock x:Name="Message" Foreground="{DynamicResource TextWindowBrush}"
                        FontSize="14" Text="Message: Put your messages here for info or confirmation" 
                        HorizontalAlignment="Left" TextWrapping="Wrap"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,30,0,0">

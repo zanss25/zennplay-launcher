@@ -1,0 +1,75 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="using:zennplay_launcher.Views.Controls"
+        xmlns:models="using:zennplay_launcher.Models"
+        xmlns:viewmodels="using:zennplay_launcher.ViewModels"
+        xmlns:views="using:zennplay_launcher.Views"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
+        Width="900" Height="600"
+        MinWidth="900" MinHeight="600"
+        x:Class="zennplay_launcher.Views.AppPropertiesWindow"
+        x:DataType="viewmodels:AppPropertiesViewModel"
+        Title="AppPropertiesWindow"
+        
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        
+        ExtendClientAreaToDecorationsHint="True"  
+        ExtendClientAreaTitleBarHeightHint="-1"
+        WindowDecorations="Full">
+  
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto, *">
+        
+        <!-- Title Bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" MinHeight="35"
+                    Background="{DynamicResource CommonTitleBackgroundBrush}"
+                    >
+            <TextBlock x:Name="TitleText" Classes="TitleText"
+                       Text="TitleText" Margin="30,0"/>
+
+        </StackPanel>
+        
+        <views:TitleBarView Grid.Row="0"/>
+
+        <!-- Content Slot -->
+        <Grid Grid.Column="1" Grid.Row="1" RowDefinitions="Auto, *">
+            <Grid Grid.Row="1" RowDefinitions="Auto,*">
+
+                <ListBox Grid.Row="0" Background="Transparent" 
+                         HorizontalAlignment="Stretch" Classes="TabListBox"
+                         ItemsSource="{Binding PropertiesTabs}"
+                         SelectedItem="{Binding SelectedTab}"
+                         >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="models:BasicTabModel"> 
+                            <StackPanel Orientation="Horizontal" Spacing="10"> 
+                                <TextBlock Text="{Binding Name}"/> 
+                            </StackPanel>  
+                        </DataTemplate> 
+                    </ListBox.ItemTemplate> 
+                </ListBox>
+
+                <ContentControl Grid.Row="1"
+                            x:Name="ContentSlot" 
+                            HorizontalAlignment="Stretch" 
+                            VerticalAlignment="Stretch"
+                            Content="{Binding CurrentView}">
+
+            </ContentControl>
+
+            </Grid>
+        </Grid>
+
+    </Grid>
+
+</Window>

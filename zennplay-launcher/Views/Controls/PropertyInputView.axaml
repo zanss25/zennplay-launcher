@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <ControlTheme x:Key="{x:Type controls:PropertyInputView}" TargetType="controls:PropertyInputView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="130, *" VerticalAlignment="Center" Margin="0,0,0,12">
+                    
+                    <TextBlock Grid.Column="0" 
+                               Text="{TemplateBinding Label}" 
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextWindowBrighterBrush}"
+                               FontSize="13"/>
+
+                    <TextBox Grid.Column="1" 
+                             Text="{TemplateBinding Text, Mode=TwoWay}"
+                             PlaceholderText="{TemplateBinding PlaceholderText}"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

@@ -416,6 +416,23 @@
         </Style>
     </Style>
 
+    <!-- List Box Horizontal Tab -->
+    <Style Selector="ListBox.TabListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <UniformGrid Rows="1" HorizontalAlignment="Stretch" />
+            </ItemsPanelTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ListBox.TabListBox > ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+
     <!-- Scroll Bar (Simple) -->
     <Style Selector="Button.CoverButton">
         <Setter Property="Background" Value="{DynamicResource CoverGridBrush}"/>

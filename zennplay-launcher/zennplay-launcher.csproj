@@ -12,13 +12,9 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
     <AvaloniaXaml Remove="Services\NewFolder\**" />
-    <AvaloniaXaml Remove="Views\NewFolder\**" />
     <Compile Remove="Services\NewFolder\**" />
-    <Compile Remove="Views\NewFolder\**" />
     <EmbeddedResource Remove="Services\NewFolder\**" />
-    <EmbeddedResource Remove="Views\NewFolder\**" />
     <None Remove="Services\NewFolder\**" />
-    <None Remove="Views\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>

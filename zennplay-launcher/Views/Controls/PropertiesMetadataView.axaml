@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:zennplay_launcher.Views.Controls"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:views="using:zennplay_launcher.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="zennplay_launcher.Views.Controls.PropertiesMetadataView">
+  
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*">
+        <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+            <controls:PropertyInputView Label="Title"/>
+            <controls:PropertyInputView Label="Sorting Title"/>
+            <controls:PropertyInputView Label="Platform"/>
+            <controls:PropertyInputView Label="Genres"/>
+            <controls:PropertyInputView Label="Developer"/>
+            <controls:PropertyInputView Label="Publisher"/>
+            <controls:PropertyInputView Label="Section"/>
+            <controls:PropertyInputView Label="Tags"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
+            <controls:PropertyInputView Label="Series"/>
+            <controls:PropertyInputView Label="Release Date"/>
+            <controls:PropertyInputView Label="Age Rating"/>
+            <controls:PropertyInputView Label="Source"/>
+            <controls:PropertyInputView Label="Completion Status"/>
+            <controls:PropertyInputView Label="User Rating"/>
+            <controls:PropertyInputView Label="Favorite"/>
+            <controls:PropertyInputView Label="Pinned"/>
+        </StackPanel>
+        <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
+            <controls:PropertyInputView Label="Description"/>
+        </StackPanel>
+    </Grid>  
+    </ScrollViewer>
+
+</UserControl>

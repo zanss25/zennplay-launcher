@@ -99,52 +99,53 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    // Otomatis terpicu saat SelectedSection berubah
+    partial void OnSelectedSectionChanged(SectionModel? value)
+    {
+        if (value == null) return;
+
+        // Reset seleksi tab statis
+        SelectedSidebarTab = null;
+
+        Debug.WriteLine("Selected Section ID: " + value.Id);
+
+        IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(value.Id);
+        DisplayedApps = new ObservableCollection<AppModel>(apps);
+        CurrentView = _sectionView;
+    }
+
     // ============================================================
     // TABS LOADING & INTERACTION FUNCTIONS
     // ============================================================
-    partial void OnSelectedSidebarTabChanged(SidebarTabModel? tab)
+    partial void OnSelectedSidebarTabChanged(SidebarTabModel? value)
     {
-        if (tab == null) return;
+        if (value == null) return;
 
         // Reset seleksi pada SidebarSections secara otomatis
         SelectedSection = null;
 
-        if (tab != null) Debug.WriteLine("Selected Static Tab ID: " + tab.Id);
+        if (value != null) Debug.WriteLine("Selected Static Tab ID: " + value.Id);
 
         // Eksekusi Logika Navigasi UI
-        switch (tab.Id)
+        switch (value.Id)
         {
             case "library":
-                Debug.WriteLine("Switch case: " + tab.Name);
+                Debug.WriteLine("Switch case: " + value.Name);
                 CurrentView = _workInProgress;
                 break;
             case "favorites":
-                Debug.WriteLine("Switch case: " + tab.Name);
+                Debug.WriteLine("Switch case: " + value.Name);
                 CurrentView = _workInProgress;
                 break;
             case "boards":
-                Debug.WriteLine("Switch case: " + tab.Name);
+                Debug.WriteLine("Switch case: " + value.Name);
                 CurrentView = _workInProgress;
                 break;
             case "relics":
-                Debug.WriteLine("Switch case: " + tab.Name);
+                Debug.WriteLine("Switch case: " + value.Name);
                 CurrentView = _workInProgress;
                 break;
         }
     }
 
-    // Otomatis terpicu saat SelectedSection berubah
-    partial void OnSelectedSectionChanged(SectionModel? section)
-    {
-        if (section == null) return;
-
-        // Reset seleksi tab statis
-        SelectedSidebarTab = null;
-
-        Debug.WriteLine("Selected Section ID: " + section.Id);
-
-        IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(section.Id);
-        DisplayedApps = new ObservableCollection<AppModel>(apps);
-        CurrentView = _sectionView;
-    }
 }

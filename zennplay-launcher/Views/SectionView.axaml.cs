@@ -10,5 +10,17 @@ namespace zennplay_launcher.Views
         {
             InitializeComponent();
         }
+
+        public void AddGame_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var parentWindow = TopLevel.GetTopLevel(this) as Window;
+
+            if (parentWindow != null)
+            {
+                AppPropertiesWindow propertiesWindow = new();
+                propertiesWindow.ShowDialog(parentWindow);
+            }
+
+        }
     }
 }
