@@ -2,9 +2,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:zennplay_launcher.Views.Controls"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:views="using:zennplay_launcher.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="zennplay_launcher.Views.Controls.PropertiesFoldersView">
   
-    <TextBlock Text="Folders &amp; Actions"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
+
+            <!-- Folders -->
+            <StackPanel Grid.Row="0">
+                <controls:OptionHeaderView Label="Folders"/>
+                <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                    <controls:PropertyInputView Label="Installation Folder"/>
+                    <controls:PropertyInputView Label="Is Installed"/>
+                    <controls:PropertyInputView Label="Install Size"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Actions -->
+            <StackPanel Grid.Row="1">
+                <controls:OptionHeaderView Label="Actions"/>
+                <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                    <controls:PropertyInputView Label="Actions List"/>
+                    <controls:PropertyInputView Label="Add Action"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Links -->
+            <StackPanel Grid.Row="2">
+                <controls:OptionHeaderView Label="Links"/>
+                <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                    <controls:PropertyInputView Label="Links List"/>
+                    <controls:PropertyInputView Label="Add Link"/>
+                </StackPanel>
+            </StackPanel>
+
+        </Grid>  
+    </ScrollViewer>
 
 </UserControl>

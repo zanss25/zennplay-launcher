@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="using:zennplay_launcher.Views.Controls"
-             xmlns:models="using:zennplay_launcher.Models"
              xmlns:views="using:zennplay_launcher.Views"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:controls="using:zennplay_launcher.Views.Controls"
+             xmlns:vmcontrols="using:zennplay_launcher.ViewModels.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="zennplay_launcher.Views.Controls.PropertiesMetadataView">
+             x:Class="zennplay_launcher.Views.Controls.PropertiesMetadataView"
+             x:DataType="vmcontrols:PropertiesMetadataViewModel">
   
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
@@ -18,18 +20,53 @@
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
                         <controls:PropertyInputView Label="Title"/>
-                        <controls:PropertyInputView Label="Series"/>
-                        <controls:PropertyInputView Label="Platforms"/>
-                        <controls:PropertyInputView Label="Developers"/>
-                        <controls:PropertyInputView Label="Publishers"/>
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Series"
+                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableGenres}"
+                                  AddNewText="New Series"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Platforms"
+                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableGenres}"
+                                  AddNewText="New Platform"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Developers"
+                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableGenres}"
+                                  AddNewText="New Developer"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Publishers"
+                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableGenres}"
+                                  AddNewText="New Publisher"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
                         <controls:PropertyInputView Label="Release Date"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
                         <controls:PropertyInputView Label="Age Rating"/>
-                        <controls:PropertyInputView Label="Genres"/>
-                        <controls:PropertyInputView Label="Tags"/>
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Genres"
+                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableGenres}"
+                                  AddNewText="New Series"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  Label="Tags"
+                                  Contents="{Binding SelectedTagsText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableTags}"
+                                  AddNewText="New Tag"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
                         <controls:PropertyInputView Label="Source"/>
-                        <controls:PropertyInputView Label="Installation"/>
                         <controls:PropertyInputView Label="User Rating"/>
                     </StackPanel>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
@@ -54,6 +91,9 @@
                         <controls:PropertyInputView Label="Last Launched"/>
                         <controls:PropertyInputView Label="Launch Times"/>
                         <controls:PropertyInputView Label="Completion Status"/>
+                    </StackPanel>
+                    <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
+                        <controls:PropertyInputView Label="Notes"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>

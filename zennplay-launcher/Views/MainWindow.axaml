@@ -53,13 +53,18 @@
             <views:TitleBarView Grid.Row="0"/>
 
             <!-- Contents --> 
-            <Grid Grid.RowSpan="2" ColumnDefinitions="Auto, *">
+            <SplitView IsPaneOpen="True"
+                       DisplayMode="CompactInline"
+                       CompactPaneLength="52"
+                       OpenPaneLength="220"
+                       PaneBackground="Transparent"
+                       Grid.RowSpan="2">
 
-                <!-- Sidebar -->
-                <views:SidebarView Grid.Column="0" />
+                <SplitView.Pane>
+                    <views:SidebarView />
+                </SplitView.Pane>
 
-                <!-- Content Slot -->
-                <Grid Grid.Column="1" RowDefinitions="Auto, *">
+                <Grid>
                     <ContentControl Grid.Row="1"
                                     x:Name="ContentSlot" 
                                     HorizontalAlignment="Stretch" 
@@ -68,8 +73,8 @@
 
                     </ContentControl>
                 </Grid>
+            </SplitView>
 
-            </Grid>
         </Grid>
     </Border>
 

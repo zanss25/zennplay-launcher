@@ -19,15 +19,6 @@
         ExtendClientAreaToDecorationsHint="True"  
         ExtendClientAreaTitleBarHeightHint="-1"
         WindowDecorations="Full">
-  
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/OptionHeaderView.axaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
     <Grid ColumnDefinitions="*" RowDefinitions="Auto, *, Auto">
         
@@ -71,12 +62,14 @@
             </Grid>
         </Grid>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
-            <Button x:Name="SaveBtn" Classes="ButtonSecondary" Click="SaveBtn_Click"
-                    Content="Save" Margin="10,0,0,0"/>
-            <Button x:Name="CancelBtn" Classes="ButtonSecondary" Click="CancelBtn_Click"
-                    Content="Cancel" Margin="10,0,0,0"/>
-        </StackPanel>
+        <Border Grid.Row="2" BorderBrush="{DynamicResource BorderCommonBrush}" BorderThickness="0,0,0,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,12,20,20">
+                    <Button x:Name="SaveBtn" Classes="ButtonSecondary" Click="SaveBtn_Click"
+                            Content="Save" Margin="10,0,0,0"/>
+                    <Button x:Name="CancelBtn" Classes="ButtonSecondary" Click="CancelBtn_Click"
+                            Content="Cancel" Margin="10,0,0,0"/>
+                </StackPanel>
+        </Border>
 
     </Grid>
 

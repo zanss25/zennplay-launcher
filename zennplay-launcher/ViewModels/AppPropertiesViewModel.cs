@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services.Repositories;
+using zennplay_launcher.ViewModels.Controls;
 using zennplay_launcher.Views.Controls;
 using zennplay_launcher.Views.Tabs;
 
@@ -42,6 +43,7 @@ namespace zennplay_launcher.ViewModels
         object? _currentView;
 
         // Tab View Instances
+        private readonly PropertiesMetadataViewModel _metadataViewModel = new();
         private readonly PropertiesMetadataView _metadataView = new();
         private readonly PropertiesFoldersView _foldersView = new();
         private readonly PropertiesMediaView _mediaView = new();
@@ -56,10 +58,17 @@ namespace zennplay_launcher.ViewModels
             {
                 LoadAppData(appId);
             }
+
+            LoadTabsData();
         }
 
         public AppPropertiesViewModel()
         {
+            _metadataView = new PropertiesMetadataView
+            {
+                DataContext = _metadataViewModel
+            };
+
             // Load static tabs list
             PropertiesTabs = new ObservableCollection<BasicTabModel>(PropertiesTabsList.PropertiesTabs);
 
@@ -93,6 +102,11 @@ namespace zennplay_launcher.ViewModels
                     CurrentView = _mediaView;
                     break;
             }
+        }
+
+        public void LoadTabsData(int appId = 0)
+        {
+            _metadataViewModel.LoadData(appId);
         }
 
         // ============================================================

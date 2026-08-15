@@ -30,12 +30,12 @@
         <views:TitleBarView Grid.Row="0"/>
 
         <!-- Contents -->
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="30"
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20"
                     HorizontalAlignment="Stretch" VerticalAlignment="Center"
                     >
             <TextBlock x:Name="Message" Foreground="{DynamicResource TextWindowBrush}"
                        FontSize="14" Text="Message: Put your messages here for info or confirmation" 
-                       HorizontalAlignment="Left" TextWrapping="Wrap"/>
+                       HorizontalAlignment="Left" TextWrapping="Wrap" Margin="10,0,0,0"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,30,0,0">
                 <Button x:Name="ActionBtn" Classes="ButtonSecondary" Click="ActionBtn_Click"
                         Content="Ok" Margin="10,0,0,0"/>

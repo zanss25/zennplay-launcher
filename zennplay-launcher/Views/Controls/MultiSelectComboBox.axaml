@@ -1,0 +1,128 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="using:zennplay_launcher.Models"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <Design.PreviewWith>
+        <StackPanel Width="400" Margin="20" Spacing="10" Background="{DynamicResource WindowBackgroundBrush}">
+            <controls:MultiSelectComboBox PlaceholderText="Pilih atau ketik genres..." />
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <ControlTheme x:Key="{x:Type controls:MultiSelectComboBox}"
+                  TargetType="controls:MultiSelectComboBox">
+        
+        <!-- Nilai Default Properti Visual -->
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <!-- Input Bar Utama (Kotak TextBox + Toggle Dropdown) -->
+                    <Border x:Name="PART_RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            MinHeight="32">
+                        
+                        <Grid ColumnDefinitions="*, Auto">
+                            <!-- Kolom Teks / Input Ketik -->
+                            <TextBox x:Name="PART_TextBox"
+                                     Grid.Column="0"
+                                     Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                     PlaceholderText="{TemplateBinding PlaceholderText}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="8,5"
+                                     VerticalContentAlignment="Center"/>
+
+                            <!-- Tombol Dropdown Toggle -->
+                            <ToggleButton x:Name="PART_DropDownToggle"
+                                          Grid.Column="1"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Width="30"
+                                          Focusable="False"
+                                          Cursor="Hand">
+                                <PathIcon Data="M7 10l5 5 5-5z"
+                                          Width="10"
+                                          Height="10"
+                                          Foreground="{DynamicResource TextCommonBrush}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                    </Border>
+
+                    <!-- Popup Dropdown -->
+                    <Popup x:Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                           PlacementTarget="{Binding #PART_RootBorder}"
+                           Placement="Bottom"
+                           IsLightDismissEnabled="True"
+                           MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        
+                        <Border Background="{DynamicResource PopupBackgroundBrush}"
+                                BorderBrush="{DynamicResource PopupBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="4"
+                                MinWidth="{Binding #PART_RootBorder.Bounds.Width}"
+                                Margin="0,4,0,0">
+                            
+                            <Grid RowDefinitions="Auto, Auto, *">
+                                
+                                <!-- 1. Tombol + New di Paling Atas -->
+                                <Button x:Name="PART_AddNewButton"
+                                        Grid.Row="0"
+                                        Classes="ButtonPopup"
+                                        HorizontalAlignment="Stretch"
+                                        Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="+" FontWeight="Bold" Foreground="{DynamicResource TextCommonActiveBrush}"/>
+                                        <TextBlock Text="{TemplateBinding AddNewText}"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- Separator Garis Tipis -->
+                                <Separator Grid.Row="1" Classes="ContextMenuSeparator" Margin="0,2,0,4"/>
+
+                                <!-- 2. List Items dengan Checkbox -->
+                                <ScrollViewer Grid.Row="2" MaxHeight="220">
+                                    <ItemsControl x:Name="PART_ItemsControl"
+                                                  ItemsSource="{TemplateBinding FilteredItems}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:SelectableItem">
+                                                <CheckBox Content="{Binding Name}"
+                                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                          Margin="4,2"
+                                                          HorizontalAlignment="Stretch"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- Focus & Hover Trigger States -->
+        <Style Selector="^:pointerover /template/ Border#PART_RootBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderHoverBrush}"/>
+        </Style>
+
+        <Style Selector="^:focus-within /template/ Border#PART_RootBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
+            <Setter Property="BorderThickness" Value="1.1"/>
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>
