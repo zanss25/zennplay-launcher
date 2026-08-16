@@ -92,6 +92,19 @@ namespace zennplay_launcher.ViewModels.Controls
         // Method load data awal
         public void LoadData(int appId = 0)
         {
+            var seriesFromDb = _seriesRepo.GetAllSeries();
+            var selectedSeriesSet = (SelectedSeriesText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailableSeries = new ObservableCollection<SelectableItem>(
+                seriesFromDb.Select(s => new SelectableItem(
+                    name: s.Name,
+                    id: s.Id,
+                    description: s.Desc,
+                    isSelected: selectedSeriesSet.Contains(s.Name)
+                ))
+            );
+
             var genresFromDb = _genreRepo.GetAllGenres();
             var selectedGenresSet = (SelectedGenresText ?? string.Empty)
                                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -106,7 +119,7 @@ namespace zennplay_launcher.ViewModels.Controls
             );
 
             var tagsFromDb = _tagRepo.GetAllTags();
-            var selecteTagsSet = (SelectedTagsText ?? string.Empty)
+            var selectedTagsSet = (SelectedTagsText ?? string.Empty)
                                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             AvailableTags = new ObservableCollection<SelectableItem>(
@@ -114,9 +127,49 @@ namespace zennplay_launcher.ViewModels.Controls
                     name: g.Name,
                     id: g.Id,
                     description: g.Desc,
-                    isSelected: selectedGenresSet.Contains(g.Name)
+                    isSelected: selectedTagsSet.Contains(g.Name)
                 ))
             );
+
+            var developersFromDb = _developerRepo.GetAllDevelopers();
+            var selectedDevelopersSet = (SelectedDevelopersText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailableDevelopers = new ObservableCollection<SelectableItem>(
+                developersFromDb.Select(d => new SelectableItem(
+                    name: d.Name,
+                    id: d.Id,
+                    description: d.Desc,
+                    isSelected: selectedDevelopersSet.Contains(d.Name)
+                ))
+            );
+
+            var publishersFromDb = _publisherRepo.GetAllPublishers();
+            var selectedPublishersSet = (SelectedPublishersText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailablePublishers = new ObservableCollection<SelectableItem>(
+                publishersFromDb.Select(p => new SelectableItem(
+                    name: p.Name,
+                    id: p.Id,
+                    description: p.Desc,
+                    isSelected: selectedPublishersSet.Contains(p.Name)
+                ))
+            );
+
+            var platformsFromDb = _platformRepo.GetAllPlatforms();
+            var selecteTagsSet = (SelectedPlatformsText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailablePlatforms = new ObservableCollection<SelectableItem>(
+                platformsFromDb.Select(l => new SelectableItem(
+                    name: l.Name,
+                    id: l.Id,
+                    description: l.Desc,
+                    isSelected: selectedGenresSet.Contains(l.Name)
+                ))
+            );
+
         }
 
     }

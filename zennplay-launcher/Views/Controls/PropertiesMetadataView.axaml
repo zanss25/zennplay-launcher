@@ -22,29 +22,29 @@
                         <controls:PropertyInputView Label="Title"/>
                         <controls:PropertyMultiSelectComboBoxView 
                                   Label="Series"
-                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
-                                  ItemsSource="{Binding AvailableGenres}"
+                                  Contents="{Binding SelectedSeriesText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableSeries}"
                                   AddNewText="New Series"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   Label="Platforms"
-                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
-                                  ItemsSource="{Binding AvailableGenres}"
+                                  Contents="{Binding SelectedPlatformsText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailablePlatforms}"
                                   AddNewText="New Platform"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   Label="Developers"
-                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
-                                  ItemsSource="{Binding AvailableGenres}"
+                                  Contents="{Binding SelectedDevelopersText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableDevelopers}"
                                   AddNewText="New Developer"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   Label="Publishers"
-                                  Contents="{Binding SelectedGenresText, Mode=TwoWay}"
-                                  ItemsSource="{Binding AvailableGenres}"
+                                  Contents="{Binding SelectedPublishersText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailablePublishers}"
                                   AddNewText="New Publisher"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
