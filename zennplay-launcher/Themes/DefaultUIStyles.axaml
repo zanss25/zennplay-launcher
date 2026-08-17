@@ -277,10 +277,10 @@
 
     <!-- Checkbox Common -->
     <Style Selector="CheckBox">
-        <Setter Property="Background" Value="{DynamicResource CheckBoxCommonBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxCommonBorderBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
-        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="6,0,0,0"/>

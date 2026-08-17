@@ -37,4 +37,13 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
     <PackageReference Include="System.Text.Json" Version="10.0.10" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\Controls\CalendarTextDatePicker.axaml.cs">
+      <DependentUpon>CalendarTextDatePicker.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Controls\PropertyCalendarTextInputView.axaml.cs">
+      <DependentUpon>PropertyCalendarTextInputView.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 </Project>

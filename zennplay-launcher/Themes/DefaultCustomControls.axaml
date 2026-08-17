@@ -1,0 +1,14 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyDropdownView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/MultiSelectComboBox.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyMultiSelectComboBoxView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/OptionHeaderView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/CalendarTextDatePicker.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyCalendarTextInputView.axaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

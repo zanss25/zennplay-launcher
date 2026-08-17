@@ -24,22 +24,20 @@ namespace zennplay_launcher.ViewModels.Controls
         private readonly DeveloperRepository _developerRepo = new();
         private readonly PublisherRepository _publisherRepo = new();
         private readonly PlatformRepository _platformRepo = new();
+        private readonly AgeRatingRepository _ageRatingRepo = new();
 
         // Series list
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availableSeries = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedSeriesText = string.Empty;
-
 
         // Genres list
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availableGenres = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedGenresText = string.Empty;
@@ -48,7 +46,6 @@ namespace zennplay_launcher.ViewModels.Controls
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availableTags = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedTagsText = string.Empty;
@@ -57,7 +54,6 @@ namespace zennplay_launcher.ViewModels.Controls
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availableDevelopers = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedDevelopersText = string.Empty;
@@ -66,7 +62,6 @@ namespace zennplay_launcher.ViewModels.Controls
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availablePublishers = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedPublishersText = string.Empty;
@@ -75,10 +70,17 @@ namespace zennplay_launcher.ViewModels.Controls
         // 1. Data Master (Untuk ItemsSource)
         [ObservableProperty]
         private ObservableCollection<SelectableItem> _availablePlatforms = new();
-
         // 2. Teks Terpilih (Untuk Contents / Text)
         [ObservableProperty]
         private string? _selectedPlatformsText = string.Empty;
+
+        // Age Ratings list
+        // 1. Data Master (Untuk ItemsSource)
+        [ObservableProperty]
+        private ObservableCollection<SelectableItem> _availableAgeRatings = new();
+        // 2. Teks Terpilih (Untuk Contents / Text)
+        [ObservableProperty]
+        private string? _selectedAgeRatingsText = string.Empty;
 
         // ============================================================
         // FUNCTIONS
@@ -158,7 +160,7 @@ namespace zennplay_launcher.ViewModels.Controls
             );
 
             var platformsFromDb = _platformRepo.GetAllPlatforms();
-            var selecteTagsSet = (SelectedPlatformsText ?? string.Empty)
+            var selectedPlatformsSet = (SelectedPlatformsText ?? string.Empty)
                                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             AvailablePlatforms = new ObservableCollection<SelectableItem>(
@@ -166,7 +168,20 @@ namespace zennplay_launcher.ViewModels.Controls
                     name: l.Name,
                     id: l.Id,
                     description: l.Desc,
-                    isSelected: selectedGenresSet.Contains(l.Name)
+                    isSelected: selectedPlatformsSet.Contains(l.Name)
+                ))
+            );
+
+            var ageRatingsFromDb = _ageRatingRepo.GetAllAgeRatings();
+            var selectedAgeRatingsSet = (SelectedAgeRatingsText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailableAgeRatings = new ObservableCollection<SelectableItem>(
+                ageRatingsFromDb.Select(r => new SelectableItem(
+                    name: r.Name,
+                    id: r.Id,
+                    description: r.Desc,
+                    isSelected: selectedAgeRatingsSet.Contains(r.Name)
                 ))
             );
 

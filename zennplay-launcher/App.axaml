@@ -13,11 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://zennplay-launcher/Themes/ColorSchemes/ObsidianPurple.axaml" />
                 <ResourceInclude Source="avares://zennplay-launcher/Themes/FontSchemes/Default.axaml" />
-
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/MultiSelectComboBox.axaml" />
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyMultiSelectComboBoxView.axaml" />
-                <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/OptionHeaderView.axaml" />
+                <ResourceInclude Source="avares://zennplay-launcher/Themes/DefaultCustomControls.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

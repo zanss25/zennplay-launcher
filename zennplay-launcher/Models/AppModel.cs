@@ -44,6 +44,7 @@ namespace zennplay_launcher.Models
         public List<long> DeveloperIds { get; set; } = new();
         public List<long> PublisherIds { get; set; } = new();
         public List<long> PlatformIds { get; set; } = new();
+        public List<long> AgeRatingIds { get; set; } = new();
     }
 
 }

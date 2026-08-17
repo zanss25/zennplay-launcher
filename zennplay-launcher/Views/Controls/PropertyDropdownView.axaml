@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <ControlTheme x:Key="{x:Type controls:PropertyDropdownView}" TargetType="controls:PropertyDropdownView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="130, *" VerticalAlignment="Center" Margin="0,0,0,12">
+                    
+                    <TextBlock Grid.Column="0" 
+                               Text="{TemplateBinding Label}" 
+                               FontFamily="{DynamicResource FontCommon}"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextCommonBrush}"
+                               FontSize="13"/>
+
+                    <ComboBox Grid.Column="1"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{TemplateBinding ItemsSource}"
+                              SelectedItem="{TemplateBinding SelectedItem}"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

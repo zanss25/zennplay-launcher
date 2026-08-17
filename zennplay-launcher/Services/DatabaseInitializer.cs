@@ -27,6 +27,7 @@ namespace zennplay_launcher.Services
             GenerateAppPublishersTable();
             GeneratePlatformsTable();
             GenerateAppPlatformsTable();
+            GenerateAgeRatingsTable();
 
             // 2. Isi Data Awal (Seed Data)
             SeedDefaultSeries();
@@ -36,6 +37,7 @@ namespace zennplay_launcher.Services
             SeedDefaultDevelopers();
             SeedDefaultPublishers();
             SeedDefaultPlatforms();
+            SeedDefaultAgeRatings();
         }
 
         #region DDL Table Generators
@@ -352,6 +354,36 @@ namespace zennplay_launcher.Services
                                     app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
                                     platform_id INTEGER NOT NULL REFERENCES platforms(id) ON DELETE CASCADE,
                                     UNIQUE(app_id, platform_id)
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAgeRatingsTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS age_ratings (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    name TEXT NOT NULL UNIQUE,
+                                    desc TEXT,
+                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                );";
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void GenerateAppAgeRatingsTable()
+        {
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            using (var command = connection.CreateCommand())
+            {
+                command.CommandText = @"CREATE TABLE IF NOT EXISTS app_age_ratings (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                    age_rating_id INTEGER NOT NULL REFERENCES age_ratings(id) ON DELETE CASCADE,
+                                    UNIQUE(app_id, age_rating_id)
                                 );";
                 command.ExecuteNonQuery();
             }
@@ -675,6 +707,74 @@ namespace zennplay_launcher.Services
                 }
             }
             Console.WriteLine("Default platforms seeded successfully.");
+        }
+
+        private void SeedDefaultAgeRatings()
+        {
+            // Daftar default rating (ESRB & PEGI) beserta deskripsinya
+            var defaultRatings = new (string Name, string Desc)[]
+            {
+                // --- ESRB (Entertainment Software Rating Board) ---
+                ("ESRB: Everyone (E)", "Content is generally suitable for all ages. May contain minimal cartoon, fantasy or mild violence."),
+                ("ESRB: Everyone 10+ (E10+)", "Content is generally suitable for ages 10 and up. May contain more cartoon, fantasy or mild violence."),
+                ("ESRB: Teen (T)", "Content is generally suitable for ages 13 and up. May contain violence, suggestive themes, crude humor, or blood."),
+                ("ESRB: Mature 17+ (M)", "Content is generally suitable for ages 17 and up. May contain intense violence, blood and gore, sexual content, or strong language."),
+                ("ESRB: Adults Only 18+ (AO)", "Content suitable only for adults ages 18 and up. May include prolonged scenes of intense violence or graphic sexual content."),
+                ("ESRB: Rating Pending (RP)", "Not yet assigned a final ESRB rating."),
+
+                // --- PEGI (Pan European Game Information) ---
+                ("PEGI 3", "Suitable for all age groups. Contains no sounds or pictures that may frighten young children."),
+                ("PEGI 7", "Suitable for ages 7 and up. May contain scenes or sounds that can possibly be frightening to younger children."),
+                ("PEGI 12", "Suitable for ages 12 and up. Shows slightly more explicit violence towards fantasy characters or non-graphic violence towards human characters."),
+                ("PEGI 16", "Suitable for ages 16 and up. Realistic violence, sexual activity, or coarse language."),
+                ("PEGI 18", "Suitable for adults 18 and up. High levels of violence, graphic sexual depictions, or depiction of drug use.")
+            };
+
+            using (var connection = DatabaseHelper.GetOpenConnection())
+            {
+                // 1. Cek apakah sudah pernah di-seed sebelumnya
+                using (var checkCmd = connection.CreateCommand())
+                {
+                    checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_age_ratings_v1';";
+                    long count = (long)checkCmd.ExecuteScalar()!;
+                    if (count > 0) return;
+                }
+
+                // 2. Insert data default dengan transaksi agar cepat & aman
+                using (var transaction = connection.BeginTransaction())
+                using (var command = connection.CreateCommand())
+                {
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO age_ratings (name, desc) VALUES (@name, @desc);";
+
+                    var paramName = command.CreateParameter();
+                    paramName.ParameterName = "@name";
+                    command.Parameters.Add(paramName);
+
+                    var paramDesc = command.CreateParameter();
+                    paramDesc.ParameterName = "@desc";
+                    command.Parameters.Add(paramDesc);
+
+                    foreach (var rating in defaultRatings)
+                    {
+                        paramName.Value = rating.Name;
+                        paramDesc.Value = (object?)rating.Desc ?? DBNull.Value;
+                        command.ExecuteNonQuery();
+                    }
+
+                    // 3. Catat di db_metadata bahwa seeding selesai
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_age_ratings_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+                }
+            }
+
+            Console.WriteLine("Default age ratings seeded successfully.");
         }
 
         #endregion

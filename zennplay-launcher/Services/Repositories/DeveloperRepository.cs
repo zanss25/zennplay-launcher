@@ -69,7 +69,7 @@ namespace zennplay_launcher.Services.Repositories
                 string sql = @"
                     SELECT d.* FROM developers d
                     INNER JOIN app_developers ad ON d.id = ad.developer_id
-                    WHERE ag.app_id = @AppId
+                    WHERE ad.app_id = @AppId
                     ORDER BY d.name ASC;";
 
                 return conn.Query<DeveloperModel>(sql, new { AppId = appId });

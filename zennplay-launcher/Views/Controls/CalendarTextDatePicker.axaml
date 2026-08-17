@@ -1,0 +1,92 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <ControlTheme x:Key="{x:Type controls:CalendarTextDatePicker}" TargetType="controls:CalendarTextDatePicker">
+        <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <!-- Input Bar: TextBox dengan Tombol Kalender di Ujung Kanan -->
+                    <Border x:Name="PART_RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            MinHeight="32">
+                        
+                        <Grid ColumnDefinitions="*, Auto">
+                            <!-- Input Teks Langsung (Bisa Diketik Bebas) -->
+                            <TextBox x:Name="PART_TextBox"
+                                     Grid.Column="0"
+                                     Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                     PlaceholderText="{TemplateBinding PlaceholderText}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="8,5"
+                                     VerticalContentAlignment="Center"/>
+
+                            <!-- Tombol Ikon Kalender Kecil -->
+                            <ToggleButton x:Name="PART_CalendarToggle"
+                                          Grid.Column="1"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          Background="Transparent"
+                                          BorderThickness="0"
+                                          Width="30"
+                                          Padding="0"
+                                          Focusable="False"
+                                          Cursor="Hand">
+                                <!-- Ikon Kalender Minimalis -->
+                                <PathIcon Data="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z"
+                                          Width="14"
+                                          Height="14"
+                                          Foreground="{DynamicResource TextCommonBrush}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </ToggleButton>
+                        </Grid>
+                    </Border>
+
+                    <!-- Popup Grid Kalender Desktop -->
+                    <Popup x:Name="PART_Popup"
+                           IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                           PlacementTarget="{Binding #PART_RootBorder}"
+                           Placement="Bottom"
+                           IsLightDismissEnabled="True">
+                        
+                        <Border Background="{DynamicResource PopupBackgroundBrush}"
+                                BorderBrush="{DynamicResource PopupBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="4"
+                                Margin="0,4,0,0">
+                            
+                            <!-- Kontrol Kalender Klasik Avalonia -->
+                            <Calendar x:Name="PART_Calendar"
+                                      SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      DisplayDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}}"
+                                      SelectionMode="SingleDate"/>
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- Hover & Focus States -->
+        <Style Selector="^:pointerover /template/ Border#PART_RootBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderHoverBrush}"/>
+        </Style>
+
+        <Style Selector="^:focus-within /template/ Border#PART_RootBorder">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
+            <Setter Property="BorderThickness" Value="1.1"/>
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

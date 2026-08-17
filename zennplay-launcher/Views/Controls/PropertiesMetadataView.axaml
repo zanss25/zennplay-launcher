@@ -19,8 +19,10 @@
                 <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                        <controls:PropertyInputView Label="Title"/>
+                        <controls:PropertyInputView x:Name="TitleInput"
+                                                    Label="Title"/>
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="SeriesInput"
                                   Label="Series"
                                   Contents="{Binding SelectedSeriesText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableSeries}"
@@ -28,6 +30,7 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="PlatformsInput"
                                   Label="Platforms"
                                   Contents="{Binding SelectedPlatformsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailablePlatforms}"
@@ -35,6 +38,7 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="DevelopersInput"
                                   Label="Developers"
                                   Contents="{Binding SelectedDevelopersText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableDevelopers}"
@@ -42,17 +46,28 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="PublishersInput"
                                   Label="Publishers"
                                   Contents="{Binding SelectedPublishersText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailablePublishers}"
                                   AddNewText="New Publisher"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
-                        <controls:PropertyInputView Label="Release Date"/>
+                        <controls:PropertyCalendarTextInputView x:Name="ReleaseDateInput"
+                                                                Label="Release Date"
+                                                                SelectedDate="2022-05-12"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
-                        <controls:PropertyInputView Label="Age Rating"/>
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="AgeRatingsInput"
+                                  Label="Age Ratings"
+                                  Contents="{Binding SelectedAgeRatingsText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableAgeRatings}"
+                                  AddNewText="New Age Rating"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="GenresInput"
                                   Label="Genres"
                                   Contents="{Binding SelectedGenresText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableGenres}"
@@ -60,54 +75,65 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="TagsInput"
                                   Label="Tags"
                                   Contents="{Binding SelectedTagsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableTags}"
                                   AddNewText="New Tag"
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
-                        <controls:PropertyInputView Label="Source"/>
-                        <controls:PropertyInputView Label="User Rating"/>
+                        <controls:PropertyDropdownView x:Name="SourceInput"
+                                                       Label="Source"/>
+                        <controls:PropertyInputView x:Name="UserRatingInput"
+                                                    Label="User Rating"/>
                     </StackPanel>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
-                        <controls:PropertyInputView Label="Description"/>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
-
-            <!-- Other Details -->
-            <StackPanel Grid.Row="1">
-                <controls:OptionHeaderView Label="Other Details"/>
-                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
-                      Grid.Row="1">
-                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                        <controls:PropertyInputView Label="Sorting Title"/>
-                        <controls:PropertyInputView Label="Is Game"/>
-                        <controls:PropertyInputView Label="Is Excluded"/>
-                        <controls:PropertyInputView Label="Is Pinned"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
-                        <controls:PropertyInputView Label="First Launched"/>
-                        <controls:PropertyInputView Label="Last Launched"/>
-                        <controls:PropertyInputView Label="Launch Times"/>
-                        <controls:PropertyInputView Label="Completion Status"/>
-                    </StackPanel>
-                    <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
-                        <controls:PropertyInputView Label="Notes"/>
+                        <controls:PropertyInputView x:Name="DescriptionInput"
+                                                    Label="Description"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
 
             <!-- Section Options -->
-            <StackPanel Grid.Row="2">
+            <StackPanel Grid.Row="1">
                 <controls:OptionHeaderView Label="Section Options"/>
                 <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                        <controls:PropertyInputView Label="Section"/>
-                        <controls:PropertyInputView Label="Is Game"/>
-                        <controls:PropertyInputView Label="Is Excluded"/>
-                        <controls:PropertyInputView Label="Is Pinned"/>
+                        <controls:PropertyInputView x:Name="SectionsInput"
+                                                    Label="Sections"/>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+
+            <!-- Other Details -->
+            <StackPanel Grid.Row="2">
+                <controls:OptionHeaderView Label="Other Details"/>
+                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
+                      Grid.Row="1">
+                    <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
+                        <controls:PropertyInputView x:Name="SortingTitleInput"
+                                                    Label="Sorting Title"/>
+                        <controls:PropertyInputView x:Name="FirstLaunchedInput"
+                                                    Label="First Launched"/>
+                        <controls:PropertyInputView x:Name="LastLaunchedInput"
+                                                    Label="Last Launched"/>
+                        <controls:PropertyInputView x:Name="LaunchTimesInput"
+                                                    Label="Launch Times"/>
+                        <controls:PropertyDropdownView x:Name="CompletionStatusInput"
+                                                       Label="Completion Status"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
+                        <controls:PropertyInputView x:Name="NotesInput"
+                                                    Label="Notes"/>
+                    </StackPanel>
+                    <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
+                        <ToggleSwitch x:Name="IsNotGameInput"
+                                      Content="Flag as non-game app" />
+                        <ToggleSwitch x:Name="IsExcludedInput"
+                                      Content="Exclude from stats" />
+                        <ToggleSwitch x:Name="IsPinnedInput"
+                                      Content="Pin to the top" />
                     </StackPanel>
                 </Grid>
             </StackPanel>

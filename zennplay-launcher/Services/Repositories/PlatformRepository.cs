@@ -67,10 +67,10 @@ namespace zennplay_launcher.Services.Repositories
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = @"
-                    SELECT g.* FROM platforms g
-                    INNER JOIN app_platforms ag ON g.id = ag.platform_id
-                    WHERE ag.app_id = @AppId
-                    ORDER BY g.name ASC;";
+                    SELECT p.* FROM platforms p
+                    INNER JOIN app_platforms ap ON p.id = ap.platform_id
+                    WHERE ap.app_id = @AppId
+                    ORDER BY p.name ASC;";
 
                 return conn.Query<PlatformModel>(sql, new { AppId = appId });
             }

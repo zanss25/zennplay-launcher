@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <Design.PreviewWith>
+        <StackPanel Width="400" Spacing="10">
+            <StackPanel Background="{DynamicResource SystemRegionBrush}">
+                <controls:PropertyCalendarTextInputView />
+            </StackPanel>
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <ControlTheme x:Key="{x:Type controls:PropertyCalendarTextInputView}"
+                  TargetType="controls:PropertyCalendarTextInputView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="130, *" VerticalAlignment="Center" Margin="0,0,0,12">
+                    <TextBlock Grid.Column="0" 
+                               Text="{TemplateBinding Label}" 
+                               FontFamily="{DynamicResource FontCommon}"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextCommonBrush}"
+                               FontSize="13"/>
+
+                    <!-- Kontrol input / datepicker kamu di kolom 1 -->
+                    <controls:CalendarTextDatePicker Grid.Column="1"
+                                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                                               SelectedDate="{TemplateBinding SelectedDate, Mode=TwoWay}"
+                                               PlaceholderText="{TemplateBinding PlaceholderText}"/>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

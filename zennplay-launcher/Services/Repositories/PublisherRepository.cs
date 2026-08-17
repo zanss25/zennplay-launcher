@@ -67,10 +67,10 @@ namespace zennplay_launcher.Services.Repositories
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = @"
-                    SELECT g.* FROM publishers g
-                    INNER JOIN app_publishers ag ON g.id = ag.publisher_id
-                    WHERE ag.app_id = @AppId
-                    ORDER BY g.name ASC;";
+                    SELECT p.* FROM publishers p
+                    INNER JOIN app_publishers ap ON p.id = ap.publisher_id
+                    WHERE ap.app_id = @AppId
+                    ORDER BY p.name ASC;";
 
                 return conn.Query<PublisherModel>(sql, new { AppId = appId });
             }

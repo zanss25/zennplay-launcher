@@ -23,6 +23,7 @@ namespace zennplay_launcher.Models
         public IEnumerable<long>? DeveloperIds { get; set; }
         public IEnumerable<long>? PublisherIds { get; set; }
         public IEnumerable<long>? PlatformIds { get; set; }
+        public IEnumerable<long>? AgeRatingIds { get; set; }
 
         public AppSortBy SortBy { get; set; } = AppSortBy.Title;
         public SortDirection SortDirection { get; set; } = SortDirection.Ascending;

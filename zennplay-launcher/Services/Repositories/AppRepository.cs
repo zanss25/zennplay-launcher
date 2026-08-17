@@ -25,6 +25,7 @@ namespace zennplay_launcher.Services.Repositories
                           List<int>? developerIds = null,
                           List<int>? publisherIds = null,
                           List<int>? platformIds = null,
+                          List<int>? ageRatingIds = null,
                           List<AppActionModel>? actions = null,
                           List<AppLinkModel>? links = null)
         {
@@ -44,12 +45,12 @@ namespace zennplay_launcher.Services.Repositories
                         INSERT INTO apps (
                             guid, title, sorting_title, desc, user_rating, is_favorite, is_pinned,
                             notes, first_launched, last_launched, launch_times, completion_status,
-                            release_date, age_rating, is_installed, is_game, is_excluded, version, app_dir, 
+                            release_date, is_installed, is_game, is_excluded, version, app_dir, 
                             external_id, cover_path, background_path, icon_path
                         ) VALUES (
                             @Guid, @Title, @SortingTitle, @Desc, @UserRating, @IsFavorite, @IsPinned,
                             @Notes, @FirstLaunched, @LastLaunched, @LaunchTimes, @CompletionStatus,
-                            @ReleaseDate, @AgeRating, @IsInstalled, @IsGame, @IsExcluded, @Version, @AppDir, 
+                            @ReleaseDate, @IsInstalled, @IsGame, @IsExcluded, @Version, @AppDir, 
                             @ExternalId, @CoverPath, @BackgroundPath, @IconPath
                         );
                         SELECT last_insert_rowid();";
@@ -140,6 +141,14 @@ namespace zennplay_launcher.Services.Repositories
                         conn.Execute(sqlPlatform, platformData, transaction);
                     }
 
+                    // Insert Relasi Age Rating
+                    if (ageRatingIds != null && ageRatingIds.Any())
+                    {
+                        string sqlAgeRating = "INSERT INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
+                        var ageRatingData = ageRatingIds.Select(artId => new { AppId = newAppId, AgeRatingId = artId });
+                        conn.Execute(sqlAgeRating, ageRatingData, transaction);
+                    }
+
                     // Commit jika semua tahap sukses
                     transaction.Commit();
                     return newAppId;
@@ -193,8 +202,8 @@ namespace zennplay_launcher.Services.Repositories
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 var sql = @"
-            SELECT DISTINCT a.* FROM apps a
-            WHERE a.is_deleted = 0 ";
+                            SELECT DISTINCT a.* FROM apps a
+                            WHERE a.is_deleted = 0 ";
 
                 var parameters = new DynamicParameters();
 
@@ -271,6 +280,12 @@ namespace zennplay_launcher.Services.Repositories
                     parameters.Add("PlatformIds", criteria.PlatformIds);
                 }
 
+                if (criteria.AgeRatingIds != null && criteria.AgeRatingIds.Any())
+                {
+                    sql += " AND a.id IN (SELECT app_id FROM app_age_ratings WHERE age_rating_id IN @AgeRatingIds)";
+                    parameters.Add("AgeRatingIds", criteria.PlatformIds);
+                }
+
                 // 4. Sorting
                 string sortColumn = criteria.SortBy switch
                 {
@@ -305,27 +320,26 @@ namespace zennplay_launcher.Services.Repositories
                 {
                     // 1. Update data dasar tabel apps
                     string updateAppSql = @"
-                UPDATE apps SET
-                    title = @Title,
-                    sorting_title = @SortingTitle,
-                    desc = @Desc,
-                    user_rating = @UserRating,
-                    is_favorite = @IsFavorite,
-                    is_pinned = @IsPinned,
-                    notes = @Notes,
-                    completion_status = @CompletionStatus,
-                    release_date = @ReleaseDate,
-                    age_rating = @AgeRating,
-                    is_installed = @IsInstalled,
-                    is_game = @IsGame,
-                    is_excluded = @IsExcluded,
-                    version = @Version,
-                    app_dir = @AppDir,
-                    external_id = @ExternalId,
-                    cover_path = @CoverPath,
-                    background_path = @BackgroundPath,
-                    icon_path = @IconPath
-                WHERE id = @Id;";
+                        UPDATE apps SET
+                            title = @Title,
+                            sorting_title = @SortingTitle,
+                            desc = @Desc,
+                            user_rating = @UserRating,
+                            is_favorite = @IsFavorite,
+                            is_pinned = @IsPinned,
+                            notes = @Notes,
+                            completion_status = @CompletionStatus,
+                            release_date = @ReleaseDate,
+                            is_installed = @IsInstalled,
+                            is_game = @IsGame,
+                            is_excluded = @IsExcluded,
+                            version = @Version,
+                            app_dir = @AppDir,
+                            external_id = @ExternalId,
+                            cover_path = @CoverPath,
+                            background_path = @BackgroundPath,
+                            icon_path = @IconPath
+                        WHERE id = @Id;";
 
                     int rowsAffected = conn.Execute(updateAppSql, app, transaction: transaction);
                     if (rowsAffected == 0)
@@ -335,6 +349,7 @@ namespace zennplay_launcher.Services.Repositories
                     }
 
                     // 2. Sinkronisasi semua tabel junction (Delete Old -> Insert New)
+                    SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", app.AgeRatingIds);
                     SyncAppRelations(conn, transaction, app.Id, "app_developers", "developer_id", app.DeveloperIds);
                     SyncAppRelations(conn, transaction, app.Id, "app_publishers", "publisher_id", app.PublisherIds);
                     SyncAppRelations(conn, transaction, app.Id, "app_platforms", "platform_id", app.PlatformIds);
@@ -460,8 +475,8 @@ namespace zennplay_launcher.Services.Repositories
         private void IncrementGlobalCounter(IDbConnection conn, string keyName)
         {
             string sql = @"
-        INSERT INTO db_metadata (key, value) VALUES (@Key, '1')
-        ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1;";
+                    INSERT INTO db_metadata (key, value) VALUES (@Key, '1')
+                    ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1;";
 
             conn.Execute(sql, new { Key = keyName });
         }
