@@ -83,7 +83,9 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyDropdownView x:Name="SourceInput"
-                                                       Label="Source"/>
+                                                       Label="Source"
+                                                       ItemsSource="{Binding AvailableSources}"
+                                                       SelectedItem="{Binding SelectedSource}"/>
                         <controls:PropertyInputView x:Name="UserRatingInput"
                                                     Label="User Rating"/>
                     </StackPanel>
@@ -100,8 +102,14 @@
                 <Grid ColumnDefinitions="*,*" RowDefinitions="*,*"
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                        <controls:PropertyInputView x:Name="SectionsInput"
-                                                    Label="Sections"/>
+                        <controls:PropertyMultiSelectComboBoxView 
+                                  x:Name="SectionsInput"
+                                  Label="Sections"
+                                  Contents="{Binding SelectedSectionsText, Mode=TwoWay}"
+                                  ItemsSource="{Binding AvailableSections}"
+                                  AddNewText="New Section"
+                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  />
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -121,19 +129,21 @@
                         <controls:PropertyInputView x:Name="LaunchTimesInput"
                                                     Label="Launch Times"/>
                         <controls:PropertyDropdownView x:Name="CompletionStatusInput"
-                                                       Label="Completion Status"/>
+                                                       Label="Completion Status"
+                                                       ItemsSource="{Binding AvailableCompletionStatuses}"
+                                                       SelectedItem="{Binding SelectedCompletionStatus}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
                         <controls:PropertyInputView x:Name="NotesInput"
                                                     Label="Notes"/>
                     </StackPanel>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
-                        <ToggleSwitch x:Name="IsNotGameInput"
-                                      Content="Flag as non-game app" />
-                        <ToggleSwitch x:Name="IsExcludedInput"
-                                      Content="Exclude from stats" />
-                        <ToggleSwitch x:Name="IsPinnedInput"
-                                      Content="Pin to the top" />
+                        <controls:PropertySwitchTextView x:Name="IsNotGameSwitch"
+                                                         Label="Flag as non-game app"/>
+                        <controls:PropertySwitchTextView x:Name="IsExcludedSwitch"
+                                                         Label="Exclude from stats"/>
+                        <controls:PropertySwitchTextView x:Name="IsPinnedSwitch"
+                                                         Label="Pin to the top" />
                     </StackPanel>
                 </Grid>
             </StackPanel>

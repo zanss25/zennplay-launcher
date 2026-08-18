@@ -17,7 +17,6 @@ public partial class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         // Load Sections list
-        _sectionRepo = new SectionRepository();
         LoadSections();
 
         // Load static tabs list
@@ -109,7 +108,7 @@ public partial class MainViewModel : ViewModelBase
 
         Debug.WriteLine("Selected Section ID: " + value.Id);
 
-        var criteria = new AppFilterCriteria { SectionIds = new List<long> { value.Id } };
+        var criteria = new AppFilterCriteria { SectionIds = new List<Guid> { value.Id } };
 
         IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(criteria);
         DisplayedApps = new ObservableCollection<AppModel>(apps);

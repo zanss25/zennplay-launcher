@@ -18,6 +18,7 @@ namespace zennplay_launcher.ViewModels.Controls
         // ============================================================
 
         // Repositories
+        private readonly SectionRepository _sectionRepo = new();
         private readonly SeriesRepository _seriesRepo = new();
         private readonly GenreRepository _genreRepo = new();
         private readonly TagRepository _tagRepo = new();
@@ -25,6 +26,14 @@ namespace zennplay_launcher.ViewModels.Controls
         private readonly PublisherRepository _publisherRepo = new();
         private readonly PlatformRepository _platformRepo = new();
         private readonly AgeRatingRepository _ageRatingRepo = new();
+
+        // Sections list
+        // 1. Data Master (Untuk ItemsSource)
+        [ObservableProperty]
+        private ObservableCollection<SelectableItem> _availableSections = new();
+        // 2. Teks Terpilih (Untuk Contents / Text)
+        [ObservableProperty]
+        private string? _selectedSectionsText = string.Empty;
 
         // Series list
         // 1. Data Master (Untuk ItemsSource)
@@ -82,6 +91,28 @@ namespace zennplay_launcher.ViewModels.Controls
         [ObservableProperty]
         private string? _selectedAgeRatingsText = string.Empty;
 
+        // Sources List
+        // 1. Data Master
+        [ObservableProperty]
+        private ObservableCollection<AppSourceModel> _availableSources = [];
+        // 2. Source Terpilih
+        [ObservableProperty]
+        private AppSourceModel? _selectedSource;
+
+        // Completion Statuses List
+        // 1. Data Master
+        [ObservableProperty]
+        private ObservableCollection<AppCompletionStatusModel> _availableCompletionStatuses = [];
+        // 2. Completion Status Terpilih
+        [ObservableProperty]
+        private AppCompletionStatusModel? _selectedCompletionStatus;
+
+        public PropertiesMetadataViewModel()
+        {
+            AvailableSources = new ObservableCollection<AppSourceModel>(AppSourceList.AvailableSources);
+            AvailableCompletionStatuses = new ObservableCollection<AppCompletionStatusModel>(AppCompletionStatusList.AvailableCompletionStatuses);
+        }
+
         // ============================================================
         // FUNCTIONS
         // ============================================================
@@ -94,6 +125,19 @@ namespace zennplay_launcher.ViewModels.Controls
         // Method load data awal
         public void LoadData(int appId = 0)
         {
+            var sectionsFromDb = _sectionRepo.GetAllSections();
+            var selectedSectionsSet = (SelectedSectionsText ?? string.Empty)
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            AvailableSections = new ObservableCollection<SelectableItem>(
+                sectionsFromDb.Select(n => new SelectableItem(
+                    name: n.Name,
+                    id: n.Id,
+                    description: n.Desc,
+                    isSelected: selectedSectionsSet.Contains(n.Name)
+                ))
+            );
+
             var seriesFromDb = _seriesRepo.GetAllSeries();
             var selectedSeriesSet = (SelectedSeriesText ?? string.Empty)
                                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -185,6 +229,13 @@ namespace zennplay_launcher.ViewModels.Controls
                 ))
             );
 
+            string currentAppSource = "steam";
+            SelectedSource = AvailableSources.FirstOrDefault(s => s.Id == currentAppSource)
+                             ?? AvailableSources.FirstOrDefault();
+
+            string currentAppCompletionStatus = "not_played";
+            SelectedCompletionStatus = AvailableCompletionStatuses.FirstOrDefault(s => s.Id == currentAppCompletionStatus)
+                             ?? AvailableCompletionStatuses.FirstOrDefault();
         }
 
     }

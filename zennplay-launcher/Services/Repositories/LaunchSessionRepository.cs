@@ -16,19 +16,27 @@ namespace zennplay_launcher.Services.Repositories
         /// Dipanggil saat tombol "PLAY" diklik. 
         /// Mencatat awal sesi bermain game di tabel 'launch_sessions'.
         /// </summary>
-        public int StartSession(int appId)
+        public Guid StartSession(Guid appId)
         {
+            Guid sessionId = Guid.NewGuid();
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 // Format standar ISO 8601 (YYYY-MM-DD HH:mm:ss) untuk SQLite Text
                 string startTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
                 string sql = @"
-                    INSERT INTO launch_sessions (app_id, session_start)
-                    VALUES (@AppId, @SessionStart);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO launch_sessions (id, app_id, session_start)
+                    VALUES (@Id, @AppId, @SessionStart);";
 
-                return conn.ExecuteScalar<int>(sql, new { AppId = appId, SessionStart = startTime });
+                conn.Execute(sql, new
+                {
+                    Id = sessionId.ToString(),
+                    AppId = appId.ToString(),
+                    SessionStart = startTime
+                });
+
+                return sessionId;
             }
         }
 
@@ -36,7 +44,7 @@ namespace zennplay_launcher.Services.Repositories
         /// Dipanggil saat proses game ditutup.
         /// Mengisi session_end, menghitung duration_seconds, dan memperbarui statistik di tabel 'apps' & 'db_metadata'.
         /// </summary>
-        public bool EndSession(int sessionId, int appId)
+        public bool EndSession(Guid sessionId, Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             using (var transaction = conn.BeginTransaction())
@@ -47,7 +55,7 @@ namespace zennplay_launcher.Services.Repositories
 
                     // 1. Ambil session_start untuk menghitung durasi
                     string getStartSql = "SELECT session_start FROM launch_sessions WHERE id = @SessionId;";
-                    string? startStr = conn.ExecuteScalar<string>(getStartSql, new { SessionId = sessionId }, transaction);
+                    string? startStr = conn.ExecuteScalar<string>(getStartSql, new { SessionId = sessionId.ToString() }, transaction);
 
                     int durationSeconds = 0;
                     if (DateTime.TryParse(startStr, out DateTime startTime))
@@ -63,7 +71,12 @@ namespace zennplay_launcher.Services.Repositories
                             duration_seconds = @DurationSeconds
                         WHERE id = @Id;";
 
-                    conn.Execute(updateSessionSql, new { Id = sessionId, SessionEnd = endTime, DurationSeconds = durationSeconds }, transaction);
+                    conn.Execute(updateSessionSql, new
+                    {
+                        Id = sessionId.ToString(),
+                        SessionEnd = endTime,
+                        DurationSeconds = durationSeconds
+                    }, transaction);
 
                     // 3. Update statistik pada tabel 'apps' (last_launched & launch_times)
                     string updateAppStatsSql = @"
@@ -73,7 +86,11 @@ namespace zennplay_launcher.Services.Repositories
                             launch_times = launch_times + 1
                         WHERE id = @AppId;";
 
-                    conn.Execute(updateAppStatsSql, new { AppId = appId, EndTime = endTime }, transaction);
+                    conn.Execute(updateAppStatsSql, new
+                    {
+                        AppId = appId.ToString(),
+                        EndTime = endTime
+                    }, transaction);
 
                     // 4. Update Counter Global di 'db_metadata' (Total Playtime & Total Launches)
                     IncrementGlobalPlaytime(conn, transaction, durationSeconds);
@@ -96,7 +113,7 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil seluruh riwayat sesi bermain untuk 1 game tertentu.
         /// </summary>
-        public IEnumerable<LaunchSessionModel> GetSessionsByAppId(int appId)
+        public IEnumerable<LaunchSessionModel> GetSessionsByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -105,14 +122,14 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE app_id = @AppId 
                     ORDER BY session_start DESC;";
 
-                return conn.Query<LaunchSessionModel>(sql, new { AppId = appId });
+                return conn.Query<LaunchSessionModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
         /// <summary>
         /// Menghitung total durasi jam main (dalam detik) untuk 1 game tertentu.
         /// </summary>
-        public int GetTotalPlaytimeSecondsByAppId(int appId)
+        public int GetTotalPlaytimeSecondsByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -121,7 +138,7 @@ namespace zennplay_launcher.Services.Repositories
                     FROM launch_sessions 
                     WHERE app_id = @AppId;";
 
-                return conn.ExecuteScalar<int>(sql, new { AppId = appId });
+                return conn.ExecuteScalar<int>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -148,25 +165,24 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menghapus 1 baris riwayat sesi tertentu.
         /// </summary>
-        public bool DeleteSession(int sessionId)
+        public bool DeleteSession(Guid sessionId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM launch_sessions WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = sessionId }) > 0;
+                return conn.Execute(sql, new { Id = sessionId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus seluruh riwayat jam main untuk 1 game tertentu (Reset Playtime History).
         /// </summary>
-
-        public bool ClearAppSessions(int appId)
+        public bool ClearAppSessions(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM launch_sessions WHERE app_id = @AppId;";
-                return conn.Execute(sql, new { AppId = appId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString() }) > 0;
             }
         }
 

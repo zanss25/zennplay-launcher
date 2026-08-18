@@ -28,6 +28,7 @@ namespace zennplay_launcher.Services
             GeneratePlatformsTable();
             GenerateAppPlatformsTable();
             GenerateAgeRatingsTable();
+            GenerateAppAgeRatingsTable();
 
             // 2. Isi Data Awal (Seed Data)
             SeedDefaultSeries();
@@ -48,8 +49,8 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS db_metadata (
-                                        key TEXT PRIMARY KEY,
-                                        value TEXT NOT NULL
+                                            key TEXT PRIMARY KEY,
+                                            value TEXT NOT NULL
                                         );";
                 command.ExecuteNonQuery();
             }
@@ -61,8 +62,7 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS apps (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            guid TEXT NOT NULL UNIQUE,
+                                            id TEXT PRIMARY KEY,
                                             title TEXT NOT NULL,
                                             sorting_title TEXT,
                                             desc TEXT,
@@ -88,7 +88,7 @@ namespace zennplay_launcher.Services
                                             icon_path TEXT,
                                             created_at TEXT DEFAULT (datetime('now', 'localtime')),
                                             is_deleted INTEGER DEFAULT 0
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -99,11 +99,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_links (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            id TEXT PRIMARY KEY,
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
                                             name TEXT,
                                             url TEXT NOT NULL
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -114,8 +114,8 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_actions (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            id TEXT PRIMARY KEY,
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
                                             title TEXT NOT NULL,
                                             desc TEXT,
                                             action_type TEXT NOT NULL,
@@ -124,7 +124,7 @@ namespace zennplay_launcher.Services
                                             action_icon_path TEXT,
                                             is_game INTEGER DEFAULT 1,
                                             is_primary INTEGER DEFAULT 0
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -135,12 +135,12 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS launch_sessions (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            id TEXT PRIMARY KEY,
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
                                             session_start TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
                                             session_end TEXT,
                                             duration_seconds INTEGER
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -151,11 +151,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS series (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    name TEXT NOT NULL UNIQUE,
-                                    desc TEXT,
-                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                );";
+                                            id TEXT PRIMARY KEY,
+                                            name TEXT NOT NULL UNIQUE,
+                                            desc TEXT,
+                                            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -166,11 +166,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_series (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                    series_id INTEGER NOT NULL REFERENCES series(id) ON DELETE CASCADE,
-                                    UNIQUE(app_id, series_id)
-                                );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            series_id TEXT NOT NULL REFERENCES series(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, series_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -181,11 +180,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS genres (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            id TEXT PRIMARY KEY,
                                             name TEXT NOT NULL UNIQUE,
                                             desc TEXT,
                                             created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -196,11 +195,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_genres (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                            genre_id INTEGER NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
-                                            UNIQUE(app_id, genre_id)
-                                            );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            genre_id TEXT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, genre_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -211,11 +209,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS tags (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            id TEXT PRIMARY KEY,
                                             name TEXT NOT NULL UNIQUE,
                                             desc TEXT,
                                             created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -226,11 +224,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_tags (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                            tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-                                            UNIQUE(app_id, tag_id)
-                                            );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            tag_id TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, tag_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -241,15 +238,16 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS sections (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            id TEXT PRIMARY KEY,
                                             name TEXT NOT NULL UNIQUE,
                                             desc TEXT,
+                                            sort_order INTEGER DEFAULT 0,
                                             icon TEXT,
                                             app_type TEXT,
                                             is_game_by_default INTEGER DEFAULT 1,
                                             is_excluded_by_default INTEGER DEFAULT 0,
                                             created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                            );";
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -260,11 +258,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_sections (
-                                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                            app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                            section_id INTEGER NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
-                                            UNIQUE(app_id, section_id)
-                                            );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            section_id TEXT NOT NULL REFERENCES sections(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, section_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -275,11 +272,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS developers (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    name TEXT NOT NULL UNIQUE,
-                                    desc TEXT,
-                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                );";
+                                            id TEXT PRIMARY KEY,
+                                            name TEXT NOT NULL UNIQUE,
+                                            desc TEXT,
+                                            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -290,11 +287,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_developers (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                    developer_id INTEGER NOT NULL REFERENCES developers(id) ON DELETE CASCADE,
-                                    UNIQUE(app_id, developer_id)
-                                );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            developer_id TEXT NOT NULL REFERENCES developers(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, developer_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -305,11 +301,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS publishers (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    name TEXT NOT NULL UNIQUE,
-                                    desc TEXT,
-                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                );";
+                                            id TEXT PRIMARY KEY,
+                                            name TEXT NOT NULL UNIQUE,
+                                            desc TEXT,
+                                            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -320,11 +316,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_publishers (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                    publisher_id INTEGER NOT NULL REFERENCES publishers(id) ON DELETE CASCADE,
-                                    UNIQUE(app_id, publisher_id)
-                                );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            publisher_id TEXT NOT NULL REFERENCES publishers(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, publisher_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -335,11 +330,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS platforms (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    name TEXT NOT NULL UNIQUE,
-                                    desc TEXT,
-                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                );";
+                                            id TEXT PRIMARY KEY,
+                                            name TEXT NOT NULL UNIQUE,
+                                            desc TEXT,
+                                            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -350,11 +345,10 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_platforms (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                    platform_id INTEGER NOT NULL REFERENCES platforms(id) ON DELETE CASCADE,
-                                    UNIQUE(app_id, platform_id)
-                                );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            platform_id TEXT NOT NULL REFERENCES platforms(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, platform_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -365,11 +359,11 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS age_ratings (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    name TEXT NOT NULL UNIQUE,
-                                    desc TEXT,
-                                    created_at TEXT DEFAULT (datetime('now', 'localtime'))
-                                );";
+                                            id TEXT PRIMARY KEY,
+                                            name TEXT NOT NULL UNIQUE,
+                                            desc TEXT,
+                                            created_at TEXT DEFAULT (datetime('now', 'localtime'))
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
@@ -380,27 +374,26 @@ namespace zennplay_launcher.Services
             using (var command = connection.CreateCommand())
             {
                 command.CommandText = @"CREATE TABLE IF NOT EXISTS app_age_ratings (
-                                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                    app_id INTEGER NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
-                                    age_rating_id INTEGER NOT NULL REFERENCES age_ratings(id) ON DELETE CASCADE,
-                                    UNIQUE(app_id, age_rating_id)
-                                );";
+                                            app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
+                                            age_rating_id TEXT NOT NULL REFERENCES age_ratings(id) ON DELETE CASCADE,
+                                            PRIMARY KEY (app_id, age_rating_id)
+                                        );";
                 command.ExecuteNonQuery();
             }
         }
 
         #endregion
 
-        #region Seed Data Methods (Memasukkan Data Awal)
+        #region Seed Data Methods
 
         private void SeedDefaultSeries()
         {
             string[] defaultSeries = new string[]
             {
-        "Grand Theft Auto", "The Witcher", "Final Fantasy", "Resident Evil",
-        "Assassin's Creed", "Call of Duty", "Dark Souls", "The Elder Scrolls",
-        "Fallout", "Monster Hunter", "Persona", "Far Cry",
-        "Need for Speed", "Yakuza / Like a Dragon", "Tomb Raider", "Half-Life"
+                "Grand Theft Auto", "The Witcher", "Final Fantasy", "Resident Evil",
+                "Assassin's Creed", "Call of Duty", "Dark Souls", "The Elder Scrolls",
+                "Fallout", "Monster Hunter", "Persona", "Far Cry",
+                "Need for Speed", "Yakuza / Like a Dragon", "Tomb Raider", "Half-Life"
             };
 
             using (var connection = DatabaseHelper.GetOpenConnection())
@@ -412,24 +405,30 @@ namespace zennplay_launcher.Services
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT OR IGNORE INTO series (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO series (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var seriesName in defaultSeries)
                     {
-                        param.Value = seriesName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = seriesName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_series_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_series_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default series seeded successfully.");
@@ -451,31 +450,33 @@ namespace zennplay_launcher.Services
                 {
                     checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_genres_v1';";
                     long count = (long)checkCmd.ExecuteScalar()!;
-
-                    // Jika penanda sudah ada, batalkan seeding! 
-                    // Meskipun tabel 'tags' sekarang kosong karena dihapus player.
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    // Gunakan INSERT OR IGNORE agar tidak bentrok jika genre sudah ada
-                    command.CommandText = "INSERT OR IGNORE INTO genres (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO genres (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var genreName in defaultGenres)
                     {
-                        param.Value = genreName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = genreName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_genres_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_genres_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default genres seeded successfully.");
@@ -496,31 +497,33 @@ namespace zennplay_launcher.Services
                 {
                     checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_tags_v1';";
                     long count = (long)checkCmd.ExecuteScalar()!;
-
-                    // Jika penanda sudah ada, batalkan seeding! 
-                    // Meskipun tabel 'tags' sekarang kosong karena dihapus player.
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    // Gunakan INSERT OR IGNORE agar tidak bentrok jika genre sudah ada
-                    command.CommandText = "INSERT OR IGNORE INTO tags (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO tags (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var tagName in defaultTags)
                     {
-                        param.Value = tagName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = tagName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_tags_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_tags_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default tags seeded successfully.");
@@ -530,31 +533,31 @@ namespace zennplay_launcher.Services
         {
             using (var connection = DatabaseHelper.GetOpenConnection())
             {
-                // 1. Cek apakah seeding section v1 sudah pernah dijalankan sebelumnya
                 using (var checkCmd = connection.CreateCommand())
                 {
                     checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_sections_v1';";
                     long count = (long)checkCmd.ExecuteScalar()!;
-
-                    // JIKA SUDAH PERNAH DI-SEED, LANGSUNG HENTIKAN (Meskipun dipanggil 100x oleh UI)
                     if (count > 0) return;
                 }
 
-                // 2. Eksekusi Insert Section Bawaan jika DB benar-benar baru
                 var defaultSections = new[]
                 {
-                    new { Name = "Games", Desc = "Main game collection", Icon = "gamepad", AppType="Game", IsGame = 1, IsExcluded = 0 },
-                    new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", Icon = "wrench", AppType="Tool", IsGame = 0, IsExcluded = 1 },
-                    new { Name = "Emulators", Desc = "Console and handheld emulators", Icon = "cpu", AppType = "Emulator", IsGame = 0, IsExcluded = 1 }
-        };
+                    new { Name = "Games", Desc = "Main game collection", SortOrder=1, Icon = "gamepad", AppType="Game", IsGame = 1, IsExcluded = 0 },
+                    new { Name = "Tools", Desc = "Utilities, Mod Organizers, and Tweakers", SortOrder=1, Icon = "wrench", AppType="Tool", IsGame = 0, IsExcluded = 1 },
+                    new { Name = "Emulators", Desc = "Console and handheld emulators", SortOrder=1, Icon = "cpu", AppType = "Emulator", IsGame = 0, IsExcluded = 1 }
+                };
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = @"INSERT OR IGNORE INTO sections (name, desc, icon, app_type, is_game_by_default, is_excluded_by_default) 
-                                    VALUES (@name, @desc, @icon, @appType, @isGameByDefault, @isExcludedByDefault);";
+                    command.Transaction = transaction;
+                    command.CommandText = @"INSERT OR IGNORE INTO sections (id, name, desc, sort_order, icon, app_type, is_game_by_default, is_excluded_by_default) 
+                                            VALUES (@id, @name, @desc, @sort_order, @icon, @appType, @isGameByDefault, @isExcludedByDefault);";
 
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
                     var nameParam = command.Parameters.Add("@name", SqliteType.Text);
                     var descParam = command.Parameters.Add("@desc", SqliteType.Text);
+                    var sortOrderParam = command.Parameters.Add("@sort_order", SqliteType.Integer);
                     var iconParam = command.Parameters.Add("@icon", SqliteType.Text);
                     var appTypeParam = command.Parameters.Add("@appType", SqliteType.Text);
                     var isGameParam = command.Parameters.Add("@isGameByDefault", SqliteType.Integer);
@@ -562,8 +565,10 @@ namespace zennplay_launcher.Services
 
                     foreach (var sec in defaultSections)
                     {
+                        idParam.Value = Guid.NewGuid().ToString();
                         nameParam.Value = sec.Name;
                         descParam.Value = sec.Desc;
+                        sortOrderParam.Value = sec.SortOrder;
                         iconParam.Value = sec.Icon;
                         appTypeParam.Value = sec.AppType;
                         isGameParam.Value = sec.IsGame;
@@ -571,15 +576,18 @@ namespace zennplay_launcher.Services
 
                         command.ExecuteNonQuery();
                     }
-                }
 
-                // 3. Catat di db_metadata bahwa seeding selesai
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_sections_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_sections_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
+            Console.WriteLine("Default sections seeded successfully.");
         }
 
         private void SeedDefaultDevelopers()
@@ -601,24 +609,30 @@ namespace zennplay_launcher.Services
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT OR IGNORE INTO developers (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO developers (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var devName in defaultDevelopers)
                     {
-                        param.Value = devName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = devName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_developers_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_developers_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default developers seeded successfully.");
@@ -643,24 +657,30 @@ namespace zennplay_launcher.Services
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT OR IGNORE INTO publishers (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO publishers (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var pubName in defaultPublishers)
                     {
-                        param.Value = pubName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = pubName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_publishers_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_publishers_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default publishers seeded successfully.");
@@ -686,24 +706,30 @@ namespace zennplay_launcher.Services
                     if (count > 0) return;
                 }
 
+                using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = "INSERT OR IGNORE INTO platforms (name) VALUES (@name);";
-                    var param = command.CreateParameter();
-                    param.ParameterName = "@name";
-                    command.Parameters.Add(param);
+                    command.Transaction = transaction;
+                    command.CommandText = "INSERT OR IGNORE INTO platforms (id, name) VALUES (@id, @name);";
+
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
 
                     foreach (var platformName in defaultPlatforms)
                     {
-                        param.Value = platformName;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = platformName;
                         command.ExecuteNonQuery();
                     }
-                }
 
-                using (var markCmd = connection.CreateCommand())
-                {
-                    markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_platforms_v1', 'completed');";
-                    markCmd.ExecuteNonQuery();
+                    using (var markCmd = connection.CreateCommand())
+                    {
+                        markCmd.Transaction = transaction;
+                        markCmd.CommandText = "INSERT INTO db_metadata (key, value) VALUES ('seed_platforms_v1', 'completed');";
+                        markCmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                 }
             }
             Console.WriteLine("Default platforms seeded successfully.");
@@ -711,10 +737,8 @@ namespace zennplay_launcher.Services
 
         private void SeedDefaultAgeRatings()
         {
-            // Daftar default rating (ESRB & PEGI) beserta deskripsinya
             var defaultRatings = new (string Name, string Desc)[]
             {
-                // --- ESRB (Entertainment Software Rating Board) ---
                 ("ESRB: Everyone (E)", "Content is generally suitable for all ages. May contain minimal cartoon, fantasy or mild violence."),
                 ("ESRB: Everyone 10+ (E10+)", "Content is generally suitable for ages 10 and up. May contain more cartoon, fantasy or mild violence."),
                 ("ESRB: Teen (T)", "Content is generally suitable for ages 13 and up. May contain violence, suggestive themes, crude humor, or blood."),
@@ -722,7 +746,6 @@ namespace zennplay_launcher.Services
                 ("ESRB: Adults Only 18+ (AO)", "Content suitable only for adults ages 18 and up. May include prolonged scenes of intense violence or graphic sexual content."),
                 ("ESRB: Rating Pending (RP)", "Not yet assigned a final ESRB rating."),
 
-                // --- PEGI (Pan European Game Information) ---
                 ("PEGI 3", "Suitable for all age groups. Contains no sounds or pictures that may frighten young children."),
                 ("PEGI 7", "Suitable for ages 7 and up. May contain scenes or sounds that can possibly be frightening to younger children."),
                 ("PEGI 12", "Suitable for ages 12 and up. Shows slightly more explicit violence towards fantasy characters or non-graphic violence towards human characters."),
@@ -732,7 +755,6 @@ namespace zennplay_launcher.Services
 
             using (var connection = DatabaseHelper.GetOpenConnection())
             {
-                // 1. Cek apakah sudah pernah di-seed sebelumnya
                 using (var checkCmd = connection.CreateCommand())
                 {
                     checkCmd.CommandText = "SELECT COUNT(*) FROM db_metadata WHERE key = 'seed_age_ratings_v1';";
@@ -740,29 +762,24 @@ namespace zennplay_launcher.Services
                     if (count > 0) return;
                 }
 
-                // 2. Insert data default dengan transaksi agar cepat & aman
                 using (var transaction = connection.BeginTransaction())
                 using (var command = connection.CreateCommand())
                 {
                     command.Transaction = transaction;
-                    command.CommandText = "INSERT OR IGNORE INTO age_ratings (name, desc) VALUES (@name, @desc);";
+                    command.CommandText = "INSERT OR IGNORE INTO age_ratings (id, name, desc) VALUES (@id, @name, @desc);";
 
-                    var paramName = command.CreateParameter();
-                    paramName.ParameterName = "@name";
-                    command.Parameters.Add(paramName);
-
-                    var paramDesc = command.CreateParameter();
-                    paramDesc.ParameterName = "@desc";
-                    command.Parameters.Add(paramDesc);
+                    var idParam = command.Parameters.Add("@id", SqliteType.Text);
+                    var nameParam = command.Parameters.Add("@name", SqliteType.Text);
+                    var descParam = command.Parameters.Add("@desc", SqliteType.Text);
 
                     foreach (var rating in defaultRatings)
                     {
-                        paramName.Value = rating.Name;
-                        paramDesc.Value = (object?)rating.Desc ?? DBNull.Value;
+                        idParam.Value = Guid.NewGuid().ToString();
+                        nameParam.Value = rating.Name;
+                        descParam.Value = (object?)rating.Desc ?? DBNull.Value;
                         command.ExecuteNonQuery();
                     }
 
-                    // 3. Catat di db_metadata bahwa seeding selesai
                     using (var markCmd = connection.CreateCommand())
                     {
                         markCmd.Transaction = transaction;

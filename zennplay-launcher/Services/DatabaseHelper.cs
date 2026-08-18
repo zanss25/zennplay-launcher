@@ -12,6 +12,10 @@ namespace zennplay_launcher.Services
     public static class DatabaseHelper
     {
 
+        static DatabaseHelper()
+        {
+            SqlMapper.AddTypeHandler(new GuidTypeHandler());
+        }
 
         /// <summary>
         /// Mendapatkan path lengkap direktori dan file SQLite di %AppData%/ZennPlay/zennplay.db

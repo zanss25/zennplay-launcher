@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Data.Core;
 using System.Collections;
+using System.Net.NetworkInformation;
 
 namespace zennplay_launcher.Views.Controls
 {

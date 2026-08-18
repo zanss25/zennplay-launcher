@@ -9,6 +9,11 @@ namespace zennplay_launcher.Views.Controls
         public PropertiesMetadataView()
         {
             InitializeComponent();
+
+            IsNotGameSwitch.IsChecked = false;
+            IsExcludedSwitch.IsChecked = false;
+            IsPinnedSwitch.IsChecked = false;
+            
         }
     }
 }

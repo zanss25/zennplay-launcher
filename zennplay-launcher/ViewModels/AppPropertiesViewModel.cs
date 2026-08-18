@@ -23,7 +23,7 @@ namespace zennplay_launcher.ViewModels
         private bool _isEditMode;
 
         [ObservableProperty]
-        private int _appId;
+        private Guid _appId = Guid.Empty;
 
         [ObservableProperty]
         private AppModel? _currentApp;
@@ -49,10 +49,10 @@ namespace zennplay_launcher.ViewModels
         private readonly PropertiesMediaView _mediaView = new();
 
         // Method untuk inisialisasi mode
-        public void Initialize(int appId)
+        public void Initialize(Guid appId)
         {
             AppId = appId;
-            IsEditMode = appId >= 0;
+            IsEditMode = appId != Guid.Empty;
 
             if (IsEditMode)
             {
@@ -112,7 +112,7 @@ namespace zennplay_launcher.ViewModels
         // ============================================================
         // FETCH APP DATA
         // ============================================================
-        public void LoadAppData(int appId)
+        public void LoadAppData(Guid appId)
         {
             AppModel? app = _appRepo.GetAppById(appId);
             if (app != null)

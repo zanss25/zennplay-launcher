@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan developer baru ke database.
         /// </summary>
-        public int AddDeveloper(DeveloperModel developer)
+        public Guid AddDeveloper(DeveloperModel developer)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (developer.Id == Guid.Empty)
+            {
+                developer.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlDeveloper = @"
-                    INSERT INTO developers (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO developers (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newDeveloperId = conn.ExecuteScalar<int>(sqlDeveloper, developer);
-                developer.Id = newDeveloperId;
-                return newDeveloperId;
+                conn.Execute(sqlDeveloper, new
+                {
+                    Id = developer.Id.ToString(),
+                    developer.Name,
+                    developer.Desc
+                });
+
+                return developer.Id;
             }
         }
 
@@ -49,20 +59,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu developer berdasarkan ID.
         /// </summary>
-        public DeveloperModel? GetDeveloperById(int id)
+        public DeveloperModel? GetDeveloperById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'developers'
                 string sql = "SELECT * FROM developers WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<DeveloperModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<DeveloperModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh developer yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<DeveloperModel> GetDevelopersByAppId(int appId)
+        public IEnumerable<DeveloperModel> GetDevelopersByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +81,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE ad.app_id = @AppId
                     ORDER BY d.name ASC;";
 
-                return conn.Query<DeveloperModel>(sql, new { AppId = appId });
+                return conn.Query<DeveloperModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,35 +124,40 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, developer) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = developer.Id.ToString(),
+                    developer.Name,
+                    developer.Desc
+                }) > 0;
             }
         }
 
         #endregion
 
-        #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
+        #region 4. RELATIONAL MANAGEMENT (APP <-> DEVELOPER)
 
         /// <summary>
         /// Menghubungkan game dengan suatu Developer.
         /// </summary>
-        public bool AssignDeveloperToApp(int appId, int developerId)
+        public bool AssignDeveloperToApp(Guid appId, Guid developerId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_developers (app_id, developer_id) VALUES (@AppId, @DeveloperId);";
-                return conn.Execute(sql, new { AppId = appId, DeveloperId = developerId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan developer dari game tertentu.
         /// </summary>
-        public bool RemoveDeveloperFromApp(int appId, int developerId)
+        public bool RemoveDeveloperFromApp(Guid appId, Guid developerId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_developers WHERE app_id = @AppId AND developer_id = @DeveloperId;";
-                return conn.Execute(sql, new { AppId = appId, DeveloperId = developerId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() }) > 0;
             }
         }
 
@@ -155,16 +169,15 @@ namespace zennplay_launcher.Services.Repositories
         /// Hapus permanen Developer dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_developers').
         /// </summary>
-        public bool DeleteDeveloper(int id)
+        public bool DeleteDeveloper(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM developers WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 
         #endregion
     }
 }
-

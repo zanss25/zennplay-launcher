@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan publisher baru ke database.
         /// </summary>
-        public int AddPublisher(PublisherModel publisher)
+        public Guid AddPublisher(PublisherModel publisher)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (publisher.Id == Guid.Empty)
+            {
+                publisher.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlPublisher = @"
-                    INSERT INTO publishers (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO publishers (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newPublisherId = conn.ExecuteScalar<int>(sqlPublisher, publisher);
-                publisher.Id = newPublisherId;
-                return newPublisherId;
+                conn.Execute(sqlPublisher, new
+                {
+                    Id = publisher.Id.ToString(),
+                    publisher.Name,
+                    publisher.Desc
+                });
+
+                return publisher.Id;
             }
         }
 
@@ -49,20 +59,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu publisher berdasarkan ID.
         /// </summary>
-        public PublisherModel? GetPublisherById(int id)
+        public PublisherModel? GetPublisherById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'publishers'
                 string sql = "SELECT * FROM publishers WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<PublisherModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<PublisherModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh publisher yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<PublisherModel> GetPublishersByAppId(int appId)
+        public IEnumerable<PublisherModel> GetPublishersByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +81,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE ap.app_id = @AppId
                     ORDER BY p.name ASC;";
 
-                return conn.Query<PublisherModel>(sql, new { AppId = appId });
+                return conn.Query<PublisherModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,52 +124,57 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, publisher) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = publisher.Id.ToString(),
+                    publisher.Name,
+                    publisher.Desc
+                }) > 0;
             }
         }
 
         #endregion
 
-        #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
+        #region 4. RELATIONAL MANAGEMENT (APP <-> PUBLISHER)
 
         /// <summary>
         /// Menghubungkan game dengan suatu Publisher.
         /// </summary>
-        public bool AssignPublisherToApp(int appId, int publisherId)
+        public bool AssignPublisherToApp(Guid appId, Guid publisherId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_publishers (app_id, publisher_id) VALUES (@AppId, @PublisherId);";
-                return conn.Execute(sql, new { AppId = appId, PublisherId = publisherId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan publisher dari game tertentu.
         /// </summary>
-        public bool RemovePublisherFromApp(int appId, int publisherId)
+        public bool RemovePublisherFromApp(Guid appId, Guid publisherId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_publishers WHERE app_id = @AppId AND publisher_id = @PublisherId;";
-                return conn.Execute(sql, new { AppId = appId, PublisherId = publisherId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() }) > 0;
             }
         }
 
         #endregion
 
-        #region 5. DELETEGenre
+        #region 5. DELETE
 
         /// <summary>
         /// Hapus permanen Publisher dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_publishers').
         /// </summary>
-        public bool DeletePublisher(int id)
+        public bool DeletePublisher(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM publishers WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

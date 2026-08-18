@@ -15,18 +15,22 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan ageRating baru ke database.
         /// </summary>
-        public int AddAgeRating(AgeRatingModel ageRating)
+        public Guid AddAgeRating(AgeRatingModel ageRating)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (ageRating.Id == Guid.Empty)
+            {
+                ageRating.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlAgeRating = @"
-                    INSERT INTO age_ratings (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO age_ratings (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newAgeRatingId = conn.ExecuteScalar<int>(sqlAgeRating, ageRating);
-                ageRating.Id = newAgeRatingId;
-                return newAgeRatingId;
+                conn.Execute(sqlAgeRating, ageRating);
+                return ageRating.Id;
             }
         }
 
@@ -49,20 +53,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu ageRating berdasarkan ID.
         /// </summary>
-        public AgeRatingModel? GetAgeRatingById(int id)
+        public AgeRatingModel? GetAgeRatingById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'ageRatings'
                 string sql = "SELECT * FROM age_ratings WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<AgeRatingModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<AgeRatingModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh ageRating yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<AgeRatingModel> GetAgeRatingsByAppId(int appId)
+        public IEnumerable<AgeRatingModel> GetAgeRatingsByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +75,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE ar.app_id = @AppId
                     ORDER BY r.name ASC;";
 
-                return conn.Query<AgeRatingModel>(sql, new { AppId = appId });
+                return conn.Query<AgeRatingModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -121,29 +124,29 @@ namespace zennplay_launcher.Services.Repositories
 
         #endregion
 
-        #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
+        #region 4. RELATIONAL MANAGEMENT (APP <-> AGE RATING)
 
         /// <summary>
         /// Menghubungkan game dengan suatu AgeRating.
         /// </summary>
-        public bool AssignAgeRatingToApp(int appId, int ageRatingId)
+        public bool AssignAgeRatingToApp(Guid appId, Guid ageRatingId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
-                return conn.Execute(sql, new { AppId = appId, AgeRatingId = ageRatingId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan ageRating dari game tertentu.
         /// </summary>
-        public bool RemoveAgeRatingFromApp(int appId, int ageRatingId)
+        public bool RemoveAgeRatingFromApp(Guid appId, Guid ageRatingId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_age_ratings WHERE app_id = @AppId AND age_rating_id = @AgeRatingId;";
-                return conn.Execute(sql, new { AppId = appId, AgeRatingId = ageRatingId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() }) > 0;
             }
         }
 
@@ -153,14 +156,13 @@ namespace zennplay_launcher.Services.Repositories
 
         /// <summary>
         /// Hapus permanen AgeRating dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_ageRatings').
         /// </summary>
-        public bool DeleteAgeRating(int id)
+        public bool DeleteAgeRating(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM age_ratings WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

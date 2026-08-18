@@ -1,11 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace zennplay_launcher.Models;
 
 public class SelectableItem : INotifyPropertyChanged
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
 
@@ -23,10 +24,10 @@ public class SelectableItem : INotifyPropertyChanged
         }
     }
 
-    public SelectableItem(string name, int id = 0, string? description = null, bool isSelected = false)
+    public SelectableItem(string name, Guid? id = null, string? description = null, bool isSelected = false)
     {
         Name = name;
-        Id = id;
+        Id = id ?? Guid.NewGuid(); // Jika tidak disediakan (item baru), generate GUID baru
         Description = description;
         IsSelected = isSelected;
     }

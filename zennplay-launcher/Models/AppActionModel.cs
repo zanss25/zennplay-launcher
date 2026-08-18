@@ -8,8 +8,8 @@ namespace zennplay_launcher.Models
 {
     public class AppActionModel
     {
-        public int Id { get; set; }
-        public int AppId { get; set; }
+        public Guid Id { get; set; }
+        public Guid AppId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string? Desc { get; set; }
         public string ActionType { get; set; } = string.Empty; // "executable", "url", dll

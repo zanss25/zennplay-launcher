@@ -1,9 +1,9 @@
 ﻿using Dapper;
-using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Services.Repositories
@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan genre baru ke database.
         /// </summary>
-        public int AddGenre(GenreModel genre)
+        public Guid AddGenre(GenreModel genre)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (genre.Id == Guid.Empty)
+            {
+                genre.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlGenre = @"
-                    INSERT INTO genres (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO genres (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newGenreId = conn.ExecuteScalar<int>(sqlGenre, genre);
-                genre.Id = newGenreId;
-                return newGenreId;
+                conn.Execute(sqlGenre, new
+                {
+                    Id = genre.Id.ToString(),
+                    genre.Name,
+                    genre.Desc
+                });
+
+                return genre.Id;
             }
         }
 
@@ -49,20 +59,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu genre berdasarkan ID.
         /// </summary>
-        public GenreModel? GetGenreById(int id)
+        public GenreModel? GetGenreById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'genres'
                 string sql = "SELECT * FROM genres WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<GenreModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<GenreModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh genre yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<GenreModel> GetGenresByAppId(int appId)
+        public IEnumerable<GenreModel> GetGenresByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +81,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE ag.app_id = @AppId
                     ORDER BY g.name ASC;";
 
-                return conn.Query<GenreModel>(sql, new { AppId = appId });
+                return conn.Query<GenreModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,7 +124,12 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, genre) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = genre.Id.ToString(),
+                    genre.Name,
+                    genre.Desc
+                }) > 0;
             }
         }
 
@@ -126,24 +140,24 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menghubungkan game dengan suatu Genre.
         /// </summary>
-        public bool AssignGenreToApp(int appId, int genreId)
+        public bool AssignGenreToApp(Guid appId, Guid genreId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
-                return conn.Execute(sql, new { AppId = appId, GenreId = genreId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan genre dari game tertentu.
         /// </summary>
-        public bool RemoveGenreFromApp(int appId, int genreId)
+        public bool RemoveGenreFromApp(Guid appId, Guid genreId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_genres WHERE app_id = @AppId AND genre_id = @GenreId;";
-                return conn.Execute(sql, new { AppId = appId, GenreId = genreId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() }) > 0;
             }
         }
 
@@ -155,12 +169,12 @@ namespace zennplay_launcher.Services.Repositories
         /// Hapus permanen Genre dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_genres').
         /// </summary>
-        public bool DeleteGenre(int id)
+        public bool DeleteGenre(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM genres WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan platform baru ke database.
         /// </summary>
-        public int AddPlatform(PlatformModel platform)
+        public Guid AddPlatform(PlatformModel platform)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (platform.Id == Guid.Empty)
+            {
+                platform.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlPlatform = @"
-                    INSERT INTO platforms (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO platforms (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newPlatformId = conn.ExecuteScalar<int>(sqlPlatform, platform);
-                platform.Id = newPlatformId;
-                return newPlatformId;
+                conn.Execute(sqlPlatform, new
+                {
+                    Id = platform.Id.ToString(),
+                    platform.Name,
+                    platform.Desc
+                });
+
+                return platform.Id;
             }
         }
 
@@ -49,20 +59,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu platform berdasarkan ID.
         /// </summary>
-        public PlatformModel? GetPlatformById(int id)
+        public PlatformModel? GetPlatformById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'platforms'
                 string sql = "SELECT * FROM platforms WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<PlatformModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<PlatformModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh platform yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<PlatformModel> GetPlatformsByAppId(int appId)
+        public IEnumerable<PlatformModel> GetPlatformsByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +81,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE ap.app_id = @AppId
                     ORDER BY p.name ASC;";
 
-                return conn.Query<PlatformModel>(sql, new { AppId = appId });
+                return conn.Query<PlatformModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,35 +124,40 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, platform) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = platform.Id.ToString(),
+                    platform.Name,
+                    platform.Desc
+                }) > 0;
             }
         }
 
         #endregion
 
-        #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
+        #region 4. RELATIONAL MANAGEMENT (APP <-> PLATFORM)
 
         /// <summary>
         /// Menghubungkan game dengan suatu Platform.
         /// </summary>
-        public bool AssignPlatformToApp(int appId, int platformId)
+        public bool AssignPlatformToApp(Guid appId, Guid platformId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_platforms (app_id, platform_id) VALUES (@AppId, @PlatformId);";
-                return conn.Execute(sql, new { AppId = appId, PlatformId = platformId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan platform dari game tertentu.
         /// </summary>
-        public bool RemovePlatformFromApp(int appId, int platformId)
+        public bool RemovePlatformFromApp(Guid appId, Guid platformId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_platforms WHERE app_id = @AppId AND platform_id = @PlatformId;";
-                return conn.Execute(sql, new { AppId = appId, PlatformId = platformId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() }) > 0;
             }
         }
 
@@ -155,12 +169,12 @@ namespace zennplay_launcher.Services.Repositories
         /// Hapus permanen Platform dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_platforms').
         /// </summary>
-        public bool DeletePlatform(int id)
+        public bool DeletePlatform(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM platforms WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

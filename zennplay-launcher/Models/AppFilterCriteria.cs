@@ -16,14 +16,14 @@ namespace zennplay_launcher.Models
         public bool? OnlyPinned { get; set; }
         public bool? IsGame { get; set; }
 
-        public IEnumerable<long>? SectionIds { get; set; }
-        public IEnumerable<long>? SeriesIds { get; set; }
-        public IEnumerable<long>? GenreIds { get; set; }
-        public IEnumerable<long>? TagIds { get; set; }
-        public IEnumerable<long>? DeveloperIds { get; set; }
-        public IEnumerable<long>? PublisherIds { get; set; }
-        public IEnumerable<long>? PlatformIds { get; set; }
-        public IEnumerable<long>? AgeRatingIds { get; set; }
+        public IEnumerable<Guid>? SectionIds { get; set; }
+        public IEnumerable<Guid>? SeriesIds { get; set; }
+        public IEnumerable<Guid>? GenreIds { get; set; }
+        public IEnumerable<Guid>? TagIds { get; set; }
+        public IEnumerable<Guid>? DeveloperIds { get; set; }
+        public IEnumerable<Guid>? PublisherIds { get; set; }
+        public IEnumerable<Guid>? PlatformIds { get; set; }
+        public IEnumerable<Guid>? AgeRatingIds { get; set; }
 
         public AppSortBy SortBy { get; set; } = AppSortBy.Title;
         public SortDirection SortDirection { get; set; } = SortDirection.Ascending;

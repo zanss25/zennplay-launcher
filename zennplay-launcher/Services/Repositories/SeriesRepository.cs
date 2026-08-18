@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan series baru ke database.
         /// </summary>
-        public int AddSeries(SeriesModel series)
+        public Guid AddSeries(SeriesModel series)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (series.Id == Guid.Empty)
+            {
+                series.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlSeries = @"
-                    INSERT INTO series (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO series (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newSeriesId = conn.ExecuteScalar<int>(sqlSeries, series);
-                series.Id = newSeriesId;
-                return newSeriesId;
+                conn.Execute(sqlSeries, new
+                {
+                    Id = series.Id.ToString(),
+                    series.Name,
+                    series.Desc
+                });
+
+                return series.Id;
             }
         }
 
@@ -49,20 +59,19 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu series berdasarkan ID.
         /// </summary>
-        public SeriesModel? GetSeriesById(int id)
+        public SeriesModel? GetSeriesById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                // PERBAIKAN: Mengubah tabel 'apps' menjadi 'series'
                 string sql = "SELECT * FROM series WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<SeriesModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<SeriesModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Mengambil seluruh series yang dimiliki oleh game tertentu.
         /// </summary>
-        public IEnumerable<SeriesModel> GetSeriesByAppId(int appId)
+        public IEnumerable<SeriesModel> GetSeriesByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +81,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE as.app_id = @AppId
                     ORDER BY s.name ASC;";
 
-                return conn.Query<SeriesModel>(sql, new { AppId = appId });
+                return conn.Query<SeriesModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,35 +124,40 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, series) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = series.Id.ToString(),
+                    series.Name,
+                    series.Desc
+                }) > 0;
             }
         }
 
         #endregion
 
-        #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
+        #region 4. RELATIONAL MANAGEMENT (APP <-> SERIES)
 
         /// <summary>
         /// Menghubungkan game dengan suatu Series.
         /// </summary>
-        public bool AssignSeriesToApp(int appId, int seriesId)
+        public bool AssignSeriesToApp(Guid appId, Guid seriesId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_series (app_id, series_id) VALUES (@AppId, @SeriesId);";
-                return conn.Execute(sql, new { AppId = appId, SeriesId = seriesId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan series dari game tertentu.
         /// </summary>
-        public bool RemoveSeriesFromApp(int appId, int seriesId)
+        public bool RemoveSeriesFromApp(Guid appId, Guid seriesId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_series WHERE app_id = @AppId AND series_id = @SeriesId;";
-                return conn.Execute(sql, new { AppId = appId, SeriesId = seriesId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() }) > 0;
             }
         }
 
@@ -155,12 +169,12 @@ namespace zennplay_launcher.Services.Repositories
         /// Hapus permanen Series dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_series').
         /// </summary>
-        public bool DeleteSeries(int id)
+        public bool DeleteSeries(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM series WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

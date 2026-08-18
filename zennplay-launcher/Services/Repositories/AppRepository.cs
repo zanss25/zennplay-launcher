@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using HarfBuzzSharp;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
@@ -17,22 +16,22 @@ namespace zennplay_launcher.Services.Repositories
         /// Menambahkan aplikasi baru beserta relasi awal (Section, Genres, Tags, Links, Actions)
         /// menggunakan SqliteTransaction demi keamanan data.
         /// </summary>
-        public int AddApp(AppModel app,
-                          List<int>? sectionIds = null,
-                          List<int>? seriesIds = null,
-                          List<int>? genreIds = null,
-                          List<int>? tagIds = null,
-                          List<int>? developerIds = null,
-                          List<int>? publisherIds = null,
-                          List<int>? platformIds = null,
-                          List<int>? ageRatingIds = null,
-                          List<AppActionModel>? actions = null,
-                          List<AppLinkModel>? links = null)
+        public Guid AddApp(AppModel app,
+                           List<Guid>? sectionIds = null,
+                           List<Guid>? seriesIds = null,
+                           List<Guid>? genreIds = null,
+                           List<Guid>? tagIds = null,
+                           List<Guid>? developerIds = null,
+                           List<Guid>? publisherIds = null,
+                           List<Guid>? platformIds = null,
+                           List<Guid>? ageRatingIds = null,
+                           List<AppActionModel>? actions = null,
+                           List<AppLinkModel>? links = null)
         {
-            // Auto-generate GUID jika belum ada
-            if (string.IsNullOrWhiteSpace(app.Guid))
+            // Auto-generate GUID jika belum diinisialisasi
+            if (app.Id == Guid.Empty)
             {
-                app.Guid = Guid.NewGuid().ToString();
+                app.Id = Guid.NewGuid();
             }
 
             using (var conn = DatabaseHelper.GetOpenConnection())
@@ -40,122 +39,159 @@ namespace zennplay_launcher.Services.Repositories
             {
                 try
                 {
-                    // Insert data utama ke tabel 'apps'
+                    // 1. Insert data utama ke tabel 'apps'
                     string sqlApp = @"
                         INSERT INTO apps (
-                            guid, title, sorting_title, desc, user_rating, is_favorite, is_pinned,
+                            id, title, sorting_title, desc, user_rating, is_favorite, is_pinned,
                             notes, first_launched, last_launched, launch_times, completion_status,
                             release_date, is_installed, is_game, is_excluded, version, app_dir, 
-                            external_id, cover_path, background_path, icon_path
+                            source, external_id, cover_path, background_path, icon_path
                         ) VALUES (
-                            @Guid, @Title, @SortingTitle, @Desc, @UserRating, @IsFavorite, @IsPinned,
+                            @Id, @Title, @SortingTitle, @Desc, @UserRating, @IsFavorite, @IsPinned,
                             @Notes, @FirstLaunched, @LastLaunched, @LaunchTimes, @CompletionStatus,
                             @ReleaseDate, @IsInstalled, @IsGame, @IsExcluded, @Version, @AppDir, 
-                            @ExternalId, @CoverPath, @BackgroundPath, @IconPath
-                        );
-                        SELECT last_insert_rowid();";
+                            @Source, @ExternalId, @CoverPath, @BackgroundPath, @IconPath
+                        );";
 
-                    int newAppId = conn.ExecuteScalar<int>(sqlApp, app, transaction);
-                    app.Id = newAppId;
+                    conn.Execute(sqlApp, new
+                    {
+                        Id = app.Id.ToString(),
+                        app.Title,
+                        app.SortingTitle,
+                        app.Desc,
+                        app.UserRating,
+                        app.IsFavorite,
+                        app.IsPinned,
+                        app.Notes,
+                        app.FirstLaunched,
+                        app.LastLaunched,
+                        app.LaunchTimes,
+                        app.CompletionStatus,
+                        app.ReleaseDate,
+                        app.IsInstalled,
+                        app.IsGame,
+                        app.IsExcluded,
+                        app.Version,
+                        app.AppDir,
+                        app.Source,
+                        app.ExternalId,
+                        app.CoverPath,
+                        app.BackgroundPath,
+                        app.IconPath
+                    }, transaction);
 
-                    // Insert Relasi Sections
+                    string appIdStr = app.Id.ToString();
+
+                    // 2. Insert Relasi Sections
                     if (sectionIds != null && sectionIds.Any())
                     {
-                        string sqlSection = "INSERT INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId);";
-                        var sectionData = sectionIds.Select(secId => new { AppId = newAppId, SectionId = secId });
+                        string sqlSection = "INSERT OR IGNORE INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId);";
+                        var sectionData = sectionIds.Select(secId => new { AppId = appIdStr, SectionId = secId.ToString() });
                         conn.Execute(sqlSection, sectionData, transaction);
                     }
 
-                    // Insert Relasi Series
+                    // 3. Insert Relasi Series
                     if (seriesIds != null && seriesIds.Any())
                     {
-                        string sqlSeries = "INSERT INTO app_series (app_id, series_id) VALUES (@AppId, @SeriesId);";
-                        var seriesData = seriesIds.Select(serId => new { AppId = newAppId, SeriesId = serId });
+                        string sqlSeries = "INSERT OR IGNORE INTO app_series (app_id, series_id) VALUES (@AppId, @SeriesId);";
+                        var seriesData = seriesIds.Select(serId => new { AppId = appIdStr, SeriesId = serId.ToString() });
                         conn.Execute(sqlSeries, seriesData, transaction);
                     }
 
-                    // Insert Relasi Genres
+                    // 4. Insert Relasi Genres
                     if (genreIds != null && genreIds.Any())
                     {
-                        string sqlGenre = "INSERT INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
-                        var genreData = genreIds.Select(gId => new { AppId = newAppId, GenreId = gId });
+                        string sqlGenre = "INSERT OR IGNORE INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
+                        var genreData = genreIds.Select(gId => new { AppId = appIdStr, GenreId = gId.ToString() });
                         conn.Execute(sqlGenre, genreData, transaction);
                     }
 
-                    // Insert Relasi Genres
-                    if (genreIds != null && genreIds.Any())
-                    {
-                        string sqlGenre = "INSERT INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
-                        var genreData = genreIds.Select(gId => new { AppId = newAppId, GenreId = gId });
-                        conn.Execute(sqlGenre, genreData, transaction);
-                    }
-
-                    // Insert Relasi Tags
+                    // 5. Insert Relasi Tags
                     if (tagIds != null && tagIds.Any())
                     {
-                        string sqlTag = "INSERT INTO app_tags (app_id, tag_id) VALUES (@AppId, @TagId);";
-                        var tagData = tagIds.Select(tId => new { AppId = newAppId, TagId = tId });
+                        string sqlTag = "INSERT OR IGNORE INTO app_tags (app_id, tag_id) VALUES (@AppId, @TagId);";
+                        var tagData = tagIds.Select(tId => new { AppId = appIdStr, TagId = tId.ToString() });
                         conn.Execute(sqlTag, tagData, transaction);
                     }
 
-                    // Insert App Actions
-                    if (actions != null && actions.Any())
-                    {
-                        string sqlAction = @"
-                            INSERT INTO app_actions (app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, is_primary)
-                            VALUES (@AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @IsPrimary);";
-
-                        foreach (var act in actions) { act.AppId = newAppId; }
-                        conn.Execute(sqlAction, actions, transaction);
-                    }
-
-                    // Insert App Links
-                    if (links != null && links.Any())
-                    {
-                        string sqlLink = "INSERT INTO app_links (app_id, name, url) VALUES (@AppId, @Name, @Url);";
-                        foreach (var link in links) { link.AppId = newAppId; }
-                        conn.Execute(sqlLink, links, transaction);
-                    }
-
-                    // Insert Relasi Developer
+                    // 6. Insert Relasi Developer
                     if (developerIds != null && developerIds.Any())
                     {
-                        string sqlDeveloper = "INSERT INTO app_developers (app_id, developer_id) VALUES (@AppId, @DeveloperId);";
-                        var developerData = developerIds.Select(devId => new { AppId = newAppId, DeveloperId = devId });
+                        string sqlDeveloper = "INSERT OR IGNORE INTO app_developers (app_id, developer_id) VALUES (@AppId, @DeveloperId);";
+                        var developerData = developerIds.Select(devId => new { AppId = appIdStr, DeveloperId = devId.ToString() });
                         conn.Execute(sqlDeveloper, developerData, transaction);
                     }
 
-                    // Insert Relasi Publisher
+                    // 7. Insert Relasi Publisher
                     if (publisherIds != null && publisherIds.Any())
                     {
-                        string sqlPublisher = "INSERT INTO app_publishers (app_id, publisher_id) VALUES (@AppId, @PublisherId);";
-                        var publisherData = publisherIds.Select(pubId => new { AppId = newAppId, PublisherId = pubId });
+                        string sqlPublisher = "INSERT OR IGNORE INTO app_publishers (app_id, publisher_id) VALUES (@AppId, @PublisherId);";
+                        var publisherData = publisherIds.Select(pubId => new { AppId = appIdStr, PublisherId = pubId.ToString() });
                         conn.Execute(sqlPublisher, publisherData, transaction);
                     }
 
-                    // Insert Relasi Platform
+                    // 8. Insert Relasi Platform
                     if (platformIds != null && platformIds.Any())
                     {
-                        string sqlPlatform = "INSERT INTO app_platforms (app_id, platform_id) VALUES (@AppId, @PlatformId);";
-                        var platformData = platformIds.Select(pltId => new { AppId = newAppId, PlatformId = pltId });
+                        string sqlPlatform = "INSERT OR IGNORE INTO app_platforms (app_id, platform_id) VALUES (@AppId, @PlatformId);";
+                        var platformData = platformIds.Select(pltId => new { AppId = appIdStr, PlatformId = pltId.ToString() });
                         conn.Execute(sqlPlatform, platformData, transaction);
                     }
 
-                    // Insert Relasi Age Rating
+                    // 9. Insert Relasi Age Rating
                     if (ageRatingIds != null && ageRatingIds.Any())
                     {
-                        string sqlAgeRating = "INSERT INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
-                        var ageRatingData = ageRatingIds.Select(artId => new { AppId = newAppId, AgeRatingId = artId });
+                        string sqlAgeRating = "INSERT OR IGNORE INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
+                        var ageRatingData = ageRatingIds.Select(artId => new { AppId = appIdStr, AgeRatingId = artId.ToString() });
                         conn.Execute(sqlAgeRating, ageRatingData, transaction);
+                    }
+
+                    // 10. Insert App Actions
+                    if (actions != null && actions.Any())
+                    {
+                        string sqlAction = @"
+                            INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, is_primary)
+                            VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @IsPrimary);";
+
+                        var actionData = actions.Select(act => new
+                        {
+                            Id = (act.Id == Guid.Empty ? Guid.NewGuid() : act.Id).ToString(),
+                            AppId = appIdStr,
+                            act.Title,
+                            act.Desc,
+                            act.ActionType,
+                            act.Target,
+                            act.LaunchOptions,
+                            act.ActionIconPath,
+                            act.IsGame,
+                            act.IsPrimary
+                        });
+
+                        conn.Execute(sqlAction, actionData, transaction);
+                    }
+
+                    // 11. Insert App Links
+                    if (links != null && links.Any())
+                    {
+                        string sqlLink = "INSERT INTO app_links (id, app_id, name, url) VALUES (@Id, @AppId, @Name, @Url);";
+
+                        var linkData = links.Select(link => new
+                        {
+                            Id = (link.Id == Guid.Empty ? Guid.NewGuid() : link.Id).ToString(),
+                            AppId = appIdStr,
+                            link.Name,
+                            link.Url
+                        });
+
+                        conn.Execute(sqlLink, linkData, transaction);
                     }
 
                     // Commit jika semua tahap sukses
                     transaction.Commit();
-                    return newAppId;
+                    return app.Id;
                 }
                 catch
                 {
-                    // Batalkan semua perubahan jika terjadi error di tengah jalan
                     transaction.Rollback();
                     throw;
                 }
@@ -182,21 +218,20 @@ namespace zennplay_launcher.Services.Repositories
         }
 
         /// <summary>
-        /// Mengambil detail satu aplikasi berdasarkan ID.
+        /// Mengambil detail satu aplikasi berdasarkan ID (GUID).
         /// </summary>
-        public AppModel? GetAppById(int id)
+        public AppModel? GetAppById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "SELECT * FROM apps WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<AppModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<AppModel>(sql, new { Id = id.ToString() });
             }
         }
 
         /// <summary>
         /// Query filter lanjutan berdasarkan pencarian, favorit, atau section tertentu.
         /// </summary>
-
         public IEnumerable<AppModel> GetAppsFiltered(AppFilterCriteria criteria)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
@@ -237,53 +272,53 @@ namespace zennplay_launcher.Services.Repositories
                     parameters.Add("IsGame", criteria.IsGame.Value ? 1 : 0);
                 }
 
-                // 3. Multi-Select Relations
+                // 3. Multi-Select Relations (Format string ID untuk Dapper IN clause)
                 if (criteria.SectionIds != null && criteria.SectionIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_sections WHERE section_id IN @SectionIds)";
-                    parameters.Add("SectionIds", criteria.SectionIds);
+                    parameters.Add("SectionIds", criteria.SectionIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.SeriesIds != null && criteria.SeriesIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_series WHERE series_id IN @SeriesIds)";
-                    parameters.Add("SeriesIds", criteria.SeriesIds);
+                    parameters.Add("SeriesIds", criteria.SeriesIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.GenreIds != null && criteria.GenreIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_genres WHERE genre_id IN @GenreIds)";
-                    parameters.Add("GenreIds", criteria.GenreIds);
+                    parameters.Add("GenreIds", criteria.GenreIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.TagIds != null && criteria.TagIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_tags WHERE tag_id IN @TagIds)";
-                    parameters.Add("TagIds", criteria.TagIds);
+                    parameters.Add("TagIds", criteria.TagIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.DeveloperIds != null && criteria.DeveloperIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_developers WHERE developer_id IN @DeveloperIds)";
-                    parameters.Add("DeveloperIds", criteria.DeveloperIds);
+                    parameters.Add("DeveloperIds", criteria.DeveloperIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.PublisherIds != null && criteria.PublisherIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_publishers WHERE publisher_id IN @PublisherIds)";
-                    parameters.Add("PublisherIds", criteria.PublisherIds);
+                    parameters.Add("PublisherIds", criteria.PublisherIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.PlatformIds != null && criteria.PlatformIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_platforms WHERE platform_id IN @PlatformIds)";
-                    parameters.Add("PlatformIds", criteria.PlatformIds);
+                    parameters.Add("PlatformIds", criteria.PlatformIds.Select(id => id.ToString()));
                 }
 
                 if (criteria.AgeRatingIds != null && criteria.AgeRatingIds.Any())
                 {
                     sql += " AND a.id IN (SELECT app_id FROM app_age_ratings WHERE age_rating_id IN @AgeRatingIds)";
-                    parameters.Add("AgeRatingIds", criteria.PlatformIds);
+                    parameters.Add("AgeRatingIds", criteria.AgeRatingIds.Select(id => id.ToString()));
                 }
 
                 // 4. Sorting
@@ -292,7 +327,7 @@ namespace zennplay_launcher.Services.Repositories
                     AppSortBy.ReleaseDate => "a.release_date",
                     AppSortBy.UserRating => "a.user_rating",
                     AppSortBy.CreatedAt => "a.created_at",
-                    AppSortBy.LastPlayed => "a.last_played",
+                    AppSortBy.LastPlayed => "a.last_launched",
                     _ => "COALESCE(NULLIF(a.sorting_title, ''), a.title) COLLATE NOCASE"
                 };
 
@@ -311,7 +346,14 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengubah data metadata aplikasi utama.
         /// </summary>
-        public bool UpdateApp(AppModel app)
+        public bool UpdateApp(AppModel app,
+                             IEnumerable<Guid>? ageRatingIds = null,
+                             IEnumerable<Guid>? developerIds = null,
+                             IEnumerable<Guid>? publisherIds = null,
+                             IEnumerable<Guid>? platformIds = null,
+                             IEnumerable<Guid>? seriesIds = null,
+                             IEnumerable<Guid>? tagIds = null,
+                             IEnumerable<Guid>? genreIds = null)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             using (var transaction = conn.BeginTransaction())
@@ -335,36 +377,72 @@ namespace zennplay_launcher.Services.Repositories
                             is_excluded = @IsExcluded,
                             version = @Version,
                             app_dir = @AppDir,
+                            source = @Source,
                             external_id = @ExternalId,
                             cover_path = @CoverPath,
                             background_path = @BackgroundPath,
                             icon_path = @IconPath
                         WHERE id = @Id;";
 
-                    int rowsAffected = conn.Execute(updateAppSql, app, transaction: transaction);
+                    int rowsAffected = conn.Execute(updateAppSql, new
+                    {
+                        Id = app.Id.ToString(),
+                        app.Title,
+                        app.SortingTitle,
+                        app.Desc,
+                        app.UserRating,
+                        app.IsFavorite,
+                        app.IsPinned,
+                        app.Notes,
+                        app.CompletionStatus,
+                        app.ReleaseDate,
+                        app.IsInstalled,
+                        app.IsGame,
+                        app.IsExcluded,
+                        app.Version,
+                        app.AppDir,
+                        app.Source,
+                        app.ExternalId,
+                        app.CoverPath,
+                        app.BackgroundPath,
+                        app.IconPath
+                    }, transaction: transaction);
+
                     if (rowsAffected == 0)
                     {
                         transaction.Rollback();
                         return false;
                     }
 
-                    // 2. Sinkronisasi semua tabel junction (Delete Old -> Insert New)
-                    SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", app.AgeRatingIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_developers", "developer_id", app.DeveloperIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_publishers", "publisher_id", app.PublisherIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_platforms", "platform_id", app.PlatformIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_series", "series_id", app.SeriesIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_tags", "tag_id", app.TagIds);
-                    SyncAppRelations(conn, transaction, app.Id, "app_genres", "genre_id", app.GenreIds);
+                    // 2. Sinkronisasi semua tabel junction (Delete Old -> Insert New) jika list disediakan
+                    if (ageRatingIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", ageRatingIds);
+
+                    if (developerIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_developers", "developer_id", developerIds);
+
+                    if (publisherIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_publishers", "publisher_id", publisherIds);
+
+                    if (platformIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_platforms", "platform_id", platformIds);
+
+                    if (seriesIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_series", "series_id", seriesIds);
+
+                    if (tagIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_tags", "tag_id", tagIds);
+
+                    if (genreIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_genres", "genre_id", genreIds);
 
                     // 3. Commit seluruh transaksi jika semua berhasil
                     transaction.Commit();
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     transaction.Rollback();
-                    // TODO: Log error (ex.Message)
                     return false;
                 }
             }
@@ -372,22 +450,23 @@ namespace zennplay_launcher.Services.Repositories
 
         private void SyncAppRelations(IDbConnection conn,
                                       IDbTransaction transaction,
-                                      long appId,
+                                      Guid appId,
                                       string tableName,
                                       string foreignKeyColumn,
-                                      IEnumerable<long> targetIds)
+                                      IEnumerable<Guid> targetIds)
         {
+            string appIdStr = appId.ToString();
+
             // A. Hapus semua relasi lama milik game ini di junction table
             string deleteSql = $"DELETE FROM {tableName} WHERE app_id = @AppId;";
-            conn.Execute(deleteSql, new { AppId = appId }, transaction: transaction);
+            conn.Execute(deleteSql, new { AppId = appIdStr }, transaction: transaction);
 
             // B. Masukkan data baru jika ada ID yang dipilih
             if (targetIds != null && targetIds.Any())
             {
                 string insertSql = $"INSERT OR IGNORE INTO {tableName} (app_id, {foreignKeyColumn}) VALUES (@AppId, @TargetId);";
 
-                // Dapper otomatis mengeksekusi batch jika parameter berupa collection
-                var parameters = targetIds.Select(id => new { AppId = appId, TargetId = id });
+                var parameters = targetIds.Select(id => new { AppId = appIdStr, TargetId = id.ToString() });
                 conn.Execute(insertSql, parameters, transaction: transaction);
             }
         }
@@ -395,7 +474,7 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Khusus untuk memperbarui statistik jam main setelah game ditutup.
         /// </summary>
-        public bool UpdatePlayStatistics(int appId, string lastLaunched, int newLaunchTimes)
+        public bool UpdatePlayStatistics(Guid appId, string lastLaunched, int newLaunchTimes)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -406,7 +485,7 @@ namespace zennplay_launcher.Services.Repositories
                         launch_times = @LaunchTimes
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, new { Id = appId, LastLaunched = lastLaunched, LaunchTimes = newLaunchTimes }) > 0;
+                return conn.Execute(sql, new { Id = appId.ToString(), LastLaunched = lastLaunched, LaunchTimes = newLaunchTimes }) > 0;
             }
         }
 
@@ -417,24 +496,24 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Soft Delete: Menandai game sebagai hapus tanpa membuang baris data secara permanen.
         /// </summary>
-        public bool SoftDeleteApp(int id)
+        public bool SoftDeleteApp(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "UPDATE apps SET is_deleted = 1 WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Restore: Mengembalikan game yang sebelumnya di-soft delete.
         /// </summary>
-        public bool RestoreApp(int id)
+        public bool RestoreApp(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "UPDATE apps SET is_deleted = 0 WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 
@@ -442,24 +521,26 @@ namespace zennplay_launcher.Services.Repositories
         /// Hard Delete: Hapus permanen data dari database. 
         /// (ON DELETE CASCADE akan membersihkan relasi actions, links, tags, genres, dan sessions).
         /// </summary>
-        public bool HardDeleteApp(int id)
+        public bool HardDeleteApp(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM apps WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 
         #endregion
 
-        public void RecordGameLaunch(int appId)
+        #region 5. LAUNCH TRACKING
+
+        public void RecordGameLaunch(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 // 1. Cek apakah game ini baru PERTAMA KALI dimainkan
                 string checkSql = "SELECT launch_times FROM apps WHERE id = @Id;";
-                int launchTimes = conn.ExecuteScalar<int>(checkSql, new { Id = appId });
+                int launchTimes = conn.ExecuteScalar<int>(checkSql, new { Id = appId.ToString() });
 
                 if (launchTimes == 0)
                 {
@@ -475,11 +556,12 @@ namespace zennplay_launcher.Services.Repositories
         private void IncrementGlobalCounter(IDbConnection conn, string keyName)
         {
             string sql = @"
-                    INSERT INTO db_metadata (key, value) VALUES (@Key, '1')
-                    ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1;";
+                INSERT INTO db_metadata (key, value) VALUES (@Key, '1')
+                ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1;";
 
             conn.Execute(sql, new { Key = keyName });
         }
 
+        #endregion
     }
 }

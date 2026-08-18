@@ -16,7 +16,9 @@
 
                     <TextBox Grid.Column="1" 
                              Text="{TemplateBinding Text, Mode=TwoWay}"
-                             PlaceholderText="{TemplateBinding PlaceholderText}"/>
+                             PlaceholderText="{TemplateBinding PlaceholderText}"
+                             FontFamily="{DynamicResource FontCommon}"
+                             FontSize="13"/>
                 </Grid>
             </ControlTemplate>
         </Setter>

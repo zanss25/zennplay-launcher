@@ -27,6 +27,8 @@
                                      Grid.Column="0"
                                      Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                      PlaceholderText="{TemplateBinding PlaceholderText}"
+                                     FontFamily="{DynamicResource FontCommon}"
+                                     FontSize="13"
                                      Background="Transparent"
                                      BorderThickness="0"
                                      Padding="8,5"

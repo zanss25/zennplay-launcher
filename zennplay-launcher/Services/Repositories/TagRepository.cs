@@ -15,18 +15,28 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menambahkan Tag baru ke database.
         /// </summary>
-        public int AddTag(TagModel tag)
+        public Guid AddTag(TagModel tag)
         {
+            // Pastikan entitas memiliki ID sebelum disimpan
+            if (tag.Id == Guid.Empty)
+            {
+                tag.Id = Guid.NewGuid();
+            }
+
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlTag = @"
-                    INSERT INTO tags (name, desc) 
-                    VALUES (@Name, @Desc);
-                    SELECT last_insert_rowid();";
+                    INSERT INTO tags (id, name, desc) 
+                    VALUES (@Id, @Name, @Desc);";
 
-                int newTagId = conn.ExecuteScalar<int>(sqlTag, tag);
-                tag.Id = newTagId;
-                return newTagId;
+                conn.Execute(sqlTag, new
+                {
+                    Id = tag.Id.ToString(),
+                    tag.Name,
+                    tag.Desc
+                });
+
+                return tag.Id;
             }
         }
 
@@ -49,12 +59,12 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Mengambil detail satu Tag berdasarkan ID.
         /// </summary>
-        public TagModel? GetTagById(int id)
+        public TagModel? GetTagById(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "SELECT * FROM tags WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<TagModel>(sql, new { Id = id });
+                return conn.QueryFirstOrDefault<TagModel>(sql, new { Id = id.ToString() });
             }
         }
 
@@ -62,7 +72,7 @@ namespace zennplay_launcher.Services.Repositories
         /// Mengambil seluruh Tag yang dimiliki oleh game tertentu.
         /// (Untuk menampilkan chip/badge tag di UI Game Detail)
         /// </summary>
-        public IEnumerable<TagModel> GetTagsByAppId(int appId)
+        public IEnumerable<TagModel> GetTagsByAppId(Guid appId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
@@ -72,7 +82,7 @@ namespace zennplay_launcher.Services.Repositories
                     WHERE at.app_id = @AppId
                     ORDER BY t.name ASC;";
 
-                return conn.Query<TagModel>(sql, new { AppId = appId });
+                return conn.Query<TagModel>(sql, new { AppId = appId.ToString() });
             }
         }
 
@@ -115,7 +125,12 @@ namespace zennplay_launcher.Services.Repositories
                         desc = @Desc
                     WHERE id = @Id;";
 
-                return conn.Execute(sql, tag) > 0;
+                return conn.Execute(sql, new
+                {
+                    Id = tag.Id.ToString(),
+                    tag.Name,
+                    tag.Desc
+                }) > 0;
             }
         }
 
@@ -126,24 +141,24 @@ namespace zennplay_launcher.Services.Repositories
         /// <summary>
         /// Menghubungkan game dengan suatu Tag.
         /// </summary>
-        public bool AssignTagToApp(int appId, int tagId)
+        public bool AssignTagToApp(Guid appId, Guid tagId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "INSERT OR IGNORE INTO app_tags (app_id, tag_id) VALUES (@AppId, @TagId);";
-                return conn.Execute(sql, new { AppId = appId, TagId = tagId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() }) > 0;
             }
         }
 
         /// <summary>
         /// Menghapus hubungan Tag dari game tertentu.
         /// </summary>
-        public bool RemoveTagFromApp(int appId, int tagId)
+        public bool RemoveTagFromApp(Guid appId, Guid tagId)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM app_tags WHERE app_id = @AppId AND tag_id = @TagId;";
-                return conn.Execute(sql, new { AppId = appId, TagId = tagId }) > 0;
+                return conn.Execute(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() }) > 0;
             }
         }
 
@@ -155,12 +170,12 @@ namespace zennplay_launcher.Services.Repositories
         /// Hapus permanen Tag dari database.
         /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_tags').
         /// </summary>
-        public bool DeleteTag(int id)
+        public bool DeleteTag(Guid id)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = "DELETE FROM tags WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id }) > 0;
+                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
             }
         }
 

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
@@ -9,7 +11,7 @@ namespace zennplay_launcher.Views
     {
         private readonly AppPropertiesViewModel _viewModel;
 
-        public AppPropertiesWindow(int appId = -1)
+        public AppPropertiesWindow(Guid appId = default)
         {
             InitializeComponent();
 
@@ -17,7 +19,7 @@ namespace zennplay_launcher.Views
             _viewModel.Initialize(appId);
             DataContext = _viewModel;
 
-            if (appId < 0)
+            if (appId == Guid.Empty)
             {
                 Title = "Add New Properties";
             }

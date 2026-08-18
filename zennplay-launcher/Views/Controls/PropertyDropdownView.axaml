@@ -17,7 +17,9 @@
                     <ComboBox Grid.Column="1"
                               HorizontalAlignment="Stretch"
                               ItemsSource="{TemplateBinding ItemsSource}"
-                              SelectedItem="{TemplateBinding SelectedItem}"/>
+                              SelectedItem="{TemplateBinding SelectedItem}">
+                    </ComboBox>
+                     
                 </Grid>
             </ControlTemplate>
         </Setter>

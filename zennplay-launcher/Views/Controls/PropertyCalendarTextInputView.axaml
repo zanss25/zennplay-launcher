@@ -3,7 +3,7 @@
                     xmlns:controls="using:zennplay_launcher.Views.Controls">
 
     <Design.PreviewWith>
-        <StackPanel Width="400" Spacing="10">
+        <StackPanel Width="400" Height="400" Spacing="10">
             <StackPanel Background="{DynamicResource SystemRegionBrush}">
                 <controls:PropertyCalendarTextInputView />
             </StackPanel>
