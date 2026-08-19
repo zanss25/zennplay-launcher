@@ -16,13 +16,13 @@
             <ControlTemplate>
                 
                 <Grid ColumnDefinitions="*,Auto">
-                    <TextBox Grid.Column="0"
+                    <TextBox x:Name="PART_TextBox"
+                             Grid.Column="0"
                              Text="{TemplateBinding Text, Mode=TwoWay}"
-                             PlaceholderText="{TemplateBinding PlaceholderText}"
-                             FontFamily="{DynamicResource FontCommon}"
-                             FontSize="13"/>
+                             PlaceholderText="{TemplateBinding PlaceholderText}"/>
 
-                    <Button Grid.Column="1"
+                    <Button x:Name="PART_BrowseButton"
+                            Grid.Column="1"
                             Content="Browse"
                             Margin="5,0,0,0"
                             VerticalAlignment="Stretch"/>

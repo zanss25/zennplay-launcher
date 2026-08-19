@@ -18,14 +18,12 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               FontFamily="{DynamicResource FontCommon}"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextCommonBrush}"
-                               FontSize="13"/>
+                               Classes="TextPropertiesLabel"/>
 
                     <controls:DirectoryInputView Grid.Column="1"
                                                  Text="{TemplateBinding Text, Mode=TwoWay}"
-                                                 PlaceholderText="{TemplateBinding PlaceholderText}"/>
+                                                 PlaceholderText="{TemplateBinding PlaceholderText}"
+                                                 BrowseCommand="{TemplateBinding BrowseCommand}"/>
                 </Grid>
 
             </ControlTemplate>

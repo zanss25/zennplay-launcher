@@ -64,9 +64,9 @@
 
         <Border Grid.Row="2" BorderBrush="{DynamicResource BorderCommonBrush}" BorderThickness="0,0,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,12,20,20">
-                    <Button x:Name="SaveBtn" Classes="ButtonSecondary" Click="SaveBtn_Click"
+                    <Button x:Name="SaveBtn" Classes="ButtonSecondary"
                             Content="Save" Margin="10,0,0,0"/>
-                    <Button x:Name="CancelBtn" Classes="ButtonSecondary" Click="CancelBtn_Click"
+                    <Button x:Name="CancelBtn" Classes="ButtonSecondary"
                             Content="Cancel" Margin="10,0,0,0"/>
                 </StackPanel>
         </Border>

@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using System;
+using System.Collections.Generic;
 using zennplay_launcher.ViewModels;
 
 namespace zennplay_launcher.Views
@@ -31,14 +32,18 @@ namespace zennplay_launcher.Views
             TitleText.Text = Title.ToUpper();
         }
 
-        private void SaveBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        protected override void OnLoaded(RoutedEventArgs e)
         {
+            base.OnLoaded(e);
 
+            if (DataContext is AppPropertiesViewModel mainVm)
+            {
+                if (mainVm.FoldersViewModel != null)
+                {
+                    mainVm.FoldersViewModel.StorageProvider = this.StorageProvider;
+                }
+            }
         }
 
-        private void CancelBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        {
-            Close();
-        }
     }
 }

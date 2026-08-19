@@ -1,0 +1,103 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls"
+                    xmlns:models="using:zennplay_launcher.Models">
+
+    <ControlTheme x:Key="{x:Type controls:EditableListView}" TargetType="controls:EditableListView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="*, Auto">
+                    
+                    <!-- BOX LIST CONTAINER -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource WindowBackgroundBrush}"
+                            BorderBrush="{DynamicResource TextBoxBorderBrush}"
+                            BorderThickness="0"
+                            CornerRadius="4"
+                            MinHeight="180"
+                            Padding="2">
+                        
+                        <ListBox ItemsSource="{TemplateBinding ItemsSource}"
+                                 SelectedItem="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                 SelectionMode="Single"
+                                 Background="Transparent">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:IEditableListItem">
+                                    <Grid ColumnDefinitions="Auto, *, Auto" Margin="4,2">
+                                        <!-- 1. Ikon -->
+                                        <Image Grid.Column="0"
+                                               Source="{Binding DisplayIcon}"
+                                               Width="16"
+                                               Height="16"
+                                               Margin="0,0,8,0"
+                                               IsVisible="{Binding DisplayIcon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                               VerticalAlignment="Center"/>
+
+                                        <!-- 2. Nama -->
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding DisplayName}"
+                                                   FontFamily="{DynamicResource FontCommon}"
+                                                   Foreground="{DynamicResource TextCommonBrush}"
+                                                   FontSize="13"
+                                                   VerticalAlignment="Center"/>
+
+                                        <!-- 3. Value String Tambahan (Di Kanan / Secondary) -->
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding DisplayValue}"
+                                                   FontFamily="{DynamicResource FontCommon}"
+                                                   Foreground="{DynamicResource TextMutedBrush}"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <!-- TOOLBAR TOMBOL AKSI DI BAWAH BOX -->
+                    <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="0,8,0,0">
+                        
+                        <!-- Tombol Add -->
+                        <Button Grid.Column="0"
+                                Content="Add"
+                                Command="{TemplateBinding AddCommand}"
+                                Margin="0,0,4,0"/>
+
+                        <!-- Tombol Action on Selected (Dinamis: Edit / Run / dsb) -->
+                        <Button Grid.Column="1"
+                                Content="{TemplateBinding ActionButtonText}"
+                                Command="{TemplateBinding ActionCommand}"
+                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Margin="0,0,4,0"/>
+
+                        <!-- Tombol Remove -->
+                        <Button Grid.Column="2"
+                                Content="Remove"
+                                Command="{TemplateBinding RemoveCommand}"
+                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+                        <!-- Tombol Pengurutan (Move Up & Move Down) -->
+                        <Button Grid.Column="4"
+                                Content="▲"
+                                ToolTip.Tip="Move Up"
+                                Command="{TemplateBinding MoveUpCommand}"
+                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Margin="0,0,4,0"/>
+
+                        <Button Grid.Column="5"
+                                Content="▼"
+                                ToolTip.Tip="Move Down"
+                                Command="{TemplateBinding MoveDownCommand}"
+                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                IsEnabled="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                    </Grid>
+
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

@@ -17,16 +17,11 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               FontFamily="{DynamicResource FontCommon}"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextCommonBrush}"
-                               FontSize="13"/>
+                               Classes="TextPropertiesLabel"/>
 
                     <TextBox Grid.Column="1" 
                              Text="{TemplateBinding Text, Mode=TwoWay}"
-                             PlaceholderText="{TemplateBinding PlaceholderText}"
-                             FontFamily="{DynamicResource FontCommon}"
-                             FontSize="13"/>
+                             PlaceholderText="{TemplateBinding PlaceholderText}"/>
                 </Grid>
             </ControlTemplate>
         </Setter>

@@ -525,6 +525,14 @@
         </Style>
     </Style>
 
+    <!-- Text Block Properties -->
+    <Style Selector="TextBlock.TextPropertiesLabel">
+        <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
     <!-- Text Box Common -->
     <Style Selector="TextBox">
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}"/>
@@ -533,6 +541,7 @@
         <Setter Property="CaretBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
         <Setter Property="SelectionBrush" Value="{DynamicResource TextBoxBorderActiveBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+        <Setter Property="FontSize" Value="13"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="8,5"/>
         <Setter Property="CornerRadius" Value="4"/>

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Avalonia.Interactivity;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,11 +44,12 @@ namespace zennplay_launcher.ViewModels
         object? _currentView;
 
         // Tab View Instances
-        private readonly PropertiesMetadataViewModel _metadataViewModel = new();
-        private readonly PropertiesFoldersViewModel _foldersViewModel = new();
-        private readonly PropertiesMetadataView _metadataView = new();
-        private readonly PropertiesFoldersView _foldersView = new();
-        private readonly PropertiesMediaView _mediaView = new();
+        public PropertiesMetadataViewModel MetadataViewModel { get; } = new();
+        public PropertiesFoldersViewModel FoldersViewModel { get; } = new();
+        public PropertiesMediaViewModel MediaViewModel { get; } = new();
+        public PropertiesMetadataView MetadataView { get; } = new();
+        public PropertiesFoldersView FoldersView { get; } = new();
+        public PropertiesMediaView MediaView { get; } = new();
 
         // Method untuk inisialisasi mode
         public void Initialize(Guid appId)
@@ -65,14 +67,14 @@ namespace zennplay_launcher.ViewModels
 
         public AppPropertiesViewModel()
         {
-            _metadataView = new PropertiesMetadataView
+            MetadataView = new PropertiesMetadataView
             {
-                DataContext = _metadataViewModel
+                DataContext = MetadataViewModel
             };
 
-            _foldersView = new PropertiesFoldersView
+            FoldersView = new PropertiesFoldersView
             {
-                DataContext = _foldersViewModel
+                DataContext = FoldersViewModel
             };
 
             // Load static tabs list
@@ -97,22 +99,22 @@ namespace zennplay_launcher.ViewModels
             {
                 case "metadata":
                     Debug.WriteLine("Switch case: " + value.Name);
-                    CurrentView = _metadataView;
+                    CurrentView = MetadataView;
                     break;
                 case "folders":
                     Debug.WriteLine("Switch case: " + value.Name);
-                    CurrentView = _foldersView;
+                    CurrentView = FoldersView;
                     break;
                 case "media":
                     Debug.WriteLine("Switch case: " + value.Name);
-                    CurrentView = _mediaView;
+                    CurrentView = MediaView;
                     break;
             }
         }
 
         public void LoadTabsData(int appId = 0)
         {
-            _metadataViewModel.LoadData(appId);
+            MetadataViewModel.LoadData(appId);
         }
 
         // ============================================================

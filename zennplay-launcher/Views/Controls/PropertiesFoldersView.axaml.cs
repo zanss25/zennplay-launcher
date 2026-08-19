@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace zennplay_launcher.Views.Controls
@@ -9,6 +10,9 @@ namespace zennplay_launcher.Views.Controls
         public PropertiesFoldersView()
         {
             InitializeComponent();
+
+            IsInstalledSwitch.IsChecked = true;
         }
+
     }
 }

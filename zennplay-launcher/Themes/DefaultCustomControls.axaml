@@ -12,6 +12,7 @@
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/CalendarTextDatePicker.axaml" />
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyCalendarTextInputView.axaml" />
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertySwitchTextView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/EditableListView.axaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

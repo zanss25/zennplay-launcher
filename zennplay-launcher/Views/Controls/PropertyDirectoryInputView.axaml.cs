@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using System.Windows.Input;
 
 namespace zennplay_launcher.Views.Controls
 {
@@ -37,5 +38,16 @@ namespace zennplay_launcher.Views.Controls
             get => GetValue(PlaceholderTextProperty);
             set => SetValue(PlaceholderTextProperty, value);
         }
+
+        public static readonly StyledProperty<ICommand?> BrowseCommandProperty =
+            AvaloniaProperty.Register<DirectoryInputView, ICommand?>(nameof(BrowseCommand));
+
+        // 3. Registered Property: Browse Button
+        public ICommand? BrowseCommand
+        {
+            get => GetValue(BrowseCommandProperty);
+            set => SetValue(BrowseCommandProperty, value);
+        }
+
     }
 }
