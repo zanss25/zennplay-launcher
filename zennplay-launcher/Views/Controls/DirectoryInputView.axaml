@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:zennplay_launcher.Views.Controls">
+
+    <Design.PreviewWith>
+        <StackPanel Width="400" Spacing="10">
+            <StackPanel Background="{DynamicResource SystemRegionBrush}">
+                <controls:DirectoryInputView />
+            </StackPanel>
+        </StackPanel>
+    </Design.PreviewWith>
+
+    <ControlTheme x:Key="{x:Type controls:DirectoryInputView}"
+                  TargetType="controls:DirectoryInputView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0"
+                             Text="{TemplateBinding Text, Mode=TwoWay}"
+                             PlaceholderText="{TemplateBinding PlaceholderText}"
+                             FontFamily="{DynamicResource FontCommon}"
+                             FontSize="13"/>
+
+                    <Button Grid.Column="1"
+                            Content="Browse"
+                            Margin="5,0,0,0"
+                            VerticalAlignment="Stretch"/>
+                </Grid>             
+
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>

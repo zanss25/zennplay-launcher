@@ -44,6 +44,7 @@ namespace zennplay_launcher.ViewModels
 
         // Tab View Instances
         private readonly PropertiesMetadataViewModel _metadataViewModel = new();
+        private readonly PropertiesFoldersViewModel _foldersViewModel = new();
         private readonly PropertiesMetadataView _metadataView = new();
         private readonly PropertiesFoldersView _foldersView = new();
         private readonly PropertiesMediaView _mediaView = new();
@@ -67,6 +68,11 @@ namespace zennplay_launcher.ViewModels
             _metadataView = new PropertiesMetadataView
             {
                 DataContext = _metadataViewModel
+            };
+
+            _foldersView = new PropertiesFoldersView
+            {
+                DataContext = _foldersViewModel
             };
 
             // Load static tabs list

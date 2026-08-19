@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="using:zennplay_launcher.Views.Controls"
-             xmlns:models="using:zennplay_launcher.Models"
              xmlns:views="using:zennplay_launcher.Views"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:controls="using:zennplay_launcher.Views.Controls"
+             xmlns:vmcontrols="using:zennplay_launcher.ViewModels.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="zennplay_launcher.Views.Controls.PropertiesFoldersView">
+             x:Class="zennplay_launcher.Views.Controls.PropertiesFoldersView"
+             x:DataType="vmcontrols:PropertiesFoldersViewModel">
   
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto">
@@ -15,7 +17,8 @@
             <StackPanel Grid.Row="0">
                 <controls:OptionHeaderView Label="Folders"/>
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                    <controls:PropertyInputView Label="Installation Folder"/>
+                    <controls:PropertyDirectoryInputView Label="Installation Folder"
+                                                         Text="{Binding InstallationFolder, Mode=TwoWay}"/>
                     <controls:PropertyInputView Label="Is Installed"/>
                     <controls:PropertyInputView Label="Install Size"/>
                 </StackPanel>

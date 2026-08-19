@@ -38,7 +38,7 @@
             <Grid Grid.Row="1" RowDefinitions="Auto,*">
 
                 <ListBox Grid.Row="0" Background="Transparent" 
-                         HorizontalAlignment="Stretch" Classes="TabListBox"
+                         Classes="TabListBox"
                          ItemsSource="{Binding PropertiesTabs}"
                          SelectedItem="{Binding SelectedTab}"
                          >

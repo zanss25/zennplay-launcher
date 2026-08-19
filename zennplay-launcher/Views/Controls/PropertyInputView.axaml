@@ -2,6 +2,14 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="using:zennplay_launcher.Views.Controls">
 
+    <Design.PreviewWith>
+        <StackPanel Width="400" Spacing="10">
+            <StackPanel Background="{DynamicResource SystemRegionBrush}">
+                <controls:PropertyInputView />
+            </StackPanel>
+        </StackPanel>
+    </Design.PreviewWith>
+
     <ControlTheme x:Key="{x:Type controls:PropertyInputView}" TargetType="controls:PropertyInputView">
         <Setter Property="Template">
             <ControlTemplate>

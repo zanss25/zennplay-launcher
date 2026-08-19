@@ -3,6 +3,8 @@
   
     <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyInputView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/DirectoryInputView.axaml" />
+        <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyDirectoryInputView.axaml" />
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyDropdownView.axaml" />
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/MultiSelectComboBox.axaml" />
         <ResourceInclude Source="avares://zennplay-launcher/Views/Controls/PropertyMultiSelectComboBoxView.axaml" />

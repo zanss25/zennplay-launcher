@@ -60,6 +60,8 @@
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnCommonHoverBrush}"/>
@@ -111,8 +113,8 @@
         <Setter Property="MinWidth" Value="125"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Bottom"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{StaticResource PrimaryGradHover}"/>
@@ -148,8 +150,8 @@
         <Setter Property="Margin" Value="0,5"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="VerticalAlignment" Value="Bottom"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnSecondaryHoverBrush}"/>
@@ -370,6 +372,7 @@
         <Setter Property="Margin" Value="2,2,2,0"/>
         <Setter Property="BorderThickness" Value="0.7"/>
         <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
 
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
@@ -420,9 +423,12 @@
     <Style Selector="ListBox.TabListBox">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ItemsPanel">
             <ItemsPanelTemplate>
-                <UniformGrid Rows="1" HorizontalAlignment="Stretch" />
+                <UniformGrid Rows="1" 
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Center"/>
             </ItemsPanelTemplate>
         </Setter>
     </Style>
