@@ -1,5 +1,6 @@
 ﻿using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
+using zennplay_launcher.Services;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.ViewModels.Controls;
 using zennplay_launcher.Views.Controls;
@@ -20,16 +22,15 @@ namespace zennplay_launcher.ViewModels
         // ============================================================
         // VARIABLES
         // ============================================================
-        [ObservableProperty]
-        private bool _isEditMode;
-
+        private bool isNewApp = false;
+        
         [ObservableProperty]
         private Guid _appId = Guid.Empty;
 
         [ObservableProperty]
         private AppModel? _currentApp;
 
-        private readonly AppRepository? _appRepo;
+        private readonly AppRepository? _appRepo = new();
 
         // Tabs list
         [ObservableProperty]
@@ -52,16 +53,11 @@ namespace zennplay_launcher.ViewModels
         public PropertiesMediaView MediaView { get; } = new();
 
         // Method untuk inisialisasi mode
-        public void Initialize(Guid appId)
+        public void Initialize(Guid appId, bool isNew = false)
         {
+            isNewApp = isNew;
             AppId = appId;
-            IsEditMode = appId != Guid.Empty;
-
-            if (IsEditMode)
-            {
-                LoadAppData(appId);
-            }
-
+            LoadAppData(appId);
             LoadTabsData();
         }
 
@@ -122,17 +118,60 @@ namespace zennplay_launcher.ViewModels
         // ============================================================
         public void LoadAppData(Guid appId)
         {
-            AppModel? app = _appRepo.GetAppById(appId);
-            if (app != null)
+            if (appId != Guid.Empty)
             {
-                CurrentApp = app;
+                AppModel? app = _appRepo.GetAppById(appId);
+
+                if (app != null)
+                {
+                    CurrentApp = app;
+                }
             }
         }
 
         // ============================================================
         // APP EDIT OPERATIONS
         // ============================================================
+        public event Action? RequestClose;
 
+        /*
+        [RelayCommand]
+        private void Save()
+        {
+            if (_appRepo == null || CurrentApp == null) return;
 
+            // 1. Eksekusi UpdateApp secara sinkron (karena return type bool)
+            bool isSuccess = _appRepo.UpdateApp(
+                CurrentApp,
+                developerIds: MetadataViewModel.SelectedDeveloperIds,
+                publisherIds: MetadataViewModel.SelectedPublisherIds,
+                genreIds: MetadataViewModel.SelectedGenreIds,
+                tagIds: MetadataViewModel.SelectedTagIds
+            );
+
+            // 2. Beri tahu View untuk menutup diri jika berhasil
+            if (isSuccess)
+            {
+                RequestClose?.Invoke();
+            }
+            else
+            {
+                // Opsional: Tampilkan log/notifikasi error jika update gagal
+                Debug.WriteLine("Failed to update app metadata.");
+            }
+        }
+        */
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            if (isNewApp && _appRepo != null && AppId != Guid.Empty)
+            {
+                _appRepo.HardDeleteApp(AppId);
+            }
+
+            RequestClose?.Invoke();
+        }
+        
     }
 }

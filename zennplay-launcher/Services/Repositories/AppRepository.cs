@@ -17,6 +17,8 @@ namespace zennplay_launcher.Services.Repositories
         /// menggunakan SqliteTransaction demi keamanan data.
         /// </summary>
         public Guid AddApp(AppModel app,
+                           List<AppActionModel>? actions = null,
+                           List<AppLinkModel>? links = null,
                            List<Guid>? sectionIds = null,
                            List<Guid>? seriesIds = null,
                            List<Guid>? genreIds = null,
@@ -24,9 +26,7 @@ namespace zennplay_launcher.Services.Repositories
                            List<Guid>? developerIds = null,
                            List<Guid>? publisherIds = null,
                            List<Guid>? platformIds = null,
-                           List<Guid>? ageRatingIds = null,
-                           List<AppActionModel>? actions = null,
-                           List<AppLinkModel>? links = null)
+                           List<Guid>? ageRatingIds = null)
         {
             // Auto-generate GUID jika belum diinisialisasi
             if (app.Id == Guid.Empty)

@@ -34,6 +34,7 @@
                                                Text="Install Size"/>
                                     <TextBlock x:Name="InstallSizeText"
                                                Classes="TextPropertiesLabel"
+                                               VerticalAlignment="Center"
                                                Margin="80,0,0,0"
                                                Text="{Binding InstallSizeText}"/>
                                     <Button Margin="20,0,0,0"

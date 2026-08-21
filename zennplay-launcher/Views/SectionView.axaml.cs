@@ -1,6 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using System;
+using zennplay_launcher.ViewModels;
 
 namespace zennplay_launcher.Views
 {
@@ -11,16 +14,33 @@ namespace zennplay_launcher.Views
             InitializeComponent();
         }
 
-        public void AddGame_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+        public async void AddGame_Click(object? sender, RoutedEventArgs e)
         {
             var parentWindow = TopLevel.GetTopLevel(this) as Window;
+            if (parentWindow == null) return;
 
-            if (parentWindow != null)
+            // 1. Buka dialog selection dan TUNGGU hasilnya (mengembalikan Guid? yang dikirim via this.Close(...))
+            var newAppWin = new NewAppSelectionWindow();
+            Guid? resultAppId = await newAppWin.ShowDialog<Guid?>(parentWindow);
+
+            // 2. Jika user membatalkan (Cancel), proses berhenti di sini
+            if (!resultAppId.HasValue || resultAppId.Value == Guid.Empty)
             {
-                AppPropertiesWindow propertiesWindow = new();
-                propertiesWindow.ShowDialog(parentWindow);
+                return;
             }
 
+            // 3. Jika berhasil, buat dan tampilkan AppPropertiesWindow dengan parentWindow yang sama
+            var propertiesVm = new AppPropertiesViewModel();
+            propertiesVm.Initialize(resultAppId.Value, isNew: true);
+
+            var propertiesWindow = new AppPropertiesWindow(resultAppId.Value)
+            {
+                DataContext = propertiesVm
+            };
+
+            // Buka properties secara modal dialog atau show biasa terhadap parentWindow
+            await propertiesWindow.ShowDialog(parentWindow);
         }
+
     }
 }

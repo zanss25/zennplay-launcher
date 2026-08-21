@@ -528,7 +528,6 @@
     <!-- Text Block Properties -->
     <Style Selector="TextBlock.TextPropertiesLabel">
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
         <Setter Property="FontSize" Value="13"/>
     </Style>

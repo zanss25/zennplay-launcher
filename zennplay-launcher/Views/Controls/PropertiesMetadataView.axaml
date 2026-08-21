@@ -54,8 +54,7 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyCalendarTextInputView x:Name="ReleaseDateInput"
-                                                                Label="Release Date"
-                                                                SelectedDate="2022-05-12"/>
+                                                                Label="Release Date"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
                         <controls:PropertyMultiSelectComboBoxView 
@@ -90,8 +89,9 @@
                                                     Label="User Rating"/>
                     </StackPanel>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
-                        <controls:PropertyInputView x:Name="DescriptionInput"
-                                                    Label="Description"/>
+                        <controls:PropertyLongInputView x:Name="DescriptionInput"
+                                                        Label="Description"
+                                                        InputMinHeight="150"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>
@@ -133,10 +133,11 @@
                                                        ItemsSource="{Binding AvailableCompletionStatuses}"
                                                        SelectedItem="{Binding SelectedCompletionStatus}"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
-                        <controls:PropertyInputView x:Name="NotesInput"
-                                                    Label="Notes"/>
-                    </StackPanel>
+                    <Grid Grid.Column="1" Grid.Row="0" Margin="0,20,20,20"
+                                VerticalAlignment="Stretch">
+                        <controls:PropertyLongInputView x:Name="NotesInput"
+                                                        Label="Notes"/>
+                    </Grid>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
                         <controls:PropertySwitchTextView x:Name="IsNotGameSwitch"
                                                          Label="Flag as non-game app"/>

@@ -11,7 +11,7 @@ namespace zennplay_launcher.Models
         public Guid Id { get; set; }
         public Guid AppId { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string? Desc { get; set; }
+        public string? Desc { get; set; } = string.Empty;
         public string ActionType { get; set; } = string.Empty; // "executable", "url", dll
         public string Target { get; set; } = string.Empty;
         public string? LaunchOptions { get; set; }

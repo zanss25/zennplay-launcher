@@ -37,4 +37,17 @@ public class PropertyInputView : TemplatedControl
         get => GetValue(PlaceholderTextProperty);
         set => SetValue(PlaceholderTextProperty, value);
     }
+
+    // 4. Registered Property: MinHeight (TwoWay)
+    public static readonly StyledProperty<double> InputMinHeightProperty =
+        AvaloniaProperty.Register<PropertyInputView, double>(
+            nameof(InputMinHeight),
+            defaultValue: 0.0);
+
+    public double InputMinHeight
+    {
+        get => GetValue(InputMinHeightProperty);
+        set => SetValue(InputMinHeightProperty, value);
+    }
+
 }

@@ -17,7 +17,8 @@
                 <Grid ColumnDefinitions="130, *" VerticalAlignment="Center" Margin="0,0,0,12">
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               Classes="TextPropertiesLabel"/>
+                               Classes="TextPropertiesLabel"
+                               VerticalAlignment="Center"/>
 
                     <!-- Kontrol input / datepicker kamu di kolom 1 -->
                     <controls:CalendarTextDatePicker Grid.Column="1"

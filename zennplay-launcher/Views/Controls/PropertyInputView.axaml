@@ -17,11 +17,13 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               Classes="TextPropertiesLabel"/>
+                               Classes="TextPropertiesLabel"
+                               VerticalAlignment="Center"/>
 
                     <TextBox Grid.Column="1" 
                              Text="{TemplateBinding Text, Mode=TwoWay}"
-                             PlaceholderText="{TemplateBinding PlaceholderText}"/>
+                             PlaceholderText="{TemplateBinding PlaceholderText}"
+                             MinHeight="{TemplateBinding InputMinHeight}"/>
                 </Grid>
             </ControlTemplate>
         </Setter>

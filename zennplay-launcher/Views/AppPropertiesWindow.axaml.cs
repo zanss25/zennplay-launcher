@@ -12,24 +12,23 @@ namespace zennplay_launcher.Views
     {
         private readonly AppPropertiesViewModel _viewModel;
 
-        public AppPropertiesWindow(Guid appId = default)
+        public AppPropertiesWindow(Guid appId = default, bool isNew = false)
         {
             InitializeComponent();
 
             _viewModel = new AppPropertiesViewModel();
             _viewModel.Initialize(appId);
             DataContext = _viewModel;
-
-            if (appId == Guid.Empty)
-            {
-                Title = "Add New Properties";
-            }
-            else
-            {
-                Title = "Edit Properties";
-            }
-
+            Title = "Edit Properties";
             TitleText.Text = Title.ToUpper();
+
+            DataContextChanged += (s, e) =>
+            {
+                if (DataContext is AppPropertiesViewModel vm)
+                {
+                    vm.RequestClose += () => this.Close();
+                }
+            };
         }
 
         protected override void OnLoaded(RoutedEventArgs e)

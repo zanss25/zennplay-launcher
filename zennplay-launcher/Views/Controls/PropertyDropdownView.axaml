@@ -9,7 +9,8 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               Classes="TextPropertiesLabel"/>
+                               Classes="TextPropertiesLabel"
+                               VerticalAlignment="Center"/>
 
                     <ComboBox Grid.Column="1"
                               HorizontalAlignment="Stretch"

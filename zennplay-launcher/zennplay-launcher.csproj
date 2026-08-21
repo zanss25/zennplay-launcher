@@ -11,10 +11,6 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
-    <AvaloniaXaml Remove="Services\NewFolder\**" />
-    <Compile Remove="Services\NewFolder\**" />
-    <EmbeddedResource Remove="Services\NewFolder\**" />
-    <None Remove="Services\NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>

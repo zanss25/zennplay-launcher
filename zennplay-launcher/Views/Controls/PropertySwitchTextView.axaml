@@ -15,7 +15,8 @@
 
                     <TextBlock Grid.Column="1" 
                                Text="{TemplateBinding Label}" 
-                               Classes="TextPropertiesLabel"/>
+                               Classes="TextPropertiesLabel"
+                               VerticalAlignment="Center"/>
 
                 </Grid>
 

@@ -67,7 +67,8 @@
                     <Button x:Name="SaveBtn" Classes="ButtonSecondary"
                             Content="Save" Margin="10,0,0,0"/>
                     <Button x:Name="CancelBtn" Classes="ButtonSecondary"
-                            Content="Cancel" Margin="10,0,0,0"/>
+                            Content="Cancel" Margin="10,0,0,0"
+                            Command="{Binding CancelCommand}"/>
                 </StackPanel>
         </Border>
 
