@@ -4,6 +4,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
+using zennplay_launcher.Services.Repositories;
+using zennplay_launcher.Themes;
 using zennplay_launcher.ViewModels;
 
 namespace zennplay_launcher.Views
@@ -11,24 +13,20 @@ namespace zennplay_launcher.Views
     public partial class AppPropertiesWindow : Window
     {
         private readonly AppPropertiesViewModel _viewModel;
+        public bool IsSaved => _viewModel.IsSaved;
 
-        public AppPropertiesWindow(Guid appId = default, bool isNew = false)
+        public AppPropertiesWindow(Guid appId, bool isNew = false, Guid? initialSectionId = null)
         {
             InitializeComponent();
+            WindowExtensions.ApplyPlatformDecorations(this);
 
             _viewModel = new AppPropertiesViewModel();
-            _viewModel.Initialize(appId);
+            _viewModel.Initialize(appId, isNew, initialSectionId);
             DataContext = _viewModel;
             Title = "Edit Properties";
             TitleText.Text = Title.ToUpper();
 
-            DataContextChanged += (s, e) =>
-            {
-                if (DataContext is AppPropertiesViewModel vm)
-                {
-                    vm.RequestClose += () => this.Close();
-                }
-            };
+            _viewModel.RequestClose += () => this.Close();
         }
 
         protected override void OnLoaded(RoutedEventArgs e)
@@ -44,5 +42,20 @@ namespace zennplay_launcher.Views
             }
         }
 
+        protected override void OnClosing(WindowClosingEventArgs e)
+        {
+            base.OnClosing(e);
+
+            if (DataContext is AppPropertiesViewModel vm)
+            {
+                vm.DeleteDraftIfNotSaved();
+            }
+
+        }
+
+        private void CancelBtn_Click(object? sender, RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

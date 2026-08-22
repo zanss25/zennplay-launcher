@@ -27,7 +27,7 @@
 
         </StackPanel>
         
-        <views:TitleBarView Grid.Row="0"/>
+        <views:TitleBarView x:Name="TitleBar" Grid.Row="0"/>
 
         <!-- Contents -->
         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20"

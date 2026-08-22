@@ -14,15 +14,6 @@ namespace zennplay_launcher.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    public MainViewModel()
-    {
-        // Load Sections list
-        LoadSections();
-
-        // Load static tabs list
-        SidebarTabs = new ObservableCollection<SidebarTabModel>(SidebarTabsList.DefaultTabs);
-    }
-
     // ============================================================
     // VARIABLES
     // ============================================================
@@ -31,19 +22,15 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     object? _currentView;
 
-    // Properti untuk menampung apps
-    private readonly AppRepository _appRepo = new();
-
     // Properti untuk menampung sections
     private readonly SectionRepository _sectionRepo = new();
 
-    // Properti koleksi yang di-bind oleh XAML
-    [ObservableProperty]
-    private ObservableCollection<AppModel> _displayedApps = new();
-
     // Tab View Instances
-    private readonly SectionView _sectionView = new();
     private readonly WorkInProgress _workInProgress = new();
+
+    // Section tabs
+    private readonly SectionViewModel _sectionViewModel = new();
+    private readonly SectionView _sectionView;
 
     // Static tabs list
     [ObservableProperty]
@@ -52,6 +39,21 @@ public partial class MainViewModel : ViewModelBase
     // Active static tab
     [ObservableProperty]
     private SidebarTabModel? _selectedSidebarTab;
+
+    public MainViewModel()
+    {
+        // Hubungkan View dengan ViewModel-nya
+        _sectionView = new SectionView
+        {
+            DataContext = _sectionViewModel
+        };
+
+        // Load Sections list
+        LoadSections();
+
+        // Load static tabs list
+        SidebarTabs = new ObservableCollection<SidebarTabModel>(SidebarTabsList.DefaultTabs);
+    }
 
     // ============================================================
     // THEME FUNCTIONS (WILL BE MOVED LATER)
@@ -107,11 +109,7 @@ public partial class MainViewModel : ViewModelBase
         SelectedSidebarTab = null;
 
         Debug.WriteLine("Selected Section ID: " + value.Id);
-
-        var criteria = new AppFilterCriteria { SectionIds = new List<Guid> { value.Id } };
-
-        IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(criteria);
-        DisplayedApps = new ObservableCollection<AppModel>(apps);
+        _sectionViewModel.CurrentSection = value;
         CurrentView = _sectionView;
     }
 

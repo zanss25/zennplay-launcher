@@ -18,7 +18,8 @@
                     
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
-                               Classes="TextPropertiesLabel"/>
+                               Classes="TextPropertiesLabel"
+                               VerticalAlignment="Center"/>
 
                     <controls:DirectoryInputView Grid.Column="1"
                                                  Text="{TemplateBinding Text, Mode=TwoWay}"

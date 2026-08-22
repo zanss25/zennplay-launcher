@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services.Repositories;
@@ -14,10 +13,8 @@ namespace zennplay_launcher.ViewModels.Controls
     public partial class PropertiesMetadataViewModel : ViewModelBase
     {
         // ============================================================
-        // VARIABLES
+        // REPOSITORIES
         // ============================================================
-
-        // Repositories
         private readonly SectionRepository _sectionRepo = new();
         private readonly SeriesRepository _seriesRepo = new();
         private readonly GenreRepository _genreRepo = new();
@@ -27,85 +24,63 @@ namespace zennplay_launcher.ViewModels.Controls
         private readonly PlatformRepository _platformRepo = new();
         private readonly AgeRatingRepository _ageRatingRepo = new();
 
-        // Sections list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableSections = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedSectionsText = string.Empty;
+        // ============================================================
+        // OBSERVABLE COLLECTIONS
+        // ============================================================
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableSections = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableSeries = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableGenres = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableTags = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableDevelopers = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availablePublishers = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availablePlatforms = new();
+        [ObservableProperty] private ObservableCollection<SelectableItem> _availableAgeRatings = new();
+        [ObservableProperty] private ObservableCollection<AppSourceModel> _availableSources = [];
+        [ObservableProperty] private ObservableCollection<AppCompletionStatusModel> _availableCompletionStatuses = [];
 
-        // Series list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableSeries = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedSeriesText = string.Empty;
+        // ============================================================
+        // 1. FORM INPUT PROPERTIES
+        // ============================================================
+        [ObservableProperty] private string _title = string.Empty;
+        [ObservableProperty] private string _sortingTitle = string.Empty;
+        [ObservableProperty] private string? _userRating;
+        [ObservableProperty] private string _description = string.Empty;
+        [ObservableProperty] private string _notes = string.Empty;
+        [ObservableProperty] private string? _releaseDate;
 
-        // Genres list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableGenres = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedGenresText = string.Empty;
+        // Read-only stats
+        [ObservableProperty] private string _firstLaunched = "-";
+        [ObservableProperty] private string _lastLaunched = "-";
+        [ObservableProperty] private string _launchTimes = "0";
 
-        // Tags list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableTags = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedTagsText = string.Empty;
+        // Switches / Flags (Gunakan bool standar non-nullable)
+        [ObservableProperty] private bool _isNotGame;
+        [ObservableProperty] private bool _isExcluded;
+        [ObservableProperty] private bool _isPinned;
 
-        // Developers list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableDevelopers = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedDevelopersText = string.Empty;
+        // Dropdowns
+        [ObservableProperty] private AppSourceModel? _selectedSource;
+        [ObservableProperty] private AppCompletionStatusModel? _selectedCompletionStatus;
 
-        // Publishers list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availablePublishers = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedPublishersText = string.Empty;
+        // Multi-Select Display Text
+        [ObservableProperty] private string _selectedSeriesText = string.Empty;
+        [ObservableProperty] private string _selectedPlatformsText = string.Empty;
+        [ObservableProperty] private string _selectedDevelopersText = string.Empty;
+        [ObservableProperty] private string _selectedPublishersText = string.Empty;
+        [ObservableProperty] private string _selectedAgeRatingsText = string.Empty;
+        [ObservableProperty] private string _selectedGenresText = string.Empty;
+        [ObservableProperty] private string _selectedTagsText = string.Empty;
+        [ObservableProperty] private string _selectedSectionsText = string.Empty;
 
-        // Platforms list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availablePlatforms = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedPlatformsText = string.Empty;
-
-        // Age Ratings list
-        // 1. Data Master (Untuk ItemsSource)
-        [ObservableProperty]
-        private ObservableCollection<SelectableItem> _availableAgeRatings = new();
-        // 2. Teks Terpilih (Untuk Contents / Text)
-        [ObservableProperty]
-        private string? _selectedAgeRatingsText = string.Empty;
-
-        // Sources List
-        // 1. Data Master
-        [ObservableProperty]
-        private ObservableCollection<AppSourceModel> _availableSources = [];
-        // 2. Source Terpilih
-        [ObservableProperty]
-        private AppSourceModel? _selectedSource;
-
-        // Completion Statuses List
-        // 1. Data Master
-        [ObservableProperty]
-        private ObservableCollection<AppCompletionStatusModel> _availableCompletionStatuses = [];
-        // 2. Completion Status Terpilih
-        [ObservableProperty]
-        private AppCompletionStatusModel? _selectedCompletionStatus;
+        // 🔑 Multi-Select Junction IDs: Diekstrak otomatis dari item yang IsSelected = true
+        public List<Guid> SelectedSectionIds => AvailableSections.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedSeriesIds => AvailableSeries.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedPlatformIds => AvailablePlatforms.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedDeveloperIds => AvailableDevelopers.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedPublisherIds => AvailablePublishers.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedAgeRatingIds => AvailableAgeRatings.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedGenreIds => AvailableGenres.Where(x => x.IsSelected).Select(x => x.Id).ToList();
+        public List<Guid> SelectedTagIds => AvailableTags.Where(x => x.IsSelected).Select(x => x.Id).ToList();
 
         public PropertiesMetadataViewModel()
         {
@@ -114,129 +89,149 @@ namespace zennplay_launcher.ViewModels.Controls
         }
 
         // ============================================================
-        // FUNCTIONS
+        // COMMANDS & POPULATE DATA
         // ============================================================
         [RelayCommand]
         private async Task OpenAddNewDialogAsync(string _targetTable)
         {
-            // Logika untuk menampilkan popup/input genre baru
+            await Task.CompletedTask;
         }
 
-        // Method load data awal
-        public void LoadData(int appId = 0)
+        public void LoadData(Guid appId = default)
         {
+            // Ambil master items dari masing-masing repo
             var sectionsFromDb = _sectionRepo.GetAllSections();
-            var selectedSectionsSet = (SelectedSectionsText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailableSections = new ObservableCollection<SelectableItem>(
-                sectionsFromDb.Select(n => new SelectableItem(
-                    name: n.Name,
-                    id: n.Id,
-                    description: n.Desc,
-                    isSelected: selectedSectionsSet.Contains(n.Name)
-                ))
-            );
-
             var seriesFromDb = _seriesRepo.GetAllSeries();
-            var selectedSeriesSet = (SelectedSeriesText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailableSeries = new ObservableCollection<SelectableItem>(
-                seriesFromDb.Select(s => new SelectableItem(
-                    name: s.Name,
-                    id: s.Id,
-                    description: s.Desc,
-                    isSelected: selectedSeriesSet.Contains(s.Name)
-                ))
-            );
-
             var genresFromDb = _genreRepo.GetAllGenres();
-            var selectedGenresSet = (SelectedGenresText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailableGenres = new ObservableCollection<SelectableItem>(
-                genresFromDb.Select(g => new SelectableItem(
-                    name: g.Name,
-                    id: g.Id,
-                    description: g.Desc,
-                    isSelected: selectedGenresSet.Contains(g.Name)
-                ))
-            );
-
             var tagsFromDb = _tagRepo.GetAllTags();
-            var selectedTagsSet = (SelectedTagsText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailableTags = new ObservableCollection<SelectableItem>(
-                tagsFromDb.Select(g => new SelectableItem(
-                    name: g.Name,
-                    id: g.Id,
-                    description: g.Desc,
-                    isSelected: selectedTagsSet.Contains(g.Name)
-                ))
-            );
-
             var developersFromDb = _developerRepo.GetAllDevelopers();
-            var selectedDevelopersSet = (SelectedDevelopersText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailableDevelopers = new ObservableCollection<SelectableItem>(
-                developersFromDb.Select(d => new SelectableItem(
-                    name: d.Name,
-                    id: d.Id,
-                    description: d.Desc,
-                    isSelected: selectedDevelopersSet.Contains(d.Name)
-                ))
-            );
-
             var publishersFromDb = _publisherRepo.GetAllPublishers();
-            var selectedPublishersSet = (SelectedPublishersText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailablePublishers = new ObservableCollection<SelectableItem>(
-                publishersFromDb.Select(p => new SelectableItem(
-                    name: p.Name,
-                    id: p.Id,
-                    description: p.Desc,
-                    isSelected: selectedPublishersSet.Contains(p.Name)
-                ))
-            );
-
             var platformsFromDb = _platformRepo.GetAllPlatforms();
-            var selectedPlatformsSet = (SelectedPlatformsText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            AvailablePlatforms = new ObservableCollection<SelectableItem>(
-                platformsFromDb.Select(l => new SelectableItem(
-                    name: l.Name,
-                    id: l.Id,
-                    description: l.Desc,
-                    isSelected: selectedPlatformsSet.Contains(l.Name)
-                ))
-            );
-
             var ageRatingsFromDb = _ageRatingRepo.GetAllAgeRatings();
-            var selectedAgeRatingsSet = (SelectedAgeRatingsText ?? string.Empty)
-                                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            AvailableSections = new ObservableCollection<SelectableItem>(
+                sectionsFromDb.Select(n => new SelectableItem(n.Name, n.Id, n.Desc, false)));
+
+            AvailableSeries = new ObservableCollection<SelectableItem>(
+                seriesFromDb.Select(s => new SelectableItem(s.Name, s.Id, s.Desc, false)));
+
+            AvailableGenres = new ObservableCollection<SelectableItem>(
+                genresFromDb.Select(g => new SelectableItem(g.Name, g.Id, g.Desc, false)));
+
+            AvailableTags = new ObservableCollection<SelectableItem>(
+                tagsFromDb.Select(t => new SelectableItem(t.Name, t.Id, t.Desc, false)));
+
+            AvailableDevelopers = new ObservableCollection<SelectableItem>(
+                developersFromDb.Select(d => new SelectableItem(d.Name, d.Id, d.Desc, false)));
+
+            AvailablePublishers = new ObservableCollection<SelectableItem>(
+                publishersFromDb.Select(p => new SelectableItem(p.Name, p.Id, p.Desc, false)));
+
+            AvailablePlatforms = new ObservableCollection<SelectableItem>(
+                platformsFromDb.Select(l => new SelectableItem(l.Name, l.Id, l.Desc, false)));
+
             AvailableAgeRatings = new ObservableCollection<SelectableItem>(
-                ageRatingsFromDb.Select(r => new SelectableItem(
-                    name: r.Name,
-                    id: r.Id,
-                    description: r.Desc,
-                    isSelected: selectedAgeRatingsSet.Contains(r.Name)
-                ))
-            );
-
-            string currentAppSource = "steam";
-            SelectedSource = AvailableSources.FirstOrDefault(s => s.Id == currentAppSource)
-                             ?? AvailableSources.FirstOrDefault();
-
-            string currentAppCompletionStatus = "not_played";
-            SelectedCompletionStatus = AvailableCompletionStatuses.FirstOrDefault(s => s.Id == currentAppCompletionStatus)
-                             ?? AvailableCompletionStatuses.FirstOrDefault();
+                ageRatingsFromDb.Select(r => new SelectableItem(r.Name, r.Id, r.Desc, false)));
         }
 
+        // ==========================================
+        // 2. TRANSFER DATA (LOAD & POPULATE TO MODEL)
+        // ==========================================
+
+        public void LoadFromModel(AppModel app)
+        {
+            Title = app.Title ?? string.Empty;
+            SortingTitle = app.SortingTitle ?? string.Empty;
+            Description = app.Desc ?? string.Empty;
+            Notes = app.Notes ?? string.Empty;
+            UserRating = app.UserRating >= 0 ? app.UserRating.ToString() : string.Empty;
+            ReleaseDate = app.ReleaseDate;
+
+            // Mapping Dropdowns
+            SelectedSource = AvailableSources.FirstOrDefault(s =>
+                string.Equals(s.Id, app.Source, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(s.Name, app.Source, StringComparison.OrdinalIgnoreCase))
+                ?? AvailableSources.FirstOrDefault();
+
+            SelectedCompletionStatus = AvailableCompletionStatuses.FirstOrDefault(c =>
+                string.Equals(c.Id, app.CompletionStatus, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(c.Name, app.CompletionStatus, StringComparison.OrdinalIgnoreCase))
+                ?? AvailableCompletionStatuses.FirstOrDefault(c => c.Id == "not_played")
+                ?? AvailableCompletionStatuses.FirstOrDefault();
+
+            // Mapping Switches
+            IsNotGame = !app.IsGame;
+            IsExcluded = app.IsExcluded;
+            IsPinned = app.IsPinned;
+
+            FirstLaunched = app.FirstLaunched?.ToString("yyyy-MM-dd HH:mm") ?? "-";
+            LastLaunched = app.LastLaunched?.ToString("yyyy-MM-dd HH:mm") ?? "-";
+            LaunchTimes = app.LaunchTimes.ToString();
+
+            // Sinkronkan Checkbox & Text MultiSelect langsung dari AppModel
+            SyncSelection(AvailableSections, app.SectionIds, t => SelectedSectionsText = t);
+            SyncSelection(AvailableSeries, app.SeriesIds, t => SelectedSeriesText = t);
+            SyncSelection(AvailableGenres, app.GenreIds, t => SelectedGenresText = t);
+            SyncSelection(AvailableTags, app.TagIds, t => SelectedTagsText = t);
+            SyncSelection(AvailableDevelopers, app.DeveloperIds, t => SelectedDevelopersText = t);
+            SyncSelection(AvailablePublishers, app.PublisherIds, t => SelectedPublishersText = t);
+            SyncSelection(AvailablePlatforms, app.PlatformIds, t => SelectedPlatformsText = t);
+            SyncSelection(AvailableAgeRatings, app.AgeRatingIds, t => SelectedAgeRatingsText = t);
+        }
+
+        private void SyncSelection(ObservableCollection<SelectableItem> collection, IEnumerable<Guid> selectedIds, Action<string> setText)
+        {
+            var idSet = selectedIds.ToHashSet();
+            foreach (var item in collection)
+            {
+                item.IsSelected = idSet.Contains(item.Id);
+            }
+
+            var selectedNames = collection.Where(x => x.IsSelected).Select(x => x.Name);
+            setText(string.Join(", ", selectedNames));
+        }
+
+        public void ApplyToModel(AppModel app)
+        {
+            app.Title = Title;
+            app.SortingTitle = string.IsNullOrWhiteSpace(SortingTitle) ? Title : SortingTitle;
+            app.Desc = Description;
+            app.Notes = Notes;
+            app.UserRating = int.TryParse(UserRating, out int rating) ? rating : -1;
+            app.ReleaseDate = ReleaseDate;
+
+            app.Source = (SelectedSource?.Id == "empty") ? null : SelectedSource?.Id;
+            app.CompletionStatus = (SelectedCompletionStatus?.Id == "empty")
+                ? "not_played"
+                : (SelectedCompletionStatus?.Id ?? "not_played");
+
+            app.IsGame = !IsNotGame;
+            app.IsExcluded = IsExcluded;
+            app.IsPinned = IsPinned;
+
+            // Masukkan list ID terpilih kembali ke objek model
+            app.SectionIds = SelectedSectionIds;
+            app.SeriesIds = SelectedSeriesIds;
+            app.GenreIds = SelectedGenreIds;
+            app.TagIds = SelectedTagIds;
+            app.DeveloperIds = SelectedDeveloperIds;
+            app.PublisherIds = SelectedPublisherIds;
+            app.PlatformIds = SelectedPlatformIds;
+            app.AgeRatingIds = SelectedAgeRatingIds;
+        }
+
+        public void PreselectSection(Guid sectionId)
+        {
+            if (sectionId == Guid.Empty) return;
+
+            var matchedItem = AvailableSections.FirstOrDefault(s => s.Id == sectionId);
+            if (matchedItem != null)
+            {
+                matchedItem.IsSelected = true;
+            }
+
+            var selectedNames = AvailableSections.Where(s => s.IsSelected).Select(s => s.Name);
+            SelectedSectionsText = string.Join(", ", selectedNames);
+        }
     }
 }

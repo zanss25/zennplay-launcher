@@ -17,14 +17,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-
-        var sectionRepo = new SectionRepository();
-        var appRepo = new AppRepository();
-
-        //sectionRepo.AddSection(new SectionModel { Name = "Modding", Desc = "Modding Tools", Icon = "console" });
-        //sectionRepo.AddSection(new SectionModel { Name = "Single Player", Desc = "Single Player Games", Icon = "gamepad" });
-        //sectionRepo.AddSection(new SectionModel { Name = "Multiplayer", Desc = "Multiplayer Games", Icon = "tool" });
-
+        WindowExtensions.ApplyPlatformDecorations(this);
     }
 
     private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -34,30 +27,6 @@ public partial class MainWindow : Window
             // Memulai fungsi Drag bawaan OS
             BeginMoveDrag(e);
         }
-    }
-
-    private void OnTitleBarDoubleTapped(object? sender, TappedEventArgs e)
-    {
-        this.WindowState = this.WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-    }
-
-    private void MinimizeBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        this.WindowState = WindowState.Minimized;
-    }
-
-    private void MaximizeBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        this.WindowState = this.WindowState == WindowState.Maximized
-            ? WindowState.Normal
-            : WindowState.Maximized;
-    }
-
-    private void CloseBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        Close();
     }
 
 }

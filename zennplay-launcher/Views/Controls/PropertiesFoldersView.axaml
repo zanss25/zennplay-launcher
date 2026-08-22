@@ -31,7 +31,8 @@
                             <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <TextBlock Classes="TextPropertiesLabel"
-                                               Text="Install Size"/>
+                                               Text="Install Size"
+                                               VerticalAlignment="Center"/>
                                     <TextBlock x:Name="InstallSizeText"
                                                Classes="TextPropertiesLabel"
                                                VerticalAlignment="Center"

@@ -12,7 +12,11 @@
     <Color x:Key="BorderColorB">#FF2E2741</Color>
     <Color x:Key="TitleBackgroundA">#2D223E</Color>
     <Color x:Key="TitleBackgroundB">#312544</Color>
-    <Color x:Key="CommonTitleBackground">#241C3A</Color>
+    <Color x:Key="CommonTitleBackground">#FF241C3A</Color>
+
+    <!-- Window Border -->
+    <Color x:Key="WindowBorderColor">#FF594D7B</Color>
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="{DynamicResource WindowBorderColor}"/>
 
     <!-- Backgrounds -->
     <Color x:Key="WindowBackground">#151124</Color>

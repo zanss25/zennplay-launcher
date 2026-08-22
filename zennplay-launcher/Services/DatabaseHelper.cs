@@ -15,6 +15,7 @@ namespace zennplay_launcher.Services
         static DatabaseHelper()
         {
             SqlMapper.AddTypeHandler(new GuidTypeHandler());
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
         }
 
         /// <summary>

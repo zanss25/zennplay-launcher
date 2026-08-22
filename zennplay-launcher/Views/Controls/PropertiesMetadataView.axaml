@@ -20,7 +20,8 @@
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
                         <controls:PropertyInputView x:Name="TitleInput"
-                                                    Label="Title"/>
+                                                    Label="Title"
+                                                    Text="{Binding Title}"/>
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="SeriesInput"
                                   Label="Series"
@@ -54,7 +55,8 @@
                                   AddNewCommand="{Binding OpenAddNewDialogCommand}"
                                   />
                         <controls:PropertyCalendarTextInputView x:Name="ReleaseDateInput"
-                                                                Label="Release Date"/>
+                                                                Label="Release Date"
+                                                                Text="{Binding ReleaseDate}"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,20,20,20">
                         <controls:PropertyMultiSelectComboBoxView 
@@ -86,11 +88,13 @@
                                                        ItemsSource="{Binding AvailableSources}"
                                                        SelectedItem="{Binding SelectedSource}"/>
                         <controls:PropertyInputView x:Name="UserRatingInput"
-                                                    Label="User Rating"/>
+                                                    Label="User Rating"
+                                                    Text="{Binding UserRating}"/>
                     </StackPanel>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
                         <controls:PropertyLongInputView x:Name="DescriptionInput"
                                                         Label="Description"
+                                                        Text="{Binding Description}"
                                                         InputMinHeight="150"/>
                     </StackPanel>
                 </Grid>
@@ -121,13 +125,20 @@
                       Grid.Row="1">
                     <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
                         <controls:PropertyInputView x:Name="SortingTitleInput"
-                                                    Label="Sorting Title"/>
+                                                    Label="Sorting Title"
+                                                    Text="{Binding SortingTitle}"/>
                         <controls:PropertyInputView x:Name="FirstLaunchedInput"
-                                                    Label="First Launched"/>
+                                                    Label="First Launched"
+                                                    Text="{Binding FirstLaunched}"
+                                                    IsEnabled="False"/>
                         <controls:PropertyInputView x:Name="LastLaunchedInput"
-                                                    Label="Last Launched"/>
+                                                    Label="Last Launched"
+                                                    Text="{Binding LastLaunched}"
+                                                    IsEnabled="False"/>
                         <controls:PropertyInputView x:Name="LaunchTimesInput"
-                                                    Label="Launch Times"/>
+                                                    Label="Launch Times"
+                                                    Text="{Binding LaunchTimes}"
+                                                    IsEnabled="False"/>
                         <controls:PropertyDropdownView x:Name="CompletionStatusInput"
                                                        Label="Completion Status"
                                                        ItemsSource="{Binding AvailableCompletionStatuses}"
@@ -136,15 +147,19 @@
                     <Grid Grid.Column="1" Grid.Row="0" Margin="0,20,20,20"
                                 VerticalAlignment="Stretch">
                         <controls:PropertyLongInputView x:Name="NotesInput"
-                                                        Label="Notes"/>
+                                                        Label="Notes"
+                                                        Text="{Binding Notes}"/>
                     </Grid>
                     <StackPanel Grid.ColumnSpan="2" Grid.Row="1" Margin="20,0">
                         <controls:PropertySwitchTextView x:Name="IsNotGameSwitch"
-                                                         Label="Flag as non-game app"/>
+                                                         Label="Flag as non-game app"
+                                                         IsChecked="{Binding IsNotGame}"/>
                         <controls:PropertySwitchTextView x:Name="IsExcludedSwitch"
-                                                         Label="Exclude from stats"/>
+                                                         Label="Exclude from stats"
+                                                         IsChecked="{Binding IsExcluded}"/>
                         <controls:PropertySwitchTextView x:Name="IsPinnedSwitch"
-                                                         Label="Pin to the top" />
+                                                         Label="Pin to the top"
+                                                         IsChecked="{Binding IsPinned}"/>
                     </StackPanel>
                 </Grid>
             </StackPanel>

@@ -1,5 +1,63 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:themes="clr-namespace:zennplay_launcher.Themes">
+
+    <!-- Window Styles -->
+    <Style Selector="Window.LinuxWindow">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="TransparencyLevelHint" Value="Transparent"/>
+        <Setter Property="TransparencyBackgroundFallback" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        
+        <Setter Property="Template">
+            <ControlTemplate TargetType="Window">
+                <!-- Beri Name agar bisa di-target oleh Selector Style State -->
+                <Border Name="PART_OuterBorder"
+                        BorderBrush="{DynamicResource BorderCommonBrush}" 
+                        BorderThickness="1" 
+                        Background="{DynamicResource WindowBackgroundBrush}"
+                        CornerRadius="8">
+                    <Panel>
+                        <!-- Inner Masking Border -->
+                        <Border Name="PART_InnerBorder" 
+                                CornerRadius="7" 
+                                ClipToBounds="True">
+                            <!-- Konten Window Asli -->
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            Content="{TemplateBinding Content}"
+                                            Margin="{TemplateBinding Padding}"
+                                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+
+                        <!-- Resize Grips Container -->
+                        <Grid Name="PART_ResizeGrid" IsHitTestVisible="True">
+                            <!-- Sudut-Sudut -->
+                            <Border themes:WindowResizer.Edge="NorthWest" Cursor="TopLeftCorner"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top" Width="12" Height="12" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="NorthEast" Cursor="TopRightCorner"
+                                    HorizontalAlignment="Right" VerticalAlignment="Top" Width="12" Height="12" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="SouthWest" Cursor="BottomLeftCorner"
+                                    HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="12" Height="12" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="SouthEast" Cursor="BottomRightCorner"
+                                    HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="12" Height="12" Background="Transparent"/>
+
+                            <!-- Sisi Tepi -->
+                            <Border themes:WindowResizer.Edge="North" Cursor="TopSide"
+                                    Height="8" VerticalAlignment="Top" Margin="12,0" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="South" Cursor="BottomSide"
+                                    Height="8" VerticalAlignment="Bottom" Margin="12,0" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="West" Cursor="LeftSide"
+                                    Width="8" HorizontalAlignment="Left" Margin="0,12" Background="Transparent"/>
+                            <Border themes:WindowResizer.Edge="East" Cursor="RightSide"
+                                    Width="8" HorizontalAlignment="Right" Margin="0,12" Background="Transparent"/>
+                        </Grid>
+                    </Panel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 
      <Style Selector="WindowDrawnDecorations /template/ Panel#PART_TitleTextPanel > TextBlock">
         <Setter Property="IsVisible" Value="False" />

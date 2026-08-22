@@ -17,8 +17,8 @@ namespace zennplay_launcher.Views.Controls
         }
 
         // 2. Registered Property: IsChecked (TwoWay)
-        public static readonly StyledProperty<bool?> IsCheckedProperty =
-            AvaloniaProperty.Register<PropertySwitchTextView, bool?>(
+        public static readonly StyledProperty<bool> IsCheckedProperty =
+            AvaloniaProperty.Register<PropertySwitchTextView, bool>(
                 nameof(IsChecked),
                 defaultBindingMode: BindingMode.TwoWay);
 

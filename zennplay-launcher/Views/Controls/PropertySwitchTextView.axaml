@@ -11,7 +11,7 @@
                     
                     <ToggleSwitch Grid.Column="0"
                                   OnContent="" OffContent=""
-                                  IsChecked="{TemplateBinding IsChecked}"/>
+                                  IsChecked="{TemplateBinding IsChecked, Mode=TwoWay}"/>
 
                     <TextBlock Grid.Column="1" 
                                Text="{TemplateBinding Label}" 

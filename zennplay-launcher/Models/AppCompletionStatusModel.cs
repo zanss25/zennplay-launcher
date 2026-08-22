@@ -25,7 +25,7 @@ namespace zennplay_launcher.Models
             new AppCompletionStatusModel { Id = "played", Name = "Played" },
             new AppCompletionStatusModel { Id = "beaten", Name = "Beaten" },
             new AppCompletionStatusModel { Id = "on_hold", Name = "On Hold" },
-            new AppCompletionStatusModel { Id = "abandoned", Name = "Plan to Play" },
+            new AppCompletionStatusModel { Id = "abandoned", Name = "Abandoned" },
         ];
     }
 }

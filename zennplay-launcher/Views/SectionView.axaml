@@ -7,7 +7,7 @@
              xmlns:views="using:zennplay_launcher.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="zennplay_launcher.Views.SectionView"
-             x:DataType="viewmodels:MainViewModel">
+             x:DataType="viewmodels:SectionViewModel">
   
                     <Grid RowDefinitions="Auto,*">
                         
@@ -33,7 +33,7 @@
                                         Content="+ Add Game" 
                                         Classes="ButtonPrimary" 
                                         VerticalAlignment="Stretch"
-                                        Click="AddGame_Click"/>
+                                        Command="{Binding AddGameCommand}"/>
                             </Grid>
                         </Border>
 
@@ -51,6 +51,15 @@
                                                 <TextBlock Text="{Binding Id}" Foreground="Gray" VerticalAlignment="Center"/>
                                                 <TextBlock Text="|" Foreground="Gray" VerticalAlignment="Center"/>
                                                 <TextBlock Text="{Binding Title}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                <Button Content="Edit.."
+                                                        Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).EditAppCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                                <Button Content="Soft Delete"
+                                                        Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).SoftDeleteAppCommand}"
+                                                        CommandParameter="{Binding}"/>
+                                                <Button Content="Hard Delete" 
+                                                        Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).HardDeleteAppCommand}"
+                                                        CommandParameter="{Binding}"/>
                                             </StackPanel>
                                         </Border>
 

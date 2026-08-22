@@ -224,8 +224,24 @@ namespace zennplay_launcher.Services.Repositories
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
+                string idStr = id.ToString();
                 string sql = "SELECT * FROM apps WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<AppModel>(sql, new { Id = id.ToString() });
+                var app = conn.QueryFirstOrDefault<AppModel>(sql, new { Id = idStr });
+
+                if (app != null)
+                {
+                    // Isi list ID relasi langsung ke dalam objek app
+                    app.SectionIds = conn.Query<string>("SELECT section_id FROM app_sections WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.SeriesIds = conn.Query<string>("SELECT series_id FROM app_series WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.GenreIds = conn.Query<string>("SELECT genre_id FROM app_genres WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.TagIds = conn.Query<string>("SELECT tag_id FROM app_tags WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.DeveloperIds = conn.Query<string>("SELECT developer_id FROM app_developers WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.PublisherIds = conn.Query<string>("SELECT publisher_id FROM app_publishers WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.PlatformIds = conn.Query<string>("SELECT platform_id FROM app_platforms WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                    app.AgeRatingIds = conn.Query<string>("SELECT age_rating_id FROM app_age_ratings WHERE app_id = @Id;", new { Id = idStr }).Select(Guid.Parse).ToList();
+                }
+
+                return app;
             }
         }
 
@@ -347,13 +363,16 @@ namespace zennplay_launcher.Services.Repositories
         /// Mengubah data metadata aplikasi utama.
         /// </summary>
         public bool UpdateApp(AppModel app,
-                             IEnumerable<Guid>? ageRatingIds = null,
-                             IEnumerable<Guid>? developerIds = null,
-                             IEnumerable<Guid>? publisherIds = null,
-                             IEnumerable<Guid>? platformIds = null,
-                             IEnumerable<Guid>? seriesIds = null,
-                             IEnumerable<Guid>? tagIds = null,
-                             IEnumerable<Guid>? genreIds = null)
+                      List<AppActionModel>? actions = null,
+                      List<AppLinkModel>? links = null,
+                      List<Guid>? sectionIds = null,
+                      List<Guid>? seriesIds = null,
+                      List<Guid>? genreIds = null,
+                      List<Guid>? tagIds = null,
+                      List<Guid>? developerIds = null,
+                      List<Guid>? publisherIds = null,
+                      List<Guid>? platformIds = null,
+                      List<Guid>? ageRatingIds = null)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             using (var transaction = conn.BeginTransaction())
@@ -391,14 +410,14 @@ namespace zennplay_launcher.Services.Repositories
                         app.SortingTitle,
                         app.Desc,
                         app.UserRating,
-                        app.IsFavorite,
-                        app.IsPinned,
+                        IsFavorite = app.IsFavorite ? 1 : 0,
+                        IsPinned = app.IsPinned ? 1 : 0,
                         app.Notes,
                         app.CompletionStatus,
                         app.ReleaseDate,
-                        app.IsInstalled,
-                        app.IsGame,
-                        app.IsExcluded,
+                        IsInstalled = app.IsInstalled ? 1 : 0,
+                        IsGame = app.IsGame ? 1 : 0,
+                        IsExcluded = app.IsExcluded ? 1 : 0,
                         app.Version,
                         app.AppDir,
                         app.Source,
@@ -414,9 +433,18 @@ namespace zennplay_launcher.Services.Repositories
                         return false;
                     }
 
-                    // 2. Sinkronisasi semua tabel junction (Delete Old -> Insert New) jika list disediakan
-                    if (ageRatingIds != null)
-                        SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", ageRatingIds);
+                    // 2. Sinkronisasi semua tabel junction jika list disediakan
+                    if (sectionIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_sections", "section_id", sectionIds);
+
+                    if (seriesIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_series", "series_id", seriesIds);
+
+                    if (genreIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_genres", "genre_id", genreIds);
+
+                    if (tagIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_tags", "tag_id", tagIds);
 
                     if (developerIds != null)
                         SyncAppRelations(conn, transaction, app.Id, "app_developers", "developer_id", developerIds);
@@ -427,16 +455,18 @@ namespace zennplay_launcher.Services.Repositories
                     if (platformIds != null)
                         SyncAppRelations(conn, transaction, app.Id, "app_platforms", "platform_id", platformIds);
 
-                    if (seriesIds != null)
-                        SyncAppRelations(conn, transaction, app.Id, "app_series", "series_id", seriesIds);
+                    if (ageRatingIds != null)
+                        SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", ageRatingIds);
+                    /*
+                    // 3. Sinkronisasi entitas child (Actions & Links)
+                    if (actions != null)
+                        SyncAppActions(conn, transaction, app.Id, actions);
 
-                    if (tagIds != null)
-                        SyncAppRelations(conn, transaction, app.Id, "app_tags", "tag_id", tagIds);
+                    if (links != null)
+                        SyncAppLinks(conn, transaction, app.Id, links);
+                    */
 
-                    if (genreIds != null)
-                        SyncAppRelations(conn, transaction, app.Id, "app_genres", "genre_id", genreIds);
-
-                    // 3. Commit seluruh transaksi jika semua berhasil
+                    // 4. Commit seluruh transaksi
                     transaction.Commit();
                     return true;
                 }

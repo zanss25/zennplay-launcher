@@ -23,7 +23,8 @@ namespace zennplay_launcher.ViewModels
         // VARIABLES
         // ============================================================
         private bool isNewApp = false;
-        
+        public bool IsSaved { get; private set; } = false;
+
         [ObservableProperty]
         private Guid _appId = Guid.Empty;
 
@@ -53,12 +54,23 @@ namespace zennplay_launcher.ViewModels
         public PropertiesMediaView MediaView { get; } = new();
 
         // Method untuk inisialisasi mode
-        public void Initialize(Guid appId, bool isNew = false)
+        public void Initialize(Guid appId, bool isNew = false, Guid? initialSectionId = null)
         {
             isNewApp = isNew;
             AppId = appId;
             LoadAppData(appId);
             LoadTabsData();
+
+            if (CurrentApp != null)
+            {
+                MetadataViewModel.LoadFromModel(CurrentApp);
+            }
+
+            // Auto-select section awal jika ada (khusus add new app)
+            if (initialSectionId.HasValue && initialSectionId.Value != Guid.Empty)
+            {
+                MetadataViewModel.PreselectSection(initialSectionId.Value);
+            }
         }
 
         public AppPropertiesViewModel()
@@ -108,7 +120,7 @@ namespace zennplay_launcher.ViewModels
             }
         }
 
-        public void LoadTabsData(int appId = 0)
+        public void LoadTabsData(Guid appId = default)
         {
             MetadataViewModel.LoadData(appId);
         }
@@ -134,43 +146,51 @@ namespace zennplay_launcher.ViewModels
         // ============================================================
         public event Action? RequestClose;
 
-        /*
         [RelayCommand]
         private void Save()
         {
             if (_appRepo == null || CurrentApp == null) return;
 
-            // 1. Eksekusi UpdateApp secara sinkron (karena return type bool)
+            // 1. Salin semua input form (Title, Desc, Rating, Status, Switches, dll) ke objek CurrentApp
+            MetadataViewModel.ApplyToModel(CurrentApp);
+
+            System.Diagnostics.Debug.WriteLine($"[SAVE CHECK] IsGame: {CurrentApp.IsGame}, IsExcluded: {CurrentApp.IsExcluded}, IsPinned: {CurrentApp.IsPinned}");
+
+            // 2. Eksekusi UpdateApp dengan menyertakan seluruh junction IDs
             bool isSuccess = _appRepo.UpdateApp(
-                CurrentApp,
+                app: CurrentApp,
+                ageRatingIds: MetadataViewModel.SelectedAgeRatingIds,
                 developerIds: MetadataViewModel.SelectedDeveloperIds,
                 publisherIds: MetadataViewModel.SelectedPublisherIds,
+                platformIds: MetadataViewModel.SelectedPlatformIds,
+                seriesIds: MetadataViewModel.SelectedSeriesIds,
+                tagIds: MetadataViewModel.SelectedTagIds,
                 genreIds: MetadataViewModel.SelectedGenreIds,
-                tagIds: MetadataViewModel.SelectedTagIds
+                sectionIds: MetadataViewModel.SelectedSectionIds
             );
 
-            // 2. Beri tahu View untuk menutup diri jika berhasil
+            // 3. Verifikasi keberhasilan simpan
             if (isSuccess)
             {
+                IsSaved = true; // Menandai agar draft tidak dihapus saat OnClosing
                 RequestClose?.Invoke();
             }
             else
             {
-                // Opsional: Tampilkan log/notifikasi error jika update gagal
-                Debug.WriteLine("Failed to update app metadata.");
+                Debug.WriteLine("Failed to update app metadata in database.");
             }
         }
-        */
 
-        [RelayCommand]
-        private void Cancel()
+        public void DeleteDraftIfNotSaved()
         {
-            if (isNewApp && _appRepo != null && AppId != Guid.Empty)
+            if (isNewApp && !IsSaved && _appRepo != null && AppId != Guid.Empty)
             {
                 _appRepo.HardDeleteApp(AppId);
             }
-
-            RequestClose?.Invoke();
+            else
+            {
+                
+            }
         }
         
     }
