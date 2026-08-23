@@ -1,10 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using zennplay_launcher.Models;
+using zennplay_launcher.Services.Messages;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Themes;
 using zennplay_launcher.Views;
@@ -51,6 +53,12 @@ public partial class MainViewModel : ViewModelBase
         // Load Sections list
         LoadSections();
 
+        // LISTENER BROADCAST
+        WeakReferenceMessenger.Default.Register<SectionsUpdatedMessage>(this, (r, m) =>
+        {
+            LoadSections();
+        });
+
         // Load static tabs list
         SidebarTabs = new ObservableCollection<SidebarTabModel>(SidebarTabsList.DefaultTabs);
     }
@@ -88,9 +96,9 @@ public partial class MainViewModel : ViewModelBase
         var dbSections = _sectionRepo.GetAllSections();
 
         Sections.Clear();
-        foreach (var sec in dbSections)
+        foreach (var section in dbSections)
         {
-            Sections.Add(sec);
+            Sections.Add(section);
         }
 
         // Set item pertama sebagai default selected jika list tidak kosong

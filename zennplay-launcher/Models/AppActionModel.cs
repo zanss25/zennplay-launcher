@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Avalonia.Media;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace zennplay_launcher.Models
 {
-    public class AppActionModel
+    public class AppActionModel : IEditableListItem
     {
         public Guid Id { get; set; }
         public Guid AppId { get; set; }
@@ -18,6 +19,12 @@ namespace zennplay_launcher.Models
         public string? ActionIconPath { get; set; }
         public bool IsGame { get; set; }
         public bool IsPrimary { get; set; }
+
+        // 🔑 Mapping untuk IEditableListItem
+        public string DisplayName => string.IsNullOrWhiteSpace(Title) ? "(Untitled)" : Title;
+        public string DisplayValue => Target; 
+        public IImage? DisplayIcon => null;
+
     }
 
 }

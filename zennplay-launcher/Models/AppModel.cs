@@ -29,6 +29,7 @@ namespace zennplay_launcher.Models
         public bool IsExcluded { get; set; } = false;
         public string? Version { get; set; }
         public string? AppDir { get; set; }
+        public long InstallSize { get; set; }
         public string? Source { get; set; }
         public string? ExternalId { get; set; }
         public string? CoverPath { get; set; }

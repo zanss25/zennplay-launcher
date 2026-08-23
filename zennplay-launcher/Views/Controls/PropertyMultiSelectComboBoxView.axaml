@@ -7,6 +7,7 @@
             <ControlTemplate>
                 <Grid ColumnDefinitions="130, *" VerticalAlignment="Center" Margin="0,0,0,12">
                     
+                    <!-- Label Kiri -->
                     <TextBlock Grid.Column="0" 
                                Text="{TemplateBinding Label}" 
                                FontFamily="{DynamicResource FontCommon}"
@@ -19,8 +20,7 @@
                                 ItemsSource="{TemplateBinding ItemsSource}"
                                 AddNewText="{TemplateBinding AddNewText}"
                                 AddNewCommand="{TemplateBinding AddNewCommand}"
-                                PlaceholderText="{TemplateBinding PlaceholderText}"
-                                />
+                                PlaceholderText="{TemplateBinding PlaceholderText}" />
                 </Grid>
             </ControlTemplate>
         </Setter>

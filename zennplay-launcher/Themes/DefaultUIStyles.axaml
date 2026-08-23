@@ -621,6 +621,10 @@
         </Style>
     </Style>
 
+    <Style Selector="TextBox.InputError">
+        <Setter Property="BorderBrush" Value="#EF4444"/>
+    </Style>
+
     <!-- Text Box Search Bar -->
     <Style Selector="TextBox.TextBoxSearchBar">
         <Setter Property="Background" Value="{DynamicResource TextBoxBackgroundBrush}"/>

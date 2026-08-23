@@ -72,5 +72,8 @@ namespace zennplay_launcher.Views.Controls
             get => GetValue(AddNewCommandProperty);
             set => SetValue(AddNewCommandProperty, value);
         }
+
+        public event EventHandler<string>? ItemAdded;
+
     }
 }

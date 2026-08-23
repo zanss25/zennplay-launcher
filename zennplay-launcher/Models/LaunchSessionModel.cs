@@ -12,6 +12,6 @@ namespace zennplay_launcher.Models
         public Guid AppId { get; set; }
         public string SessionStart { get; set; } = string.Empty;
         public string? SessionEnd { get; set; }
-        public int? DurationSeconds { get; set; }
+        public long? DurationSeconds { get; set; }
     }
 }

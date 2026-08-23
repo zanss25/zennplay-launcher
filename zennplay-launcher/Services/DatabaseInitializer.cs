@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
+using System.Data;
 
 namespace zennplay_launcher.Services
 {
@@ -75,12 +76,12 @@ namespace zennplay_launcher.Services
                                             launch_times INTEGER DEFAULT 0,
                                             completion_status TEXT DEFAULT 'Not Completed',
                                             release_date TEXT,
-                                            age_rating TEXT,
                                             is_installed INTEGER DEFAULT 1,
                                             is_game INTEGER DEFAULT NULL,
                                             is_excluded INTEGER DEFAULT NULL,
                                             version TEXT,
                                             app_dir TEXT,
+                                            install_size INTEGER DEFAULT 0,
                                             source TEXT,
                                             external_id TEXT,
                                             cover_path TEXT,
@@ -795,5 +796,6 @@ namespace zennplay_launcher.Services
         }
 
         #endregion
+
     }
 }

@@ -187,6 +187,8 @@
     <!-- Miscellaneous -->
     <Color x:Key="SelectionRect">#33937BD1</Color>
     <Color x:Key="SelectionRectBorder">#FF937BD1</Color>
+    <Color x:Key="Error">#E53935</Color>
+    <SolidColorBrush x:Key="ErrorBrush" Color="{DynamicResource Error}"/>
 
     <!-- ============================================================
          BRUSHES (Solid & Gradients)

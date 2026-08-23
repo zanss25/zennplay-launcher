@@ -20,13 +20,14 @@
                     <StackPanel Margin="20">
                         <controls:PropertyDirectoryInputView x:Name="InstallationFolderInput"
                                                              Label="Installation Folder"
-                                                             Text="{Binding InstallationFolder, Mode=TwoWay}"
+                                                             Text="{Binding AppDir, Mode=TwoWay}"
                                                              BrowseCommand="{Binding BrowseFolderCommand}"/>
                         
                         <Grid ColumnDefinitions="*,*">
                             <StackPanel Grid.Column="0" HorizontalAlignment="Left">
                                 <controls:PropertySwitchTextView x:Name="IsInstalledSwitch"
-                                                                 Label="Is Installed"/>
+                                                                 Label="Is Installed"
+                                                                 IsChecked="{Binding IsInstalled}"/>
                             </StackPanel>
                             <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
@@ -37,11 +38,13 @@
                                                Classes="TextPropertiesLabel"
                                                VerticalAlignment="Center"
                                                Margin="80,0,0,0"
-                                               Text="{Binding InstallSizeText}"/>
+                                               Text="{Binding InstallSizeDisplay}"/>
                                     <Button Margin="20,0,0,0"
-                                            Content="Calculate"/>
+                                            Content="Calculate"
+                                            Command="{Binding CalculateInstallSizeCommand}"/>
                                     <Button Margin="5,0,0,0"
-                                            Content="Input Manually"/>
+                                            Content="Input Manually"
+                                            Command="{Binding InstallSizeManualInputCommand}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
@@ -54,7 +57,9 @@
             <StackPanel Grid.Row="1">
                 <controls:OptionHeaderView Label="Actions"/>
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                    <controls:EditableListView ActionButtonText="Edit"/>
+                    <controls:EditableListView ActionButtonText="Edit"
+                                               ItemsSource="{Binding AppActions}"
+                                               />
                 </StackPanel>
             </StackPanel>
 
@@ -62,7 +67,8 @@
             <StackPanel Grid.Row="2">
                 <controls:OptionHeaderView Label="Links"/>
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                    <controls:EditableListView ActionButtonText="Edit"/>
+                    <controls:EditableListView ActionButtonText="Edit"
+                                               ItemsSource="{Binding AppLinks}"/>
                 </StackPanel>
             </StackPanel>
 

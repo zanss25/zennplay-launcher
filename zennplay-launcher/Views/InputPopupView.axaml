@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:zennplay_launcher.Models"
+        xmlns:views="using:zennplay_launcher.Views"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="200"
+        Width="550" SizeToContent="Height" MaxHeight="600"
+        x:Class="zennplay_launcher.Views.InputPopupView"
+        Title="InputPopupView"       
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        CanResize="False"
+        
+        ExtendClientAreaToDecorationsHint="True"  
+        ExtendClientAreaTitleBarHeightHint="-1"
+        WindowDecorations="Full">
+  
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto, *">
+        
+        <!-- Title Bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" MinHeight="35"
+                    Background="{DynamicResource CommonTitleBackgroundBrush}"
+                    >
+            <TextBlock x:Name="TitleText" Classes="TitleText"
+                       Text="TitleText" Margin="30,0"/>
+
+        </StackPanel>
+        
+        <views:TitleBarView x:Name="TitleBar" Grid.Row="0"/>
+
+        <!-- Contents -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    >
+            <TextBlock x:Name="Message" Foreground="{DynamicResource TextWindowBrush}"
+                       FontSize="14" Text="Message: Put your messages here for info or confirmation" 
+                       HorizontalAlignment="Left" TextWrapping="Wrap" Margin="10,0,0,0"/>
+            <TextBox x:Name="InputText" Margin="10,20,10,0"
+                     TextChanged="InputText_TextChanged"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,30,0,0">
+                <Button x:Name="ActionBtn" Classes="ButtonSecondary" Click="ActionBtn_Click"
+                        Content="Ok" Margin="10,0,0,0"/>
+                <Button x:Name="CancelBtn" Classes="ButtonSecondary" Click="CancelBtn_Click"
+                    Content="Cancel" Margin="10,0,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+    </Grid>
+
+</Window>

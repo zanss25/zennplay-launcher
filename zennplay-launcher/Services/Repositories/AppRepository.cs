@@ -44,12 +44,12 @@ namespace zennplay_launcher.Services.Repositories
                         INSERT INTO apps (
                             id, title, sorting_title, desc, user_rating, is_favorite, is_pinned,
                             notes, first_launched, last_launched, launch_times, completion_status,
-                            release_date, is_installed, is_game, is_excluded, version, app_dir, 
+                            release_date, is_installed, is_game, is_excluded, version, app_dir, install_size, 
                             source, external_id, cover_path, background_path, icon_path
                         ) VALUES (
                             @Id, @Title, @SortingTitle, @Desc, @UserRating, @IsFavorite, @IsPinned,
                             @Notes, @FirstLaunched, @LastLaunched, @LaunchTimes, @CompletionStatus,
-                            @ReleaseDate, @IsInstalled, @IsGame, @IsExcluded, @Version, @AppDir, 
+                            @ReleaseDate, @IsInstalled, @IsGame, @IsExcluded, @Version, @AppDir, @InstallSize,
                             @Source, @ExternalId, @CoverPath, @BackgroundPath, @IconPath
                         );";
 
@@ -73,6 +73,7 @@ namespace zennplay_launcher.Services.Repositories
                         app.IsExcluded,
                         app.Version,
                         app.AppDir,
+                        app.InstallSize,
                         app.Source,
                         app.ExternalId,
                         app.CoverPath,
@@ -355,6 +356,32 @@ namespace zennplay_launcher.Services.Repositories
             }
         }
 
+        /// <summary>
+        /// Mengambil daftar semua action (executable/script/link launch) milik satu aplikasi.
+        /// </summary>
+        public List<AppActionModel> GetAppActions(Guid appId)
+        {
+            using (var conn = DatabaseHelper.GetOpenConnection())
+            {
+                string sql = "SELECT * FROM app_actions WHERE app_id = @AppId ORDER BY is_primary DESC, title ASC;";
+
+                return conn.Query<AppActionModel>(sql, new { AppId = appId.ToString() }).ToList();
+            }
+        }
+
+        /// <summary>
+        /// Mengambil daftar tautan eksternal (web/wiki/store) milik satu aplikasi.
+        /// </summary>
+        public List<AppLinkModel> GetAppLinks(Guid appId)
+        {
+            using (var conn = DatabaseHelper.GetOpenConnection())
+            {
+                string sql = "SELECT * FROM app_links WHERE app_id = @AppId ORDER BY name ASC, url ASC;";
+
+                return conn.Query<AppLinkModel>(sql, new { AppId = appId.ToString() }).ToList();
+            }
+        }
+
         #endregion
 
         #region 3. UPDATE
@@ -396,6 +423,7 @@ namespace zennplay_launcher.Services.Repositories
                             is_excluded = @IsExcluded,
                             version = @Version,
                             app_dir = @AppDir,
+                            install_size = @InstallSize,
                             source = @Source,
                             external_id = @ExternalId,
                             cover_path = @CoverPath,
@@ -420,6 +448,7 @@ namespace zennplay_launcher.Services.Repositories
                         IsExcluded = app.IsExcluded ? 1 : 0,
                         app.Version,
                         app.AppDir,
+                        app.InstallSize,
                         app.Source,
                         app.ExternalId,
                         app.CoverPath,
@@ -457,14 +486,14 @@ namespace zennplay_launcher.Services.Repositories
 
                     if (ageRatingIds != null)
                         SyncAppRelations(conn, transaction, app.Id, "app_age_ratings", "age_rating_id", ageRatingIds);
-                    /*
+                    
                     // 3. Sinkronisasi entitas child (Actions & Links)
                     if (actions != null)
                         SyncAppActions(conn, transaction, app.Id, actions);
 
                     if (links != null)
                         SyncAppLinks(conn, transaction, app.Id, links);
-                    */
+                    
 
                     // 4. Commit seluruh transaksi
                     transaction.Commit();
@@ -475,6 +504,64 @@ namespace zennplay_launcher.Services.Repositories
                     transaction.Rollback();
                     return false;
                 }
+            }
+        }
+
+        private void SyncAppActions(IDbConnection conn, IDbTransaction transaction, Guid appId, IEnumerable<AppActionModel> actions)
+        {
+            string appIdStr = appId.ToString();
+
+            // 1. Hapus action lama milik app ini
+            string deleteSql = "DELETE FROM app_actions WHERE app_id = @AppId;";
+            conn.Execute(deleteSql, new { AppId = appIdStr }, transaction: transaction);
+
+            // 2. Simpan daftar action yang baru
+            if (actions != null && actions.Any())
+            {
+                string insertSql = @"
+            INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, is_primary)
+            VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @IsPrimary);";
+
+                var actionData = actions.Select(act => new
+                {
+                    Id = (act.Id == Guid.Empty ? Guid.NewGuid() : act.Id).ToString(),
+                    AppId = appIdStr,
+                    act.Title,
+                    act.Desc,
+                    act.ActionType,
+                    act.Target,
+                    act.LaunchOptions,
+                    act.ActionIconPath,
+                    IsGame = act.IsGame ? 1 : 0,
+                    IsPrimary = act.IsPrimary ? 1 : 0
+                });
+
+                conn.Execute(insertSql, actionData, transaction: transaction);
+            }
+        }
+
+        private void SyncAppLinks(IDbConnection conn, IDbTransaction transaction, Guid appId, IEnumerable<AppLinkModel> links)
+        {
+            string appIdStr = appId.ToString();
+
+            // 1. Hapus links lama milik app ini
+            string deleteSql = "DELETE FROM app_links WHERE app_id = @AppId;";
+            conn.Execute(deleteSql, new { AppId = appIdStr }, transaction: transaction);
+
+            // 2. Simpan daftar links yang baru
+            if (links != null && links.Any())
+            {
+                string insertSql = "INSERT INTO app_links (id, app_id, name, url) VALUES (@Id, @AppId, @Name, @Url);";
+
+                var linkData = links.Select(link => new
+                {
+                    Id = (link.Id == Guid.Empty ? Guid.NewGuid() : link.Id).ToString(),
+                    AppId = appIdStr,
+                    link.Name,
+                    link.Url
+                });
+
+                conn.Execute(insertSql, linkData, transaction: transaction);
             }
         }
 

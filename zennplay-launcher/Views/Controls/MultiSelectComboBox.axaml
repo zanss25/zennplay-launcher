@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:models="using:zennplay_launcher.Models"
                     xmlns:controls="using:zennplay_launcher.Views.Controls">
@@ -23,7 +23,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>
-                    <!-- Input Bar Utama (Kotak TextBox + Toggle Dropdown) -->
+                    <!-- Input Bar Utama -->
                     <Border x:Name="PART_RootBorder"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
@@ -32,22 +32,20 @@
                             MinHeight="32">
                         
                         <Grid ColumnDefinitions="*, Auto">
-                            <!-- Kolom Teks / Input Ketik -->
                             <TextBox x:Name="PART_TextBox"
                                      Grid.Column="0"
-                                     Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                     Text="{TemplateBinding Text, Mode=TwoWay}"
                                      PlaceholderText="{TemplateBinding PlaceholderText}"
-                                     FontFamily="{DynamicResource FontCommon}"
+                                     FontFamily="{TemplateBinding FontFamily}"
                                      FontSize="13"
                                      Background="Transparent"
                                      BorderThickness="0"
                                      Padding="8,5"
                                      VerticalContentAlignment="Center"/>
 
-                            <!-- Tombol Dropdown Toggle -->
                             <ToggleButton x:Name="PART_DropDownToggle"
                                           Grid.Column="1"
-                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
                                           Background="Transparent"
                                           BorderThickness="0"
                                           Width="30"
@@ -81,19 +79,49 @@
                             
                             <Grid RowDefinitions="Auto, Auto, *">
                                 
-                                <!-- 1. Tombol + New di Paling Atas -->
-                                <Button x:Name="PART_AddNewButton"
-                                        Grid.Row="0"
-                                        Classes="ButtonPopup"
-                                        HorizontalAlignment="Stretch"
-                                        Margin="0,0,0,4">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <TextBlock Text="+" FontWeight="Bold" Foreground="{DynamicResource TextCommonActiveBrush}"/>
-                                        <TextBlock Text="{TemplateBinding AddNewText}"/>
-                                    </StackPanel>
-                                </Button>
+                                <!-- BARIS 0: AREA ADD NEW (TOGGLE INLINE) -->
+                                <Panel Grid.Row="0" Margin="0,0,0,4">
+                                    
+                                    <!-- State 1: Tombol Normal "+ Add New" -->
+                                    <Button x:Name="PART_AddNewButton"
+                                            Classes="ButtonPopup"
+                                            HorizontalAlignment="Stretch"
+                                            IsVisible="{Binding !IsAddingNew, RelativeSource={RelativeSource TemplatedParent}}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="+" FontWeight="Bold" Foreground="{DynamicResource TextCommonActiveBrush}"/>
+                                            <TextBlock Text="{TemplateBinding AddNewText}"/>
+                                        </StackPanel>
+                                    </Button>
 
-                                <!-- 2. List Items dengan Checkbox -->
+                                    <!-- State 2: Box Input Mini -->
+                                    <Grid ColumnDefinitions="*, Auto, Auto"
+                                          IsVisible="{TemplateBinding IsAddingNew}">
+                                        
+                                        <TextBox x:Name="PART_NewItemTextBox"
+                                                 Grid.Column="0"
+                                                 PlaceholderText="New item name..."
+                                                 FontSize="12"
+                                                 Padding="6,3"
+                                                 VerticalContentAlignment="Center"
+                                                 Margin="0,0,4,0"/>
+
+                                        <Button x:Name="PART_ConfirmAddButton"
+                                                Grid.Column="1"
+                                                Content="✓"
+                                                Padding="6,3"
+                                                Margin="0,0,2,0"/>
+
+                                        <Button x:Name="PART_CancelAddButton"
+                                                Grid.Column="2"
+                                                Content="✕"
+                                                Padding="6,3"/>
+                                    </Grid>
+                                </Panel>
+
+                                <!-- Separator / Garis Batas -->
+                                <Rectangle Grid.Row="1" Height="1" Fill="{DynamicResource TextBoxBorderBrush}" Margin="0,2,0,4"/>
+
+                                <!-- BARIS 2: LIST CHECKBOX -->
                                 <ScrollViewer Grid.Row="2" MaxHeight="220">
                                     <ItemsControl x:Name="PART_ItemsControl"
                                                   ItemsSource="{TemplateBinding FilteredItems}">
@@ -102,12 +130,12 @@
                                                 <CheckBox Content="{Binding Name}"
                                                           IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                                           Margin="4,2"
-                                                          HorizontalAlignment="Stretch"
-                                                          />
+                                                          HorizontalAlignment="Stretch"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </ScrollViewer>
+
                             </Grid>
                         </Border>
                     </Popup>

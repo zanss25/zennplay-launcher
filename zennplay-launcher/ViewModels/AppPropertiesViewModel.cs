@@ -64,6 +64,9 @@ namespace zennplay_launcher.ViewModels
             if (CurrentApp != null)
             {
                 MetadataViewModel.LoadFromModel(CurrentApp);
+                FoldersViewModel.LoadFromModel(CurrentApp);
+                FoldersViewModel.LoadAppActions(AppId);
+                FoldersViewModel.LoadAppLinks(AppId);
             }
 
             // Auto-select section awal jika ada (khusus add new app)
@@ -153,8 +156,7 @@ namespace zennplay_launcher.ViewModels
 
             // 1. Salin semua input form (Title, Desc, Rating, Status, Switches, dll) ke objek CurrentApp
             MetadataViewModel.ApplyToModel(CurrentApp);
-
-            System.Diagnostics.Debug.WriteLine($"[SAVE CHECK] IsGame: {CurrentApp.IsGame}, IsExcluded: {CurrentApp.IsExcluded}, IsPinned: {CurrentApp.IsPinned}");
+            FoldersViewModel.ApplyToModel(CurrentApp);
 
             // 2. Eksekusi UpdateApp dengan menyertakan seluruh junction IDs
             bool isSuccess = _appRepo.UpdateApp(

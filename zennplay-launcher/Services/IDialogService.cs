@@ -10,5 +10,9 @@ namespace zennplay_launcher.Services
     {
         Task<Guid?> ShowNewAppSelectionAsync();
         Task<bool> ShowAppPropertiesAsync(Guid appId, bool isNew = false, Guid? initialSectionId = null);
+        Task<bool> ShowConfirmAsync(string title, string message, string action = "Ok", bool showCancel = true, 
+                                    string cancel = "Cancel");
+        Task<string> ShowInputAsync(string title, string message, string text, string action = "Ok", 
+                                    string cancel = "Cancel");
     }
 }

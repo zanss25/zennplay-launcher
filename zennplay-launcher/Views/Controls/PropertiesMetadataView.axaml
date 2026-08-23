@@ -28,7 +28,7 @@
                                   Contents="{Binding SelectedSeriesText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableSeries}"
                                   AddNewText="New Series"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddSeriesCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="PlatformsInput"
@@ -36,7 +36,7 @@
                                   Contents="{Binding SelectedPlatformsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailablePlatforms}"
                                   AddNewText="New Platform"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddPlatformCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="DevelopersInput"
@@ -44,7 +44,7 @@
                                   Contents="{Binding SelectedDevelopersText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableDevelopers}"
                                   AddNewText="New Developer"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddDeveloperCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="PublishersInput"
@@ -52,7 +52,7 @@
                                   Contents="{Binding SelectedPublishersText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailablePublishers}"
                                   AddNewText="New Publisher"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddPublisherCommand}"
                                   />
                         <controls:PropertyCalendarTextInputView x:Name="ReleaseDateInput"
                                                                 Label="Release Date"
@@ -65,7 +65,7 @@
                                   Contents="{Binding SelectedAgeRatingsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableAgeRatings}"
                                   AddNewText="New Age Rating"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddAgeRatingCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="GenresInput"
@@ -73,7 +73,7 @@
                                   Contents="{Binding SelectedGenresText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableGenres}"
                                   AddNewText="New Series"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddGenreCommand}"
                                   />
                         <controls:PropertyMultiSelectComboBoxView 
                                   x:Name="TagsInput"
@@ -81,7 +81,7 @@
                                   Contents="{Binding SelectedTagsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableTags}"
                                   AddNewText="New Tag"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddTagCommand}"
                                   />
                         <controls:PropertyDropdownView x:Name="SourceInput"
                                                        Label="Source"
@@ -112,7 +112,7 @@
                                   Contents="{Binding SelectedSectionsText, Mode=TwoWay}"
                                   ItemsSource="{Binding AvailableSections}"
                                   AddNewText="New Section"
-                                  AddNewCommand="{Binding OpenAddNewDialogCommand}"
+                                  AddNewCommand="{Binding AddSectionCommand}"
                                   />
                     </StackPanel>
                 </Grid>

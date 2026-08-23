@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
+using zennplay_launcher.Services.Messages;
 using zennplay_launcher.Services.Repositories;
 
 namespace zennplay_launcher.ViewModels.Controls
@@ -91,12 +93,6 @@ namespace zennplay_launcher.ViewModels.Controls
         // ============================================================
         // COMMANDS & POPULATE DATA
         // ============================================================
-        [RelayCommand]
-        private async Task OpenAddNewDialogAsync(string _targetTable)
-        {
-            await Task.CompletedTask;
-        }
-
         public void LoadData(Guid appId = default)
         {
             // Ambil master items dari masing-masing repo
@@ -233,5 +229,76 @@ namespace zennplay_launcher.ViewModels.Controls
             var selectedNames = AvailableSections.Where(s => s.IsSelected).Select(s => s.Name);
             SelectedSectionsText = string.Join(", ", selectedNames);
         }
+
+        // 🔑 FUNGSI GENERIK TERPUSAT: Menangani Insert DB + Update UI
+        private void AddLookupItem<TModel>(
+            string name,
+            Func<TModel, Guid> insertDbFunc,
+            Func<string, TModel> createModelFunc,
+            ObservableCollection<SelectableItem> targetCollection,
+            Action<string>? setTextAction = null)
+        {
+            if (string.IsNullOrWhiteSpace(name)) return;
+
+            // 1. Simpan ke database
+            var model = createModelFunc(name);
+            Guid newId = insertDbFunc(model);
+
+            // 2. Tambah ke collection dan centang
+            var newItem = new SelectableItem(name, newId, "", true);
+            targetCollection.Add(newItem);
+
+            // 3. Update tampilan string di TextBox input
+            if (setTextAction != null)
+            {
+                var selectedNames = targetCollection.Where(x => x.IsSelected).Select(x => x.Name);
+                setTextAction(string.Join(", ", selectedNames));
+            }
+        }
+
+        [RelayCommand]
+        private void AddSeries(string name) =>
+            AddLookupItem(name, _seriesRepo.AddSeries, n => new SeriesModel { Name = n }, 
+                            AvailableSeries, t => SelectedSeriesText = t);
+
+        [RelayCommand]
+        private void AddPlatform(string name) =>
+            AddLookupItem(name, _platformRepo.AddPlatform, n => new PlatformModel { Name = n }, 
+                            AvailablePlatforms, t => SelectedPlatformsText = t);
+
+        [RelayCommand]
+        private void AddDeveloper(string name) =>
+            AddLookupItem(name, _developerRepo.AddDeveloper, n => new DeveloperModel { Name = n }, 
+                            AvailableDevelopers, t => SelectedDevelopersText = t);
+
+        [RelayCommand]
+        private void AddPublisher(string name) =>
+            AddLookupItem(name, _publisherRepo.AddPublisher, n => new PublisherModel { Name = n }, 
+                            AvailablePublishers, t => SelectedPublishersText = t);
+
+        [RelayCommand]
+        private void AddAgeRating(string name) =>
+            AddLookupItem(name, _ageRatingRepo.AddAgeRating, n => new AgeRatingModel { Name = n }, 
+                            AvailableAgeRatings, t => SelectedAgeRatingsText = t);
+
+        [RelayCommand]
+        private void AddGenre(string name) =>
+            AddLookupItem(name, _genreRepo.AddGenre, n => new GenreModel { Name = n }, AvailableGenres, 
+                            t => SelectedGenresText = t);
+
+        [RelayCommand]
+        private void AddTag(string name) =>
+            AddLookupItem(name, _tagRepo.AddTag, n => new TagModel { Name = n }, AvailableTags, 
+                            t => SelectedTagsText = t);
+
+        [RelayCommand]
+        private void AddSection(string name)
+        {
+            AddLookupItem(name, _sectionRepo.AddSection, n => new SectionModel { Name = n }, AvailableSections, t => SelectedSectionsText = t);
+
+            // BROADCAST KE MAINVIEWMODEL untuk refresh section tabs
+            WeakReferenceMessenger.Default.Send(new SectionsUpdatedMessage());
+        }
+
     }
 }

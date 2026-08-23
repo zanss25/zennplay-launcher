@@ -9,7 +9,7 @@ namespace zennplay_launcher.Views
     public partial class PopupView : Window
     {
         public PopupView(string title = "PopupWindow", string message = "PopupWindow: DefaultMessage",
-                            string action = "Ok", string cancel = "Cancel")
+                            string action = "Ok", bool showCancel = true, string cancel = "Cancel")
         {
             InitializeComponent();
             WindowExtensions.ApplyPlatformDecorations(this);
@@ -23,6 +23,7 @@ namespace zennplay_launcher.Views
             Message.Text = message;
             ActionBtn.Content = action;
             CancelBtn.Content = cancel;
+            CancelBtn.IsVisible = showCancel;
         }
 
         private void CancelBtn_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

@@ -54,10 +54,26 @@ namespace zennplay_launcher.Services
             return win.IsSaved;
         }
 
-        public static async Task<bool> ShowConfirmAsync(Window parent, string title, string message, string action = "Ok", string cancel = "Cancel")
+        public async Task<bool> ShowConfirmAsync(string title, string message, 
+                                                 string action = "Ok", bool showCancel = true, 
+                                                 string cancel = "Cancel")
         {
-            var popup = new PopupView(title, message, action, cancel);
+            var parent = GetActiveWindow();
+            if (parent == null) return false;
+
+            var popup = new PopupView(title, message, action, showCancel, cancel);
             return await popup.ShowDialog<bool>(parent);
         }
+
+        public async Task<string> ShowInputAsync(string title, string message, 
+                                                 string text, string action = "Ok", string cancel = "Cancel")
+        {
+            var parent = GetActiveWindow();
+            if (parent == null) return string.Empty;
+
+            var input = new InputPopupView(title, message, text, action, cancel);
+            return await input.ShowDialog<string>(parent);
+        }
+
     }
 }

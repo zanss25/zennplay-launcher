@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
@@ -9,7 +9,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Views.Controls;
@@ -18,10 +20,14 @@ public class MultiSelectComboBox : TemplatedControl
 {
     private TextBox? _textBox;
     private Button? _addNewButton;
+    private TextBox? _newItemTextBox;
+    private Button? _confirmAddButton;
+    private Button? _cancelAddButton;
+
     private bool _isUpdatingTextInternally;
     private bool _isUpdatingSelectionInternally;
 
-    // --- STYLED PROPERTIES ---
+    // --- STYLED & DIRECT PROPERTIES ---
 
     public static readonly StyledProperty<string?> TextProperty =
         AvaloniaProperty.Register<MultiSelectComboBox, string?>(
@@ -63,6 +69,18 @@ public class MultiSelectComboBox : TemplatedControl
         set => SetValue(IsDropDownOpenProperty, value);
     }
 
+    public static readonly StyledProperty<bool> IsAddingNewProperty =
+        AvaloniaProperty.Register<MultiSelectComboBox, bool>(
+            nameof(IsAddingNew),
+            defaultValue: false,
+            defaultBindingMode: BindingMode.TwoWay);
+
+    public bool IsAddingNew
+    {
+        get => GetValue(IsAddingNewProperty);
+        set => SetValue(IsAddingNewProperty, value);
+    }
+
     public static readonly StyledProperty<double> MaxDropDownHeightProperty =
         AvaloniaProperty.Register<MultiSelectComboBox, double>(nameof(MaxDropDownHeight), 300.0);
 
@@ -101,9 +119,9 @@ public class MultiSelectComboBox : TemplatedControl
         set => SetValue(AddNewCommandProperty, value);
     }
 
-    public event EventHandler? AddNewRequested;
+    public event EventHandler<string>? ItemAdded;
 
-    // --- OVERRIDES & TEMPLATE LOGIC ---
+    // --- TEMPLATE & LIFECYCLE ---
 
     protected override Type StyleKeyOverride => typeof(MultiSelectComboBox);
 
@@ -111,14 +129,21 @@ public class MultiSelectComboBox : TemplatedControl
     {
         base.OnApplyTemplate(e);
 
-        if (_addNewButton != null)
-            _addNewButton.Click -= OnAddNewButtonClicked;
+        if (_addNewButton != null) _addNewButton.Click -= OnAddNewButtonClicked;
+        if (_confirmAddButton != null) _confirmAddButton.Click -= OnConfirmAddClicked;
+        if (_cancelAddButton != null) _cancelAddButton.Click -= OnCancelAddClicked;
+        if (_newItemTextBox != null) _newItemTextBox.KeyDown -= OnNewItemTextBoxKeyDown;
 
         _textBox = e.NameScope.Find<TextBox>("PART_TextBox");
         _addNewButton = e.NameScope.Find<Button>("PART_AddNewButton");
+        _newItemTextBox = e.NameScope.Find<TextBox>("PART_NewItemTextBox");
+        _confirmAddButton = e.NameScope.Find<Button>("PART_ConfirmAddButton");
+        _cancelAddButton = e.NameScope.Find<Button>("PART_CancelAddButton");
 
-        if (_addNewButton != null)
-            _addNewButton.Click += OnAddNewButtonClicked;
+        if (_addNewButton != null) _addNewButton.Click += OnAddNewButtonClicked;
+        if (_confirmAddButton != null) _confirmAddButton.Click += OnConfirmAddClicked;
+        if (_cancelAddButton != null) _cancelAddButton.Click += OnCancelAddClicked;
+        if (_newItemTextBox != null) _newItemTextBox.KeyDown += OnNewItemTextBoxKeyDown;
 
         SyncFilteredItems();
         SyncSelectionFromText();
@@ -142,20 +167,79 @@ public class MultiSelectComboBox : TemplatedControl
                 SyncSelectionFromText();
             }
         }
-    }
-
-    private void OnAddNewButtonClicked(object? sender, RoutedEventArgs e)
-    {
-        IsDropDownOpen = false;
-        AddNewRequested?.Invoke(this, EventArgs.Empty);
-
-        if (AddNewCommand != null && AddNewCommand.CanExecute(null))
+        else if (change.Property == IsDropDownOpenProperty && !change.GetNewValue<bool>())
         {
-            AddNewCommand.Execute(null);
+            CancelAddNew();
         }
     }
 
-    // --- SINKRONISASI 2 ARAH (TEXT <-> CHECKBOX) ---
+    // --- INLINE ADD HANDLERS ---
+
+    private void OnAddNewButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        IsAddingNew = true;
+        if (_newItemTextBox != null)
+        {
+            _newItemTextBox.Text = string.Empty;
+            Dispatcher.UIThread.Post(() => _newItemTextBox.Focus());
+        }
+    }
+
+    private void OnConfirmAddClicked(object? sender, RoutedEventArgs e) => ConfirmAddNew();
+    private void OnCancelAddClicked(object? sender, RoutedEventArgs e) => CancelAddNew();
+
+    private void OnNewItemTextBoxKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            ConfirmAddNew();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape)
+        {
+            CancelAddNew();
+            e.Handled = true;
+        }
+    }
+
+    private void ConfirmAddNew()
+    {
+        string newName = _newItemTextBox?.Text?.Trim() ?? string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            var existingItem = FilteredItems.FirstOrDefault(i => string.Equals(i.Name, newName, StringComparison.OrdinalIgnoreCase));
+
+            if (existingItem != null)
+            {
+                existingItem.IsSelected = true;
+            }
+            else
+            {
+                // Delegasikan penambahan item ke ViewModel/Consumer melalui Command atau Event
+                ItemAdded?.Invoke(this, newName);
+                if (AddNewCommand != null && AddNewCommand.CanExecute(newName))
+                {
+                    AddNewCommand.Execute(newName);
+                }
+            }
+
+            SyncTextFromSelection();
+        }
+
+        CancelAddNew();
+    }
+
+    private void CancelAddNew()
+    {
+        if (_newItemTextBox != null)
+        {
+            _newItemTextBox.Text = string.Empty;
+        }
+        IsAddingNew = false;
+    }
+
+    // --- SELECTION & TEXT SYNC ---
 
     private void SyncFilteredItems()
     {
@@ -174,6 +258,13 @@ public class MultiSelectComboBox : TemplatedControl
     private void SubscribeToItems(IEnumerable? items)
     {
         if (items == null) return;
+
+        // 🔑 1. Dengarkan jika ada penambahan / penghapusan item di ObservableCollection
+        if (items is INotifyCollectionChanged observable)
+        {
+            observable.CollectionChanged += OnItemsSourceCollectionChanged;
+        }
+
         foreach (var item in items)
         {
             if (item is SelectableItem selectable)
@@ -184,11 +275,42 @@ public class MultiSelectComboBox : TemplatedControl
     private void UnsubscribeFromItems(IEnumerable? items)
     {
         if (items == null) return;
+
+        if (items is INotifyCollectionChanged observable)
+        {
+            observable.CollectionChanged -= OnItemsSourceCollectionChanged;
+        }
+
         foreach (var item in items)
         {
             if (item is SelectableItem selectable)
                 selectable.PropertyChanged -= OnItemPropertyChanged;
         }
+    }
+
+    private void OnItemsSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+        {
+            foreach (var item in e.NewItems)
+            {
+                if (item is SelectableItem selectable)
+                {
+                    selectable.PropertyChanged += OnItemPropertyChanged;
+                    if (!FilteredItems.Contains(selectable))
+                    {
+                        FilteredItems.Add(selectable);
+                    }
+                }
+            }
+        }
+        else if (e.Action == NotifyCollectionChangedAction.Reset)
+        {
+            SyncFilteredItems();
+        }
+
+        SyncSelectionFromText();
+        SyncTextFromSelection();
     }
 
     private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)

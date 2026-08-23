@@ -10,8 +10,6 @@ namespace zennplay_launcher.Views.Controls
         public PropertiesFoldersView()
         {
             InitializeComponent();
-
-            IsInstalledSwitch.IsChecked = true;
         }
 
     }
