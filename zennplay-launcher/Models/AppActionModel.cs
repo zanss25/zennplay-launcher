@@ -17,8 +17,8 @@ namespace zennplay_launcher.Models
         public string Target { get; set; } = string.Empty;
         public string? LaunchOptions { get; set; }
         public string? ActionIconPath { get; set; }
-        public bool IsGame { get; set; }
-        public bool IsPrimary { get; set; }
+        public bool IsGame { get; set; } = true;
+        public int SortOrder { get; set; }
 
         // 🔑 Mapping untuk IEditableListItem
         public string DisplayName => string.IsNullOrWhiteSpace(Title) ? "(Untitled)" : Title;

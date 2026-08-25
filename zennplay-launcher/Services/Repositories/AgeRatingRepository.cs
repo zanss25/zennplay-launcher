@@ -12,12 +12,8 @@ namespace zennplay_launcher.Services.Repositories
     {
         #region 1. CREATE (INSERT)
 
-        /// <summary>
-        /// Menambahkan ageRating baru ke database.
-        /// </summary>
         public Guid AddAgeRating(AgeRatingModel ageRating)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (ageRating.Id == Guid.Empty)
             {
                 ageRating.Id = Guid.NewGuid();
@@ -26,16 +22,23 @@ namespace zennplay_launcher.Services.Repositories
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sqlAgeRating = @"
-                    INSERT INTO age_ratings (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                        INSERT INTO age_ratings (id, name, desc) 
+                        VALUES (@Id, @Name, @Desc);";
 
-                conn.Execute(sqlAgeRating, ageRating);
+                // 🔑 Gunakan anonymous object agar Guid tersimpan lowercase konsisten
+                conn.Execute(sqlAgeRating, new
+                {
+                    Id = ageRating.Id.ToString(),
+                    ageRating.Name,
+                    ageRating.Desc
+                });
+
                 return ageRating.Id;
             }
         }
 
-        #endregion
-
+        #endregion       
+        
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
@@ -105,20 +108,23 @@ namespace zennplay_launcher.Services.Repositories
 
         #region 3. UPDATE
 
-        /// <summary>
-        /// Mengubah nama dan deskripsi ageRating.
-        /// </summary>
         public bool UpdateAgeRating(AgeRatingModel ageRating)
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
                 string sql = @"
-                    UPDATE age_ratings SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+                        UPDATE age_ratings SET
+                            name = @Name,
+                            desc = @Desc
+                        WHERE id = @Id;";
 
-                return conn.Execute(sql, ageRating) > 0;
+                // 🔑 Gunakan anonymous object di sini juga
+                return conn.Execute(sql, new
+                {
+                    Id = ageRating.Id.ToString(),
+                    ageRating.Name,
+                    ageRating.Desc
+                }) > 0;
             }
         }
 

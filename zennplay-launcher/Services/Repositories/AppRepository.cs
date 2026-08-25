@@ -151,8 +151,8 @@ namespace zennplay_launcher.Services.Repositories
                     if (actions != null && actions.Any())
                     {
                         string sqlAction = @"
-                            INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, is_primary)
-                            VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @IsPrimary);";
+                            INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, sort_order)
+                            VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @SortOrder);";
 
                         var actionData = actions.Select(act => new
                         {
@@ -165,7 +165,7 @@ namespace zennplay_launcher.Services.Repositories
                             act.LaunchOptions,
                             act.ActionIconPath,
                             act.IsGame,
-                            act.IsPrimary
+                            act.SortOrder
                         });
 
                         conn.Execute(sqlAction, actionData, transaction);
@@ -174,14 +174,16 @@ namespace zennplay_launcher.Services.Repositories
                     // 11. Insert App Links
                     if (links != null && links.Any())
                     {
-                        string sqlLink = "INSERT INTO app_links (id, app_id, name, url) VALUES (@Id, @AppId, @Name, @Url);";
+                        string sqlLink = "INSERT INTO app_links (id, app_id, name, desc, url, sort_order) VALUES (@Id, @AppId, @Name, @Desc, @Url, @SortOrder);";
 
                         var linkData = links.Select(link => new
                         {
                             Id = (link.Id == Guid.Empty ? Guid.NewGuid() : link.Id).ToString(),
                             AppId = appIdStr,
                             link.Name,
-                            link.Url
+                            link.Desc,
+                            link.Url,
+                            link.SortOrder
                         });
 
                         conn.Execute(sqlLink, linkData, transaction);
@@ -356,6 +358,37 @@ namespace zennplay_launcher.Services.Repositories
             }
         }
 
+        public Guid AddAppAction(AppActionModel action)
+        {
+            if (action.Id == Guid.Empty)
+            {
+                action.Id = Guid.NewGuid();
+            }
+
+            using (var conn = DatabaseHelper.GetOpenConnection())
+            {
+                string sql = @"
+                    INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, sort_order)
+                    VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @SortOrder);";
+
+                conn.Execute(sql, new
+                {
+                    Id = action.Id.ToString(),
+                    AppId = action.AppId.ToString(),
+                    Title = action.Title,
+                    Desc = action.Desc,
+                    ActionType = action.ActionType,
+                    Target = action.Target,
+                    LaunchOptions = action.LaunchOptions,
+                    ActionIconPath = action.ActionIconPath,
+                    IsGame = action.IsGame? 1 : 0,
+                    SortOrder = action.SortOrder
+                });
+
+                return action.Id;
+            }
+        }
+
         /// <summary>
         /// Mengambil daftar semua action (executable/script/link launch) milik satu aplikasi.
         /// </summary>
@@ -363,7 +396,7 @@ namespace zennplay_launcher.Services.Repositories
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                string sql = "SELECT * FROM app_actions WHERE app_id = @AppId ORDER BY is_primary DESC, title ASC;";
+                string sql = "SELECT * FROM app_actions WHERE app_id = @AppId ORDER BY sort_order ASC, title ASC;";
 
                 return conn.Query<AppActionModel>(sql, new { AppId = appId.ToString() }).ToList();
             }
@@ -376,7 +409,7 @@ namespace zennplay_launcher.Services.Repositories
         {
             using (var conn = DatabaseHelper.GetOpenConnection())
             {
-                string sql = "SELECT * FROM app_links WHERE app_id = @AppId ORDER BY name ASC, url ASC;";
+                string sql = "SELECT * FROM app_links WHERE app_id = @AppId ORDER BY sort_order ASC, name ASC, url ASC;";
 
                 return conn.Query<AppLinkModel>(sql, new { AppId = appId.ToString() }).ToList();
             }
@@ -519,8 +552,8 @@ namespace zennplay_launcher.Services.Repositories
             if (actions != null && actions.Any())
             {
                 string insertSql = @"
-            INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, is_primary)
-            VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @IsPrimary);";
+                    INSERT INTO app_actions (id, app_id, title, desc, action_type, target, launch_options, action_icon_path, is_game, sort_order)
+                    VALUES (@Id, @AppId, @Title, @Desc, @ActionType, @Target, @LaunchOptions, @ActionIconPath, @IsGame, @SortOrder);";
 
                 var actionData = actions.Select(act => new
                 {
@@ -533,7 +566,7 @@ namespace zennplay_launcher.Services.Repositories
                     act.LaunchOptions,
                     act.ActionIconPath,
                     IsGame = act.IsGame ? 1 : 0,
-                    IsPrimary = act.IsPrimary ? 1 : 0
+                    act.SortOrder
                 });
 
                 conn.Execute(insertSql, actionData, transaction: transaction);
@@ -551,14 +584,16 @@ namespace zennplay_launcher.Services.Repositories
             // 2. Simpan daftar links yang baru
             if (links != null && links.Any())
             {
-                string insertSql = "INSERT INTO app_links (id, app_id, name, url) VALUES (@Id, @AppId, @Name, @Url);";
+                string insertSql = "INSERT INTO app_links (id, app_id, name, desc, url, sort_order) VALUES (@Id, @AppId, @Name, @Desc, @Url, @SortOrder);";
 
                 var linkData = links.Select(link => new
                 {
                     Id = (link.Id == Guid.Empty ? Guid.NewGuid() : link.Id).ToString(),
                     AppId = appIdStr,
                     link.Name,
-                    link.Url
+                    link.Desc,
+                    link.Url,
+                    link.SortOrder
                 });
 
                 conn.Execute(insertSql, linkData, transaction: transaction);

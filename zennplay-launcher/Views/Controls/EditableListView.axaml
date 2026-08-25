@@ -8,92 +8,103 @@
             <ControlTemplate>
                 <Grid RowDefinitions="*, Auto">
                     
-                    <!-- BOX LIST CONTAINER -->
-                    <Border Grid.Row="0"
-                            Background="{DynamicResource WindowBackgroundBrush}"
-                            BorderBrush="{DynamicResource TextBoxBorderBrush}"
-                            BorderThickness="0"
-                            CornerRadius="4"
-                            MinHeight="180"
-                            Padding="2">
-                        
-                        <ListBox ItemsSource="{TemplateBinding ItemsSource}"
+                    <!-- 1. CONTAINER UTAMA LIST -->
+                    <Grid Grid.Row="0">
+                        <ListBox x:Name="PART_ListBox"
+                                 ItemsSource="{TemplateBinding ItemsSource}"
                                  SelectedItem="{TemplateBinding SelectedItem, Mode=TwoWay}"
                                  SelectionMode="Single"
-                                 Background="Transparent">
+                                 Background="Transparent"
+                                 MinHeight="180">
+                            
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="models:IEditableListItem">
-                                    <Grid ColumnDefinitions="Auto, *, Auto" Margin="4,2">
-                                        <!-- 1. Ikon -->
-                                        <Image Grid.Column="0"
+                                    <Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto" 
+                                          Margin="4,2" 
+                                          Background="Transparent">
+                                        
+                                        <!-- Grip Handle -->
+                                        <TextBlock Grid.Column="0"
+                                                   Text="⠿"
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   Foreground="{DynamicResource TextCommonBrush}"
+                                                   Opacity="0.5"
+                                                   Cursor="SizeAll"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+
+                                        <!-- Ikon Action -->
+                                        <Image Grid.Column="1"
                                                Source="{Binding DisplayIcon}"
-                                               Width="16"
-                                               Height="16"
-                                               Margin="0,0,8,0"
+                                               Width="18"
+                                               Height="18"
+                                               Margin="0,0,10,0"
                                                IsVisible="{Binding DisplayIcon, Converter={x:Static ObjectConverters.IsNotNull}}"
                                                VerticalAlignment="Center"/>
 
-                                        <!-- 2. Nama -->
-                                        <TextBlock Grid.Column="1"
+                                        <!-- Nama Action -->
+                                        <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
                                                    FontFamily="{DynamicResource FontCommon}"
                                                    Foreground="{DynamicResource TextCommonBrighterBrush}"
                                                    FontSize="13"
                                                    VerticalAlignment="Center"/>
 
-                                        <!-- 3. Value String Tambahan (Di Kanan / Secondary) -->
-                                        <TextBlock Grid.Column="2"
+                                        <!-- Target / Path -->
+                                        <TextBlock Grid.Column="3"
                                                    Text="{Binding DisplayValue}"
                                                    FontFamily="{DynamicResource FontCommon}"
                                                    Foreground="{DynamicResource TextCommonBrush}"
                                                    FontSize="12"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   HorizontalAlignment="Right"
                                                    VerticalAlignment="Center"
-                                                   Margin="10,0,0,0"/>
+                                                   Margin="16,0,8,0"
+                                                   Opacity="0.75"/>
+
+                                        <!-- Tombol Edit -->
+                                        <Button Grid.Column="4"
+                                                Content="Edit"
+                                                Command="{Binding $parent[controls:EditableListView].EditCommand}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,4,0"/>
+
+                                        <!-- Tombol Remove -->
+                                        <Button Grid.Column="5"
+                                                Content="Remove"
+                                                Command="{Binding $parent[controls:EditableListView].RemoveCommand}"
+                                                CommandParameter="{Binding}"/>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                    </Border>
 
-                    <!-- TOOLBAR TOMBOL AKSI DI BAWAH BOX -->
-                    <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto, Auto, *, Auto, Auto" Margin="0,8,0,0">
-                        
-                        <!-- Tombol Add -->
+                        <!-- 2. FLOATING GHOST CARD (Menempel Mengikuti Kursor) -->
+                        <Canvas IsHitTestVisible="False">
+                            <Border x:Name="PART_GhostOverlay"
+                                    IsVisible="False"
+                                    Background="{DynamicResource WindowBackgroundBrush}"
+                                    BorderBrush="{DynamicResource TextBoxBorderActiveBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="10,6"
+                                    Opacity="0.85"
+                                    BoxShadow="0 4 12 0 #55000000">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="⠿" FontSize="14" Foreground="{DynamicResource TextCommonActiveBrush}"/>
+                                    <TextBlock x:Name="PART_GhostText" Text="Action Name" FontWeight="SemiBold" FontSize="13"
+                                               FontFamily="{DynamicResource FontCommon}"/>
+                                </StackPanel>
+                            </Border>
+                        </Canvas>
+                    </Grid>
+
+                    <!-- TOOLBAR BAWAH -->
+                    <Grid Grid.Row="1" ColumnDefinitions="Auto, *" Margin="0,8,0,0">
                         <Button Grid.Column="0"
-                                Content="Add"
-                                Command="{TemplateBinding AddCommand}"
-                                Margin="0,0,4,0"/>
-
-                        <!-- Tombol Action on Selected (Dinamis: Edit / Run / dsb) -->
-                        <Button Grid.Column="1"
-                                Content="{TemplateBinding ActionButtonText}"
-                                Command="{TemplateBinding ActionCommand}"
-                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                IsEnabled="{TemplateBinding SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                Margin="0,0,4,0"/>
-
-                        <!-- Tombol Remove -->
-                        <Button Grid.Column="2"
-                                Content="Remove"
-                                Command="{TemplateBinding RemoveCommand}"
-                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                IsEnabled="{TemplateBinding SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
-
-                        <!-- Tombol Pengurutan (Move Up & Move Down) -->
-                        <Button Grid.Column="4"
-                                Content="▲"
-                                ToolTip.Tip="Move Up"
-                                Command="{TemplateBinding MoveUpCommand}"
-                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                IsEnabled="{TemplateBinding SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
-                                Margin="0,0,4,0"/>
-
-                        <Button Grid.Column="5"
-                                Content="▼"
-                                ToolTip.Tip="Move Down"
-                                Command="{TemplateBinding MoveDownCommand}"
-                                CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource TemplatedParent}}"
-                                IsEnabled="{TemplateBinding SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+                                Content="{TemplateBinding AddText}"
+                                Command="{TemplateBinding AddCommand}"/>
                     </Grid>
 
                 </Grid>

@@ -37,8 +37,8 @@ namespace zennplay_launcher.ViewModels.Controls
         [ObservableProperty] private ObservableCollection<SelectableItem> _availablePublishers = new();
         [ObservableProperty] private ObservableCollection<SelectableItem> _availablePlatforms = new();
         [ObservableProperty] private ObservableCollection<SelectableItem> _availableAgeRatings = new();
-        [ObservableProperty] private ObservableCollection<AppSourceModel> _availableSources = [];
-        [ObservableProperty] private ObservableCollection<AppCompletionStatusModel> _availableCompletionStatuses = [];
+        [ObservableProperty] private ObservableCollection<StringPropertyModel> _availableSources = [];
+        [ObservableProperty] private ObservableCollection<StringPropertyModel> _availableCompletionStatuses = [];
 
         // ============================================================
         // 1. FORM INPUT PROPERTIES
@@ -55,14 +55,14 @@ namespace zennplay_launcher.ViewModels.Controls
         [ObservableProperty] private string _lastLaunched = "-";
         [ObservableProperty] private string _launchTimes = "0";
 
-        // Switches / Flags (Gunakan bool standar non-nullable)
+        // Switches / Flags
         [ObservableProperty] private bool _isNotGame;
         [ObservableProperty] private bool _isExcluded;
         [ObservableProperty] private bool _isPinned;
 
         // Dropdowns
-        [ObservableProperty] private AppSourceModel? _selectedSource;
-        [ObservableProperty] private AppCompletionStatusModel? _selectedCompletionStatus;
+        [ObservableProperty] private StringPropertyModel? _selectedSource;
+        [ObservableProperty] private StringPropertyModel? _selectedCompletionStatus;
 
         // Multi-Select Display Text
         [ObservableProperty] private string _selectedSeriesText = string.Empty;
@@ -86,8 +86,8 @@ namespace zennplay_launcher.ViewModels.Controls
 
         public PropertiesMetadataViewModel()
         {
-            AvailableSources = new ObservableCollection<AppSourceModel>(AppSourceList.AvailableSources);
-            AvailableCompletionStatuses = new ObservableCollection<AppCompletionStatusModel>(AppCompletionStatusList.AvailableCompletionStatuses);
+            AvailableSources = new ObservableCollection<StringPropertyModel>(AppSources.AvailableSources);
+            AvailableCompletionStatuses = new ObservableCollection<StringPropertyModel>(AppCompletionStatuses.AvailableCompletionStatuses);
         }
 
         // ============================================================
@@ -164,7 +164,7 @@ namespace zennplay_launcher.ViewModels.Controls
             LastLaunched = app.LastLaunched?.ToString("yyyy-MM-dd HH:mm") ?? "-";
             LaunchTimes = app.LaunchTimes.ToString();
 
-            // Sinkronkan Checkbox & Text MultiSelect langsung dari AppModel
+            // Sinkronkan Text MultiSelect langsung dari AppModel
             SyncSelection(AvailableSections, app.SectionIds, t => SelectedSectionsText = t);
             SyncSelection(AvailableSeries, app.SeriesIds, t => SelectedSeriesText = t);
             SyncSelection(AvailableGenres, app.GenreIds, t => SelectedGenresText = t);
@@ -205,7 +205,7 @@ namespace zennplay_launcher.ViewModels.Controls
             app.IsExcluded = IsExcluded;
             app.IsPinned = IsPinned;
 
-            // Masukkan list ID terpilih kembali ke objek model
+            // Memasukkan list ID terpilih kembali ke objek model
             app.SectionIds = SelectedSectionIds;
             app.SeriesIds = SelectedSeriesIds;
             app.GenreIds = SelectedGenreIds;

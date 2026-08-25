@@ -158,9 +158,16 @@ namespace zennplay_launcher.ViewModels
             MetadataViewModel.ApplyToModel(CurrentApp);
             FoldersViewModel.ApplyToModel(CurrentApp);
 
+            for (int i = 0; i < FoldersViewModel.AppActions.Count; i++)
+            {
+                FoldersViewModel.AppActions[i].SortOrder = i;
+            }
+
             // 2. Eksekusi UpdateApp dengan menyertakan seluruh junction IDs
             bool isSuccess = _appRepo.UpdateApp(
                 app: CurrentApp,
+                actions: [.. FoldersViewModel.AppActions],
+                links: [.. FoldersViewModel.AppLinks],
                 ageRatingIds: MetadataViewModel.SelectedAgeRatingIds,
                 developerIds: MetadataViewModel.SelectedDeveloperIds,
                 publisherIds: MetadataViewModel.SelectedPublisherIds,

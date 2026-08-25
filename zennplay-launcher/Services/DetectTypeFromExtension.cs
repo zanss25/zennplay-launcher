@@ -20,7 +20,7 @@ namespace zennplay_launcher.Services
 
             return extension switch
             {
-                ".exe" or ".lnk" or ".url" or ".uri" or ".bat" or ".cmd" or ".ps1"
+                ".exe" or ".lnk" or ".url" or ".uri" or ".bat" or ".cmd" or ".ps1" or ".application"
                     => "Executable",
 
                 ".txt" or ".cfg" or ".json" or ".ini" or ".xml" or ".yaml" or ".yml"

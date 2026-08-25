@@ -1,10 +1,12 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -12,6 +14,9 @@ using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services;
 using zennplay_launcher.Services.Repositories;
+using zennplay_launcher.Views;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
+using static System.Collections.Specialized.BitVector32;
 
 namespace zennplay_launcher.ViewModels.Controls
 {
@@ -171,6 +176,138 @@ namespace zennplay_launcher.ViewModels.Controls
                 // Beri peringatan jika input bukan angka valid
                 await _dialogService.ShowConfirmAsync("Invalid Input", "Please enter a valid numeric value in bytes.", "Ok", false);
             }
+        }
+
+        public async Task<Guid?> AddActionBrowseAsync(IStorageProvider storageProvider)
+        {
+            var platformService = App.PlatformService;
+
+            var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = "Select Executable/Config file",
+                AllowMultiple = false,
+                FileTypeFilter = platformService.GetExecutableFileFilters()
+            });
+
+            if (files.Count == 0)
+                return null;
+
+            string selectedPath = files[0].Path.LocalPath;
+
+            if (!platformService.IsExecutable(selectedPath))
+            {
+                return null;
+            }
+
+            // 1. Ekstrak Metadata (Title & Directory)
+            var (title, directory) = platformService.ResolveAppMetadata(selectedPath);
+            string fileTitle = !string.IsNullOrWhiteSpace(title)
+                ? title
+                : Path.GetFileNameWithoutExtension(selectedPath);
+
+            // 2. Deteksi Action Type dari Ekstensi
+            string actionType = DetectTypeFromExtension.DetectFileType(selectedPath);
+
+            // 3. Tentukan Sort Order
+            int nextSortOrder = AppActions.Count;
+
+            // 4. Buat Model Action Baru (Masih di Memori)
+            var newAction = new AppActionModel
+            {
+                Id = Guid.NewGuid(),
+                AppId = AppId,
+                Title = fileTitle,
+                ActionType = actionType,
+                Target = selectedPath,
+                IsGame = true,
+                SortOrder = nextSortOrder
+            };
+
+            // 5. Tambahkan hanya ke koleksi UI (ObservableCollection)
+            AppActions.Add(newAction);
+
+            return newAction.Id;
+        }
+
+        [RelayCommand]
+        private async Task AddActionAsync()
+        {
+            if (StorageProvider != null)
+            {
+                await AddActionBrowseAsync(StorageProvider);
+            }
+        }
+
+        [RelayCommand]
+        private async Task EditActionAsync(AppActionModel? action)
+        {
+            if (action == null) return;
+
+            // Panggil dialog melalui service
+            bool isSaved = await _dialogService.ShowAppActionPropertiesAsync(action);
+
+            if (isSaved)
+            {
+                // Beri tahu UI bahwa isi item telah berubah
+                int index = AppActions.IndexOf(action);
+                if (index >= 0)
+                {
+                    AppActions[index] = action;
+                }
+            }
+        }
+
+        [RelayCommand]
+        private async Task RemoveActionAsync(AppActionModel? action)
+        {
+            AppActions.Remove(action);
+        }
+
+        [RelayCommand]
+        public async Task AddLinkAsync()
+        {
+            var newLink = new AppLinkModel
+            {
+                Id = Guid.NewGuid(),
+                AppId = AppId,
+                Name = "New Link",
+                Desc = String.Empty,
+                Url = String.Empty
+            };
+
+            // 5. Tambahkan hanya ke koleksi UI (ObservableCollection)
+            AppLinks.Add(newLink);
+            await EditLinkAsync(newLink);
+
+            if (String.IsNullOrEmpty(newLink.Url))
+            {
+                AppLinks.Remove(newLink);
+            }
+        }
+
+        [RelayCommand]
+        public async Task EditLinkAsync(AppLinkModel? link)
+        {
+            if (link == null) return;
+
+            // Panggil dialog melalui service
+            bool isSaved = await _dialogService.ShowAppLinkPropertiesAsync(link);
+
+            if (isSaved)
+            {
+                // Beri tahu UI bahwa isi item telah berubah
+                int index = AppLinks.IndexOf(link);
+                if (index >= 0)
+                {
+                    AppLinks[index] = link;
+                }
+            }
+        }
+
+        [RelayCommand]
+        public async Task RemoveLinkAsync(AppLinkModel? link)
+        {
+            AppLinks.Remove(link);
         }
 
     }

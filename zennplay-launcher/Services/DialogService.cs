@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using System;
 using System.Threading.Tasks;
+using zennplay_launcher.Models;
+using zennplay_launcher.ViewModels;
 using zennplay_launcher.Views;
 
 namespace zennplay_launcher.Services
@@ -52,6 +54,37 @@ namespace zennplay_launcher.Services
             var win = new AppPropertiesWindow(appId, isNew, sectionId);
             await win.ShowDialog(parent);
             return win.IsSaved;
+        }
+
+        public async Task<bool> ShowAppActionPropertiesAsync(AppActionModel action)
+        {
+            var parent = GetActiveWindow();
+            if (parent == null) return false;
+
+            var win = new AppActionPropertiesWindow();
+            var vm = new AppActionPropertiesViewModel();
+
+            vm.StorageProvider = win.StorageProvider;
+            vm.LoadFromModel(action);
+            vm.RequestClose += () => win.Close(vm.IsSaved);
+            win.DataContext = vm;
+
+            return await win.ShowDialog<bool>(parent);
+        }
+
+        public async Task<bool> ShowAppLinkPropertiesAsync(AppLinkModel link)
+        {
+            var parent = GetActiveWindow();
+            if (parent == null) return false;
+
+            var win = new AppLinkPropertiesWindow();
+            var vm = new AppLinkPropertiesViewModel();
+
+            vm.LoadFromModel(link);
+            vm.RequestClose += () => win.Close(vm.IsSaved);
+            win.DataContext = vm;
+
+            return await win.ShowDialog<bool>(parent);
         }
 
         public async Task<bool> ShowConfirmAsync(string title, string message, 

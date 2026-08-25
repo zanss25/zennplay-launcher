@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:zennplay_launcher.Models"
+        xmlns:viewmodels="using:zennplay_launcher.ViewModels"
+        xmlns:views="using:zennplay_launcher.Views"
+        xmlns:controls="using:zennplay_launcher.Views.Controls"
+        xmlns:vmcontrols="using:zennplay_launcher.ViewModels.Controls"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="200"
+        Width="550" SizeToContent="Height" MaxHeight="600"
+        x:Class="zennplay_launcher.Views.AppActionPropertiesWindow"
+        x:DataType="viewmodels:AppActionPropertiesViewModel"
+        Title="AppActionPropertiesWindow"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        
+        ExtendClientAreaToDecorationsHint="True"  
+        ExtendClientAreaTitleBarHeightHint="-1"
+        WindowDecorations="Full">
+
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto, *">
+        
+        <!-- Title Bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" MinHeight="35"
+                    Background="{DynamicResource CommonTitleBackgroundBrush}"
+                    >
+            <TextBlock x:Name="TitleText" Classes="TitleText"
+                       Text="TitleText" Margin="30,0"/>
+
+        </StackPanel>
+        
+        <views:TitleBarView x:Name="TitleBar" Grid.Row="0"/>
+
+        <!-- Contents -->
+        <Grid Grid.Row="1" Margin="20" ColumnDefinitions="Auto,*" RowDefinitions="*,Auto"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                    >
+            <StackPanel Grid.Column="1" Grid.Row="0">
+                <controls:PropertyInputView Label="Title"
+                                            Text="{Binding Title}"/>
+                <controls:PropertyInputView Label="Description"
+                                            Text="{Binding Desc}"/>
+                <controls:PropertyDropdownView Label="Action Type"
+                                               ItemsSource="{Binding AvailableActionTypes}"
+                                               SelectedItem="{Binding SelectedActionType}"
+                                               />
+                <controls:PropertyDirectoryInputView Label="Target"
+                                                     Text="{Binding Target}"
+                                                     BrowseCommand="{Binding BrowseTargetCommand}"/>  
+                <controls:PropertyInputView Label="Launch Options"
+                                            Text="{Binding LaunchOptions}"/>
+                <controls:PropertySwitchTextView Label="Flag action as non-game"
+                                                 IsChecked="{Binding IsNotGame}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,30,0,0"
+                        Grid.ColumnSpan="2" Grid.Row="2">
+                <Button x:Name="SaveBtn" Classes="ButtonSecondary" Command="{Binding SaveCommand}"
+                        Content="Ok" Margin="10,0,0,0"/>
+                <Button x:Name="CancelBtn" Classes="ButtonSecondary" Command="{Binding CancelCommand}"
+                    Content="Cancel" Margin="10,0,0,0"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+
+</Window>

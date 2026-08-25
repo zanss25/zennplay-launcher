@@ -57,9 +57,12 @@
             <StackPanel Grid.Row="1">
                 <controls:OptionHeaderView Label="Actions"/>
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                    <controls:EditableListView ActionButtonText="Edit"
+                    <controls:EditableListView x:Name="AppActionsList"
                                                ItemsSource="{Binding AppActions}"
-                                               />
+                                               AddText="Add Action"
+                                               AddCommand="{Binding AddActionCommand}"
+                                               EditCommand="{Binding EditActionCommand}"
+                                               RemoveCommand="{Binding RemoveActionCommand}"/>
                 </StackPanel>
             </StackPanel>
 
@@ -67,8 +70,12 @@
             <StackPanel Grid.Row="2">
                 <controls:OptionHeaderView Label="Links"/>
                 <StackPanel Grid.Column="0" Grid.Row="0" Margin="20">
-                    <controls:EditableListView ActionButtonText="Edit"
-                                               ItemsSource="{Binding AppLinks}"/>
+                    <controls:EditableListView x:Name="AppLinksList"
+                                               ItemsSource="{Binding AppLinks}"
+                                               AddText="Add Link"
+                                               AddCommand="{Binding AddLinkCommand}"
+                                               EditCommand="{Binding EditLinkCommand}"
+                                               RemoveCommand="{Binding RemoveLinkCommand}"/>
                 </StackPanel>
             </StackPanel>
 

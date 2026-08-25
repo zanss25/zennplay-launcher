@@ -103,7 +103,9 @@ namespace zennplay_launcher.Services
                                             id TEXT PRIMARY KEY,
                                             app_id TEXT NOT NULL REFERENCES apps(id) ON DELETE CASCADE,
                                             name TEXT,
-                                            url TEXT NOT NULL
+                                            desc TEXT,
+                                            url TEXT NOT NULL,
+                                            sort_order INTEGER DEFAULT 0
                                         );";
                 command.ExecuteNonQuery();
             }
@@ -124,7 +126,7 @@ namespace zennplay_launcher.Services
                                             launch_options TEXT,
                                             action_icon_path TEXT,
                                             is_game INTEGER DEFAULT 1,
-                                            is_primary INTEGER DEFAULT 0
+                                            sort_order INTEGER DEFAULT 0
                                         );";
                 command.ExecuteNonQuery();
             }
