@@ -29,19 +29,6 @@ namespace zennplay_launcher.Views
             _viewModel.RequestClose += () => this.Close();
         }
 
-        protected override void OnLoaded(RoutedEventArgs e)
-        {
-            base.OnLoaded(e);
-
-            if (DataContext is AppPropertiesViewModel mainVm)
-            {
-                if (mainVm.FoldersViewModel != null)
-                {
-                    mainVm.FoldersViewModel.StorageProvider = this.StorageProvider;
-                }
-            }
-        }
-
         protected override void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);

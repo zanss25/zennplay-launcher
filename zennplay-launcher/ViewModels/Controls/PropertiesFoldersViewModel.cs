@@ -182,11 +182,12 @@ namespace zennplay_launcher.ViewModels.Controls
         {
             var platformService = App.PlatformService;
 
+            // 1. Izinkan semua tipe file (All Files + Executables + Common Configs)
             var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Select Executable/Config file",
+                Title = "Select Target File",
                 AllowMultiple = false,
-                FileTypeFilter = platformService.GetExecutableFileFilters()
+                FileTypeFilter = [FilePickerFileTypes.All]
             });
 
             if (files.Count == 0)
@@ -194,24 +195,32 @@ namespace zennplay_launcher.ViewModels.Controls
 
             string selectedPath = files[0].Path.LocalPath;
 
-            if (!platformService.IsExecutable(selectedPath))
+            // 2. Validasi keberadaan file nyata (bukan pembatasan binary executable)
+            if (!File.Exists(selectedPath))
             {
                 return null;
             }
 
-            // 1. Ekstrak Metadata (Title & Directory)
-            var (title, directory) = platformService.ResolveAppMetadata(selectedPath);
-            string fileTitle = !string.IsNullOrWhiteSpace(title)
-                ? title
-                : Path.GetFileNameWithoutExtension(selectedPath);
-
-            // 2. Deteksi Action Type dari Ekstensi
+            // 3. Deteksi Type & Metadata
             string actionType = DetectTypeFromExtension.DetectFileType(selectedPath);
+            bool isExecutable = platformService.IsExecutable(selectedPath);
 
-            // 3. Tentukan Sort Order
+            string fileTitle;
+            if (isExecutable)
+            {
+                (string title, _, _) = platformService.ResolveAppMetadata(selectedPath);
+                fileTitle = !string.IsNullOrWhiteSpace(title) ? title : Path.GetFileNameWithoutExtension(selectedPath);
+            }
+            else
+            {
+                // Untuk file teks/config, tampilkan nama file beserta ekstensinya agar jelas (misal: "settings.ini")
+                fileTitle = Path.GetFileName(selectedPath);
+            }
+
+            // 4. Tentukan Sort Order
             int nextSortOrder = AppActions.Count;
 
-            // 4. Buat Model Action Baru (Masih di Memori)
+            // 5. Buat Model Action Baru
             var newAction = new AppActionModel
             {
                 Id = Guid.NewGuid(),
@@ -219,11 +228,11 @@ namespace zennplay_launcher.ViewModels.Controls
                 Title = fileTitle,
                 ActionType = actionType,
                 Target = selectedPath,
-                IsGame = true,
+                IsGame = isExecutable, // Otomatis true jika executable, false jika config/dokumen
                 SortOrder = nextSortOrder
             };
 
-            // 5. Tambahkan hanya ke koleksi UI (ObservableCollection)
+            // 6. Masukkan ke UI Collection
             AppActions.Add(newAction);
 
             return newAction.Id;

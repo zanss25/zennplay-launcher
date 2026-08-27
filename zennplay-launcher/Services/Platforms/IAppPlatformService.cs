@@ -12,8 +12,11 @@ public interface IAppPlatformService
     // Validasi apakah target bisa dieksekusi di OS ini
     bool IsExecutable(string targetPath);
 
-    // Resolusi nama dan direktori dari target path (misal extract dari .lnk atau .desktop)
-    (string Title, string Directory) ResolveAppMetadata(string targetPath);
+    // Resolusi metadata: Title, Executable/Target Path akhir (setelah dereference shortcut), dan Base Directory
+    (string Title, string ResolvedTargetPath, string Directory) ResolveAppMetadata(string targetPath);
+
+    // Deteksi root game directory untuk keperluan kalkulasi size & scanning
+    string DetectRootGameDirectory(string resolvedTargetPath, string defaultDir);
 
     // Logika menjalankan game / program di OS bersangkutan
     Task LaunchAppAsync(string targetPath, string workingDir, string arguments);

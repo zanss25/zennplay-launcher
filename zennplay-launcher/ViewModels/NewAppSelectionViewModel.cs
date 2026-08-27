@@ -25,29 +25,30 @@ namespace zennplay_launcher.ViewModels
 
             var files = await storageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                Title = "Select Application / Game",
+                Title = "Select Application, Game, or Shortcut",
                 AllowMultiple = false,
                 FileTypeFilter = platformService.GetExecutableFileFilters()
             });
 
-            // Jika user klik Cancel di file picker
             if (files.Count == 0)
                 return null;
 
             string selectedPath = files[0].Path.LocalPath;
 
             if (!platformService.IsExecutable(selectedPath))
-            {
                 return null;
-            }
 
-            var (title, directory) = platformService.ResolveAppMetadata(selectedPath);
+            // 1. Resolusi shortcut (.lnk/.desktop), ekstrak path asli, title, dan working dir
+            var (title, resolvedTargetPath, workingDir) = platformService.ResolveAppMetadata(selectedPath);
 
-            // Buat draft dan kembalikan ID barunya
+            // 2. Deteksi Root Directory untuk kalkulasi size instalasi
+            string rootGameDir = platformService.DetectRootGameDirectory(resolvedTargetPath, workingDir);
+
+            // 3. Simpan ke Draft
             Guid newAppId = _appEditorService.CreateDraft(
                 appTitle: title,
-                appDir: directory,
-                primaryActionTarget: selectedPath
+                appDir: rootGameDir,
+                primaryActionTarget: resolvedTargetPath
             );
 
             return newAppId;

@@ -72,46 +72,6 @@ namespace zennplay_launcher.Services
 
             return assetsFolderPath;
         }
-
-        public static string GetIconAssetsDataPath()
-        {
-            string dir = GetAssetsDataPath();
-            string iconsFolderPath = Path.Combine(dir, "Icons");
-
-            if (!Directory.Exists(iconsFolderPath))
-            {
-                Directory.CreateDirectory(iconsFolderPath);
-            }
-
-            return iconsFolderPath;
-        }
-
-        public static string GetCoverAssetsDataPath()
-        {
-            string dir = GetAssetsDataPath();
-            string coversFolderPath = Path.Combine(dir, "Cover");
-
-            if (!Directory.Exists(coversFolderPath))
-            {
-                Directory.CreateDirectory(coversFolderPath);
-            }
-
-            return coversFolderPath;
-        }
-
-        public static string GetBackgroundAssetsDataPath()
-        {
-            string dir = GetAssetsDataPath();
-            string backgroundFolderPath = Path.Combine(dir, "Background");
-
-            if (!Directory.Exists(backgroundFolderPath))
-            {
-                Directory.CreateDirectory(backgroundFolderPath);
-            }
-
-            return backgroundFolderPath;
-        }
-
         public static string GetSectionIconsDataPath()
         {
             string dir = GetAssetsDataPath();

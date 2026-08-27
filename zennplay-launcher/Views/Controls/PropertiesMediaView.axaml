@@ -4,8 +4,138 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:zennplay_launcher.Views.Controls"
              xmlns:models="using:zennplay_launcher.Models"
-             xmlns:views="using:zennplay_launcher.Views"
+             xmlns:vm="using:zennplay_launcher.ViewModels.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="zennplay_launcher.Views.Controls.PropertiesMediaView">
-  Media
+             x:Class="zennplay_launcher.Views.Controls.PropertiesMediaView"
+             x:DataType="vm:PropertiesMediaViewModel">
+
+    <!-- CONTAINER UTAMA: 2 Kolom Seimbang -->
+    <Grid ColumnDefinitions="*, *" Margin="24,16" VerticalAlignment="Center">
+
+        <!-- ============================================================
+             KOLOM KIRI: ICON & COVER POSTER
+             ============================================================ -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="0,0,16,0">
+            
+            <!-- Section Header -->
+            <TextBlock Grid.Row="0"
+                       Text="Icon &amp; Cover"
+                       Foreground="{DynamicResource TextCommonBrighterBrush}"
+                       FontFamily="{DynamicResource FontCommon}"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,24"/>
+
+            <!-- Previews Container (Icon di kiri, Cover di kanan) -->
+            <Grid Grid.Row="1" ColumnDefinitions="Auto, Auto" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                
+                <!-- 1. Icon (1:1) -->
+                <StackPanel Grid.Column="0" Spacing="10" VerticalAlignment="Bottom" Margin="0,0,24,0">
+                    <Viewbox MaxHeight="80" MaxWidth="80" Stretch="Uniform">
+                        <Border x:Name="IconBorder"
+                                Width="100" Height="100"
+                                CornerRadius="0"
+                                BorderThickness="1"
+                                Background="{DynamicResource CoverGridBrush}"
+                                BorderBrush="{DynamicResource CoverGridBorderBrush}"
+                                ClipToBounds="True">
+                            <Image Source="{Binding IconBitmap}" Stretch="UniformToFill"/>
+                        </Border>
+                    </Viewbox>
+                    <TextBlock Text="1:1"
+                               Foreground="{DynamicResource TextCommonBrush}"
+                               FontFamily="{DynamicResource FontCommon}"
+                               FontSize="13"
+                               Opacity="0.75"
+                               HorizontalAlignment="Center"/>
+                    <Button Content="Change"
+                            Command="{Binding BrowseIconCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,0"/>
+                    <Button Content="Remove"
+                            Command="{Binding RemoveIconCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,0"/>
+                </StackPanel>
+
+                <!-- 2. Cover Poster (2:3) -->
+                <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Bottom">
+                    <Viewbox MaxHeight="240" MaxWidth="160" Stretch="Uniform">
+                        <Border x:Name="CoverBorder"
+                                Width="200" Height="300"
+                                CornerRadius="0"
+                                BorderThickness="1"
+                                Background="{DynamicResource CoverGridBrush}"
+                                BorderBrush="{DynamicResource CoverGridBorderBrush}"
+                                ClipToBounds="True">
+                            <Image Source="{Binding CoverBitmap}" Stretch="UniformToFill"/>
+                        </Border>
+                    </Viewbox>
+                    <TextBlock Text="2:3"
+                               Foreground="{DynamicResource TextCommonBrush}"
+                               FontFamily="{DynamicResource FontCommon}"
+                               FontSize="13"
+                               Opacity="0.75"
+                               HorizontalAlignment="Center"/>
+                    <Button Content="Change" 
+                            Command="{Binding BrowseCoverCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,10,0,0"/>
+                    <Button Content="Remove"
+                            Command="{Binding RemoveCoverCommand}"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,0"/>
+                </StackPanel>
+
+            </Grid>
+        </Grid>
+
+        <!-- ============================================================
+             KOLOM KANAN: BACKGROUND HERO BANNER
+             ============================================================ -->
+        <Grid Grid.Column="1" RowDefinitions="Auto, *" Margin="16,0,0,0">
+            
+            <!-- Section Header -->
+            <TextBlock Grid.Row="0"
+                       Text="Background"
+                       Foreground="{DynamicResource TextCommonBrighterBrush}"
+                       FontFamily="{DynamicResource FontCommon}"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,24"/>
+
+            <!-- 3. Background Banner (3:2) -->
+            <StackPanel Grid.Row="1" Spacing="10" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                <Viewbox MaxHeight="240" MaxWidth="360" Stretch="Uniform">
+                    <Border x:Name="BackgroundBorder"
+                            Width="1920" Height="620"
+                            CornerRadius="0"
+                            BorderThickness="1"
+                            Background="{DynamicResource CoverGridBrush}"
+                            BorderBrush="{DynamicResource CoverGridBorderBrush}"
+                            ClipToBounds="True">
+                        <Image Source="{Binding BackgroundBitmap}" Stretch="UniformToFill"/>
+                    </Border>
+                </Viewbox>
+                <TextBlock Text="3:2"
+                           Foreground="{DynamicResource TextCommonBrush}"
+                           FontFamily="{DynamicResource FontCommon}"
+                           FontSize="13"
+                           Opacity="0.75"
+                           HorizontalAlignment="Center"/>
+                <Button Content="Change"
+                        Command="{Binding BrowseBackgroundCommand}"
+                        HorizontalAlignment="Center"
+                        Margin="0,10,0,0"/>
+                <Button Content="Remove"
+                        Command="{Binding RemoveBackgroundCommand}"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,0"/>
+            </StackPanel>
+            
+        </Grid>
+
+    </Grid>
 </UserControl>

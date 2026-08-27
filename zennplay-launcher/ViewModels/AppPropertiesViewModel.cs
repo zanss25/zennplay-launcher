@@ -67,6 +67,7 @@ namespace zennplay_launcher.ViewModels
                 FoldersViewModel.LoadFromModel(CurrentApp);
                 FoldersViewModel.LoadAppActions(AppId);
                 FoldersViewModel.LoadAppLinks(AppId);
+                MediaViewModel.LoadFromModel(CurrentApp);
             }
 
             // Auto-select section awal jika ada (khusus add new app)
@@ -86,6 +87,11 @@ namespace zennplay_launcher.ViewModels
             FoldersView = new PropertiesFoldersView
             {
                 DataContext = FoldersViewModel
+            };
+
+            MediaView = new PropertiesMediaView
+            {
+                DataContext = MediaViewModel
             };
 
             // Load static tabs list
@@ -154,16 +160,17 @@ namespace zennplay_launcher.ViewModels
         {
             if (_appRepo == null || CurrentApp == null) return;
 
-            // 1. Salin semua input form (Title, Desc, Rating, Status, Switches, dll) ke objek CurrentApp
+            // 1. Salin semua input form ke objek CurrentApp
             MetadataViewModel.ApplyToModel(CurrentApp);
             FoldersViewModel.ApplyToModel(CurrentApp);
+            MediaViewModel.ApplyToModel(CurrentApp);
 
             for (int i = 0; i < FoldersViewModel.AppActions.Count; i++)
             {
                 FoldersViewModel.AppActions[i].SortOrder = i;
             }
 
-            // 2. Eksekusi UpdateApp dengan menyertakan seluruh junction IDs
+            // 2. Eksekusi UpdateApp ke database
             bool isSuccess = _appRepo.UpdateApp(
                 app: CurrentApp,
                 actions: [.. FoldersViewModel.AppActions],
@@ -181,7 +188,8 @@ namespace zennplay_launcher.ViewModels
             // 3. Verifikasi keberhasilan simpan
             if (isSuccess)
             {
-                IsSaved = true; // Menandai agar draft tidak dihapus saat OnClosing
+                IsSaved = true;
+                MediaViewModel.CommitChanges(); // 🔑 Commit: Hapus file lama fisik di disk
                 RequestClose?.Invoke();
             }
             else
@@ -192,15 +200,17 @@ namespace zennplay_launcher.ViewModels
 
         public void DeleteDraftIfNotSaved()
         {
+            // Jika user menutup window tanpa klik Save
+            if (!IsSaved)
+            {
+                MediaViewModel.RollbackChanges(); 
+            }
+
             if (isNewApp && !IsSaved && _appRepo != null && AppId != Guid.Empty)
             {
                 _appRepo.HardDeleteApp(AppId);
             }
-            else
-            {
-                
-            }
         }
-        
+
     }
 }

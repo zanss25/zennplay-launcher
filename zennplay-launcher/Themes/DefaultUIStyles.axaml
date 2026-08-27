@@ -108,6 +108,25 @@
         <Setter Property="Margin" Value="0,1,0,0" />
     </Style>
 
+    <!-- App/Game Card Item (WIP) -->
+    <Style Selector="Border.AppCard">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="ClipToBounds" Value="True"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Transitions">
+            <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15"/>
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Border.AppCard:pointerover">
+        <Setter Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}"/>
+        <Setter Property="RenderTransform" Value="scale(1.02)"/>
+    </Style>
+
     <!-- Button Common -->
     <Style Selector="Button">
         <Setter Property="Background" Value="{DynamicResource BtnCommonBrush}"/>
