@@ -3,7 +3,9 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Services.Repositories
@@ -13,9 +15,9 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan Tag baru ke database.
+        /// Menambahkan Tag baru ke database secara asinkron.
         /// </summary>
-        public Guid AddTag(TagModel tag)
+        public async Task<Guid> AddTagAsync(TagModel tag)
         {
             // Pastikan entitas memiliki ID sebelum disimpan
             if (tag.Id == Guid.Empty)
@@ -23,21 +25,19 @@ namespace zennplay_launcher.Services.Repositories
                 tag.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlTag = @"
+                INSERT INTO tags (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlTag, new
             {
-                string sqlTag = @"
-                    INSERT INTO tags (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = tag.Id.ToString(),
+                tag.Name,
+                tag.Desc
+            });
 
-                conn.Execute(sqlTag, new
-                {
-                    Id = tag.Id.ToString(),
-                    tag.Name,
-                    tag.Desc
-                });
-
-                return tag.Id;
-            }
+            return tag.Id;
         }
 
         #endregion
@@ -45,67 +45,59 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua Tag (diurutkan alfabetis).
+        /// Mengambil semua Tag (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<TagModel> GetAllTags()
+        public async Task<IEnumerable<TagModel>> GetAllTagsAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM tags ORDER BY name ASC;";
-                return conn.Query<TagModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM tags ORDER BY name ASC;";
+            return await conn.QueryAsync<TagModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu Tag berdasarkan ID.
+        /// Mengambil detail satu Tag berdasarkan ID secara asinkron.
         /// </summary>
-        public TagModel? GetTagById(Guid id)
+        public async Task<TagModel?> GetTagByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM tags WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<TagModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM tags WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<TagModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh Tag yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh Tag yang dimiliki oleh game tertentu secara asinkron.
         /// (Untuk menampilkan chip/badge tag di UI Game Detail)
         /// </summary>
-        public IEnumerable<TagModel> GetTagsByAppId(Guid appId)
+        public async Task<IEnumerable<TagModel>> GetTagsByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT t.* FROM tags t
-                    INNER JOIN app_tags at ON t.id = at.tag_id
-                    WHERE at.app_id = @AppId
-                    ORDER BY t.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT t.* FROM tags t
+                INNER JOIN app_tags at ON t.id = at.tag_id
+                WHERE at.app_id = @AppId
+                ORDER BY t.name ASC;";
 
-                return conn.Query<TagModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<TagModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari Tag berdasarkan kata kunci nama.
+        /// Mencari Tag berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<TagModel> GetTagsFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<TagModel>> GetTagsFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM tags";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM tags";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<TagModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<TagModel>(sql, parameters);
         }
 
         #endregion
@@ -113,25 +105,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi Tag.
+        /// Mengubah nama dan deskripsi Tag secara asinkron.
         /// </summary>
-        public bool UpdateTag(TagModel tag)
+        public async Task<bool> UpdateTagAsync(TagModel tag)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE tags SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE tags SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = tag.Id.ToString(),
-                    tag.Name,
-                    tag.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = tag.Id.ToString(),
+                tag.Name,
+                tag.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -139,27 +131,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> TAG)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Tag.
+        /// Menghubungkan game dengan suatu Tag secara asinkron.
         /// </summary>
-        public bool AssignTagToApp(Guid appId, Guid tagId)
+        public async Task<bool> AssignTagToAppAsync(Guid appId, Guid tagId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_tags (app_id, tag_id) VALUES (@AppId, @TagId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_tags (app_id, tag_id) VALUES (@AppId, @TagId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan Tag dari game tertentu.
+        /// Menghapus hubungan Tag dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemoveTagFromApp(Guid appId, Guid tagId)
+        public async Task<bool> RemoveTagFromAppAsync(Guid appId, Guid tagId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_tags WHERE app_id = @AppId AND tag_id = @TagId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_tags WHERE app_id = @AppId AND tag_id = @TagId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), TagId = tagId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -167,16 +157,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Tag dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_tags').
+        /// Hapus permanen Tag dari database secara asinkron.
         /// </summary>
-        public bool DeleteTag(Guid id)
+        public async Task<bool> DeleteTagAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM tags WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM tags WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

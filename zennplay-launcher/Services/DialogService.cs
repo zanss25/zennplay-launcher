@@ -37,12 +37,21 @@ namespace zennplay_launcher.Services
             return null;
         }
 
-        public async Task<Guid?> ShowNewAppSelectionAsync()
+        public async Task<Guid?> ShowNewAppSelectionAsync(Guid? targetSectionId = null)
         {
             var parent = GetActiveWindow();
             if (parent == null) return null;
 
             var win = new NewAppSelectionWindow();
+            var vm = new NewAppSelectionViewModel
+            {
+                StorageProvider = win.StorageProvider,
+                TargetSectionId = targetSectionId 
+            };
+
+            win.DataContext = vm;
+            vm.RequestClose += (newAppId) => win.Close(newAppId);
+
             return await win.ShowDialog<Guid?>(parent);
         }
 

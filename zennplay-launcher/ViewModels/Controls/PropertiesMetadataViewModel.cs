@@ -93,17 +93,31 @@ namespace zennplay_launcher.ViewModels.Controls
         // ============================================================
         // COMMANDS & POPULATE DATA
         // ============================================================
-        public void LoadData(Guid appId = default)
+        public async Task LoadData(Guid appId = default)
         {
-            // Ambil master items dari masing-masing repo
-            var sectionsFromDb = _sectionRepo.GetAllSections();
-            var seriesFromDb = _seriesRepo.GetAllSeries();
-            var genresFromDb = _genreRepo.GetAllGenres();
-            var tagsFromDb = _tagRepo.GetAllTags();
-            var developersFromDb = _developerRepo.GetAllDevelopers();
-            var publishersFromDb = _publisherRepo.GetAllPublishers();
-            var platformsFromDb = _platformRepo.GetAllPlatforms();
-            var ageRatingsFromDb = _ageRatingRepo.GetAllAgeRatings();
+            // Ambil master items secara paralel agar loading instan
+            var sectionsTask = _sectionRepo.GetAllSectionsAsync();
+            var seriesTask = _seriesRepo.GetAllSeriesAsync();
+            var genresTask = _genreRepo.GetAllGenresAsync();
+            var tagsTask = _tagRepo.GetAllTagsAsync();
+            var developersTask = _developerRepo.GetAllDevelopersAsync();
+            var publishersTask = _publisherRepo.GetAllPublishersAsync();
+            var platformsTask = _platformRepo.GetAllPlatformsAsync();
+            var ageRatingsTask = _ageRatingRepo.GetAllAgeRatingsAsync();
+
+            await Task.WhenAll(
+                sectionsTask, seriesTask, genresTask, tagsTask,
+                developersTask, publishersTask, platformsTask, ageRatingsTask
+            );
+
+            var sectionsFromDb = await sectionsTask;
+            var seriesFromDb = await seriesTask;
+            var genresFromDb = await genresTask;
+            var tagsFromDb = await tagsTask;
+            var developersFromDb = await developersTask;
+            var publishersFromDb = await publishersTask;
+            var platformsFromDb = await platformsTask;
+            var ageRatingsFromDb = await ageRatingsTask;
 
             AvailableSections = new ObservableCollection<SelectableItem>(
                 sectionsFromDb.Select(n => new SelectableItem(n.Name, n.Id, n.Desc, false)));
@@ -230,19 +244,19 @@ namespace zennplay_launcher.ViewModels.Controls
             SelectedSectionsText = string.Join(", ", selectedNames);
         }
 
-        // 🔑 FUNGSI GENERIK TERPUSAT: Menangani Insert DB + Update UI
-        private void AddLookupItem<TModel>(
+        // 🔑 FUNGSI GENERIK TERPUSAT (ASYNC): Menangani Insert DB + Update UI
+        private async Task AddLookupItemAsync<TModel>(
             string name,
-            Func<TModel, Guid> insertDbFunc,
+            Func<TModel, Task<Guid>> insertDbFuncAsync,
             Func<string, TModel> createModelFunc,
             ObservableCollection<SelectableItem> targetCollection,
             Action<string>? setTextAction = null)
         {
             if (string.IsNullOrWhiteSpace(name)) return;
 
-            // 1. Simpan ke database
+            // 1. Simpan ke database secara asinkron
             var model = createModelFunc(name);
-            Guid newId = insertDbFunc(model);
+            Guid newId = await insertDbFuncAsync(model);
 
             // 2. Tambah ke collection dan centang
             var newItem = new SelectableItem(name, newId, "", true);
@@ -257,48 +271,47 @@ namespace zennplay_launcher.ViewModels.Controls
         }
 
         [RelayCommand]
-        private void AddSeries(string name) =>
-            AddLookupItem(name, _seriesRepo.AddSeries, n => new SeriesModel { Name = n }, 
+        private async Task AddSeriesAsync(string name) =>
+            await AddLookupItemAsync(name, _seriesRepo.AddSeriesAsync, n => new SeriesModel { Name = n },
                             AvailableSeries, t => SelectedSeriesText = t);
 
         [RelayCommand]
-        private void AddPlatform(string name) =>
-            AddLookupItem(name, _platformRepo.AddPlatform, n => new PlatformModel { Name = n }, 
+        private async Task AddPlatformAsync(string name) =>
+            await AddLookupItemAsync(name, _platformRepo.AddPlatformAsync, n => new PlatformModel { Name = n },
                             AvailablePlatforms, t => SelectedPlatformsText = t);
 
         [RelayCommand]
-        private void AddDeveloper(string name) =>
-            AddLookupItem(name, _developerRepo.AddDeveloper, n => new DeveloperModel { Name = n }, 
+        private async Task AddDeveloperAsync(string name) =>
+            await AddLookupItemAsync(name, _developerRepo.AddDeveloperAsync, n => new DeveloperModel { Name = n },
                             AvailableDevelopers, t => SelectedDevelopersText = t);
 
         [RelayCommand]
-        private void AddPublisher(string name) =>
-            AddLookupItem(name, _publisherRepo.AddPublisher, n => new PublisherModel { Name = n }, 
+        private async Task AddPublisherAsync(string name) =>
+            await AddLookupItemAsync(name, _publisherRepo.AddPublisherAsync, n => new PublisherModel { Name = n },
                             AvailablePublishers, t => SelectedPublishersText = t);
 
         [RelayCommand]
-        private void AddAgeRating(string name) =>
-            AddLookupItem(name, _ageRatingRepo.AddAgeRating, n => new AgeRatingModel { Name = n }, 
+        private async Task AddAgeRatingAsync(string name) =>
+            await AddLookupItemAsync(name, _ageRatingRepo.AddAgeRatingAsync, n => new AgeRatingModel { Name = n },
                             AvailableAgeRatings, t => SelectedAgeRatingsText = t);
 
         [RelayCommand]
-        private void AddGenre(string name) =>
-            AddLookupItem(name, _genreRepo.AddGenre, n => new GenreModel { Name = n }, AvailableGenres, 
+        private async Task AddGenreAsync(string name) =>
+            await AddLookupItemAsync(name, _genreRepo.AddGenreAsync, n => new GenreModel { Name = n }, AvailableGenres,
                             t => SelectedGenresText = t);
 
         [RelayCommand]
-        private void AddTag(string name) =>
-            AddLookupItem(name, _tagRepo.AddTag, n => new TagModel { Name = n }, AvailableTags, 
+        private async Task AddTagAsync(string name) =>
+            await AddLookupItemAsync(name, _tagRepo.AddTagAsync, n => new TagModel { Name = n }, AvailableTags,
                             t => SelectedTagsText = t);
 
         [RelayCommand]
-        private void AddSection(string name)
+        private async Task AddSectionAsync(string name)
         {
-            AddLookupItem(name, _sectionRepo.AddSection, n => new SectionModel { Name = n }, AvailableSections, t => SelectedSectionsText = t);
+            await AddLookupItemAsync(name, _sectionRepo.AddSectionAsync, n => new SectionModel { Name = n }, AvailableSections, t => SelectedSectionsText = t);
 
             // BROADCAST KE MAINVIEWMODEL untuk refresh section tabs
             WeakReferenceMessenger.Default.Send(new SectionsUpdatedMessage());
         }
-
     }
 }

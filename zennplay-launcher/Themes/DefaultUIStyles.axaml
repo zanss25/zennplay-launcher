@@ -135,7 +135,7 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -187,8 +187,9 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="MinWidth" Value="125"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="Padding" Value="15,8"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -223,9 +224,8 @@
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Padding" Value="15,8"/>
-        <Setter Property="MinWidth" Value="100"/>
-        <Setter Property="Margin" Value="0,5"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -260,7 +260,7 @@
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Padding" Value="10"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -293,7 +293,7 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -435,7 +435,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource ListBoxBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0.5"/>
         <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Padding" Value="1"/>
     </Style>
 
     <Style Selector="ListBoxItem">
@@ -447,7 +447,7 @@
         <Setter Property="MinHeight" Value="20"/>
         <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Margin" Value="2,2,2,0"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
 
@@ -469,7 +469,7 @@
     <Style Selector="ListBox.ListBoxPrimary">
         <Setter Property="Background" Value="{DynamicResource ListBoxBackgroundBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource ListBoxBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0.5"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="CornerRadius" Value="4"/>
         <Setter Property="Padding" Value="0"/>
     </Style>
@@ -483,7 +483,7 @@
         <Setter Property="MinHeight" Value="20"/>
         <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Margin" Value="2,2,2,0"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="0.5"/>
         <Setter Property="CornerRadius" Value="4"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
@@ -545,7 +545,6 @@
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="MinWidth" Value="200"/>
         <Setter Property="CornerRadius" Value="3"/>
-        <Setter Property="Margin" Value="2,0"/>
 
         <Style Selector="^:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource BtnPopupHoverBrush}"/>
@@ -571,10 +570,10 @@
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
         <Setter Property="FontWeight" Value="Medium"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Padding" Value="10,5"/>
+        <Setter Property="Padding" Value="15,8"/>
         <Setter Property="MaxDropDownHeight" Value="400"/>
         <Setter Property="CornerRadius" Value="4"/>
-        <Setter Property="BorderThickness" Value="0.7"/>
+        <Setter Property="BorderThickness" Value="1"/>
 
         <Style Selector="^:pointerover#PART_ContentPresenter">
             <Setter Property="Background" Value="{DynamicResource ComboBoxCommonHoverBrush}"/>
@@ -735,6 +734,19 @@
         <Setter Property="Background" Value="{DynamicResource BorderCommonBrush}"/>
         <Setter Property="Margin" Value="1,1"/>
         <Setter Property="Height" Value="1"/>
+    </Style>
+
+    <!-- Data Grid -->
+    <Style Selector="TableView">
+        <Setter Property="Background" Value="{DynamicResource TableViewCommonHeaderBrush}"/>
+    </Style>
+
+    <Style Selector="TableView.TableViewColumn">
+        <Setter Property="Background" Value="{DynamicResource TableViewCommonHeaderBrush}"/>
+    </Style>
+
+    <Style Selector="TableView.TableViewRow">
+        <Setter Property="Background" Value="Transparent"/>
     </Style>
 
 </Styles>

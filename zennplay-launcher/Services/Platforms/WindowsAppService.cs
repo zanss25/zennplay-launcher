@@ -91,7 +91,7 @@ public class WindowsAppService : IAppPlatformService
         return (title, finalPath, workingDir);
     }
 
-    public string DetectRootGameDirectory(string resolvedTargetPath, string defaultDir)
+    public string DetectRootAppDirectory(string resolvedTargetPath, string defaultDir)
     {
         if (string.IsNullOrWhiteSpace(resolvedTargetPath))
             return defaultDir;

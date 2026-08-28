@@ -9,7 +9,7 @@ namespace zennplay_launcher.Services
 {
     public interface IDialogService
     {
-        Task<Guid?> ShowNewAppSelectionAsync();
+        Task<Guid?> ShowNewAppSelectionAsync(Guid? targetSectionId = null);
         Task<bool> ShowAppPropertiesAsync(Guid appId, bool isNew = false, Guid? initialSectionId = null);
         Task<bool> ShowAppActionPropertiesAsync(AppActionModel action);
         Task<bool> ShowAppLinkPropertiesAsync(AppLinkModel link);

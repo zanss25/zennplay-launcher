@@ -85,9 +85,9 @@ namespace zennplay_launcher.ViewModels.Controls
 
         }
 
-        public void LoadAppActions(Guid appId)
+        public async Task LoadAppActions(Guid appId)
         {
-            var dbAppActions = _appRepo.GetAppActions(appId);
+            var dbAppActions = await _appRepo.GetAppActionsAsync(appId);
 
             AppActions.Clear();
             foreach (var appAction in dbAppActions)
@@ -96,9 +96,9 @@ namespace zennplay_launcher.ViewModels.Controls
             }
         }
 
-        public void LoadAppLinks(Guid appId)
+        public async Task LoadAppLinks(Guid appId)
         {
-            var dbAppLinks = _appRepo.GetAppLinks(appId);
+            var dbAppLinks = await _appRepo.GetAppLinksAsync(appId);
             AppLinks.Clear();
             foreach (var appLink in dbAppLinks)
             {

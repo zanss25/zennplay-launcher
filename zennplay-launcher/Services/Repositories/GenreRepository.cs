@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -13,31 +13,28 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan genre baru ke database.
+        /// Menambahkan genre baru ke database secara asinkron.
         /// </summary>
-        public Guid AddGenre(GenreModel genre)
+        public async Task<Guid> AddGenreAsync(GenreModel genre)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (genre.Id == Guid.Empty)
             {
                 genre.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlGenre = @"
+                INSERT INTO genres (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlGenre, new
             {
-                string sqlGenre = @"
-                    INSERT INTO genres (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = genre.Id.ToString(),
+                genre.Name,
+                genre.Desc
+            });
 
-                conn.Execute(sqlGenre, new
-                {
-                    Id = genre.Id.ToString(),
-                    genre.Name,
-                    genre.Desc
-                });
-
-                return genre.Id;
-            }
+            return genre.Id;
         }
 
         #endregion
@@ -45,66 +42,58 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua genre (diurutkan alfabetis).
+        /// Mengambil semua genre (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<GenreModel> GetAllGenres()
+        public async Task<IEnumerable<GenreModel>> GetAllGenresAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM genres ORDER BY name ASC;";
-                return conn.Query<GenreModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM genres ORDER BY name ASC;";
+            return await conn.QueryAsync<GenreModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu genre berdasarkan ID.
+        /// Mengambil detail satu genre berdasarkan ID secara asinkron.
         /// </summary>
-        public GenreModel? GetGenreById(Guid id)
+        public async Task<GenreModel?> GetGenreByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM genres WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<GenreModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM genres WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<GenreModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh genre yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh genre yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<GenreModel> GetGenresByAppId(Guid appId)
+        public async Task<IEnumerable<GenreModel>> GetGenresByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT g.* FROM genres g
-                    INNER JOIN app_genres ag ON g.id = ag.genre_id
-                    WHERE ag.app_id = @AppId
-                    ORDER BY g.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT g.* FROM genres g
+                INNER JOIN app_genres ag ON g.id = ag.genre_id
+                WHERE ag.app_id = @AppId
+                ORDER BY g.name ASC;";
 
-                return conn.Query<GenreModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<GenreModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari genre berdasarkan kata kunci nama.
+        /// Mencari genre berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<GenreModel> GetGenresFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<GenreModel>> GetGenresFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM genres";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM genres";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<GenreModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<GenreModel>(sql, parameters);
         }
 
         #endregion
@@ -112,25 +101,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi genre.
+        /// Mengubah nama dan deskripsi genre secara asinkron.
         /// </summary>
-        public bool UpdateGenre(GenreModel genre)
+        public async Task<bool> UpdateGenreAsync(GenreModel genre)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE genres SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE genres SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = genre.Id.ToString(),
-                    genre.Name,
-                    genre.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = genre.Id.ToString(),
+                genre.Name,
+                genre.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -138,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> GENRE)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Genre.
+        /// Menghubungkan game dengan suatu Genre secara asinkron.
         /// </summary>
-        public bool AssignGenreToApp(Guid appId, Guid genreId)
+        public async Task<bool> AssignGenreToAppAsync(Guid appId, Guid genreId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_genres (app_id, genre_id) VALUES (@AppId, @GenreId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan genre dari game tertentu.
+        /// Menghapus hubungan genre dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemoveGenreFromApp(Guid appId, Guid genreId)
+        public async Task<bool> RemoveGenreFromAppAsync(Guid appId, Guid genreId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_genres WHERE app_id = @AppId AND genre_id = @GenreId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_genres WHERE app_id = @AppId AND genre_id = @GenreId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), GenreId = genreId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -166,16 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Genre dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_genres').
+        /// Hapus permanen Genre dari database secara asinkron.
         /// </summary>
-        public bool DeleteGenre(Guid id)
+        public async Task<bool> DeleteGenreAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM genres WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM genres WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

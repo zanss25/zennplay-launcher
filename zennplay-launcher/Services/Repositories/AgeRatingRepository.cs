@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -12,120 +12,114 @@ namespace zennplay_launcher.Services.Repositories
     {
         #region 1. CREATE (INSERT)
 
-        public Guid AddAgeRating(AgeRatingModel ageRating)
+        /// <summary>
+        /// Menambahkan age rating baru ke database secara asinkron.
+        /// </summary>
+        public async Task<Guid> AddAgeRatingAsync(AgeRatingModel ageRating)
         {
             if (ageRating.Id == Guid.Empty)
             {
                 ageRating.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlAgeRating = @"
+                INSERT INTO age_ratings (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlAgeRating, new
             {
-                string sqlAgeRating = @"
-                        INSERT INTO age_ratings (id, name, desc) 
-                        VALUES (@Id, @Name, @Desc);";
+                Id = ageRating.Id.ToString(),
+                ageRating.Name,
+                ageRating.Desc
+            });
 
-                // 🔑 Gunakan anonymous object agar Guid tersimpan lowercase konsisten
-                conn.Execute(sqlAgeRating, new
-                {
-                    Id = ageRating.Id.ToString(),
-                    ageRating.Name,
-                    ageRating.Desc
-                });
-
-                return ageRating.Id;
-            }
+            return ageRating.Id;
         }
 
-        #endregion       
-        
+        #endregion
+
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua ageRating (diurutkan alfabetis).
+        /// Mengambil semua age rating (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<AgeRatingModel> GetAllAgeRatings()
+        public async Task<IEnumerable<AgeRatingModel>> GetAllAgeRatingsAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM age_ratings ORDER BY name ASC;";
-                return conn.Query<AgeRatingModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM age_ratings ORDER BY name ASC;";
+            return await conn.QueryAsync<AgeRatingModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu ageRating berdasarkan ID.
+        /// Mengambil detail satu age rating berdasarkan ID secara asinkron.
         /// </summary>
-        public AgeRatingModel? GetAgeRatingById(Guid id)
+        public async Task<AgeRatingModel?> GetAgeRatingByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM age_ratings WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<AgeRatingModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM age_ratings WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<AgeRatingModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh ageRating yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh age rating yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<AgeRatingModel> GetAgeRatingsByAppId(Guid appId)
+        public async Task<IEnumerable<AgeRatingModel>> GetAgeRatingsByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT r.* FROM age_ratings r
-                    INNER JOIN app_age_ratings ar ON r.id = ar.age_rating_id
-                    WHERE ar.app_id = @AppId
-                    ORDER BY r.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT r.* FROM age_ratings r
+                INNER JOIN app_age_ratings ar ON r.id = ar.age_rating_id
+                WHERE ar.app_id = @AppId
+                ORDER BY r.name ASC;";
 
-                return conn.Query<AgeRatingModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<AgeRatingModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari ageRating berdasarkan kata kunci nama.
+        /// Mencari age rating berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<AgeRatingModel> GetAgeRatingsFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<AgeRatingModel>> GetAgeRatingsFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM age_ratings";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM age_ratings";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<AgeRatingModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<AgeRatingModel>(sql, parameters);
         }
 
         #endregion
 
         #region 3. UPDATE
 
-        public bool UpdateAgeRating(AgeRatingModel ageRating)
+        /// <summary>
+        /// Mengubah nama dan deskripsi age rating secara asinkron.
+        /// </summary>
+        public async Task<bool> UpdateAgeRatingAsync(AgeRatingModel ageRating)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                        UPDATE age_ratings SET
-                            name = @Name,
-                            desc = @Desc
-                        WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE age_ratings SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                // 🔑 Gunakan anonymous object di sini juga
-                return conn.Execute(sql, new
-                {
-                    Id = ageRating.Id.ToString(),
-                    ageRating.Name,
-                    ageRating.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = ageRating.Id.ToString(),
+                ageRating.Name,
+                ageRating.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -133,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> AGE RATING)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu AgeRating.
+        /// Menghubungkan game dengan suatu AgeRating secara asinkron.
         /// </summary>
-        public bool AssignAgeRatingToApp(Guid appId, Guid ageRatingId)
+        public async Task<bool> AssignAgeRatingToAppAsync(Guid appId, Guid ageRatingId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_age_ratings (app_id, age_rating_id) VALUES (@AppId, @AgeRatingId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan ageRating dari game tertentu.
+        /// Menghapus hubungan age rating dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemoveAgeRatingFromApp(Guid appId, Guid ageRatingId)
+        public async Task<bool> RemoveAgeRatingFromAppAsync(Guid appId, Guid ageRatingId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_age_ratings WHERE app_id = @AppId AND age_rating_id = @AgeRatingId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_age_ratings WHERE app_id = @AppId AND age_rating_id = @AgeRatingId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), AgeRatingId = ageRatingId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -161,15 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen AgeRating dari database.
+        /// Hapus permanen AgeRating dari database secara asinkron.
         /// </summary>
-        public bool DeleteAgeRating(Guid id)
+        public async Task<bool> DeleteAgeRatingAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM age_ratings WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM age_ratings WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

@@ -11,9 +11,9 @@
   
                     <Grid RowDefinitions="Auto,*">
                         
-                        <Border Grid.Row="0" Padding="40,50,40,0">
+                        <Border Grid.Row="0" Padding="40,50,40,20">
                             <Grid ColumnDefinitions="Auto, Auto, *, Auto"
-                                  MaxHeight="30">
+                                  MaxHeight="40">
                             
                                 <TextBox Grid.Column="0" 
                                          Width="260"

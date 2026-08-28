@@ -21,7 +21,7 @@ namespace zennplay_launcher.Views
             WindowExtensions.ApplyPlatformDecorations(this);
 
             _viewModel = new AppPropertiesViewModel();
-            _viewModel.Initialize(appId, isNew, initialSectionId);
+            _ = _viewModel.Initialize(appId, isNew, initialSectionId);
             DataContext = _viewModel;
             Title = "Edit Properties";
             TitleText.Text = Title.ToUpper();
@@ -29,13 +29,13 @@ namespace zennplay_launcher.Views
             _viewModel.RequestClose += () => this.Close();
         }
 
-        protected override void OnClosing(WindowClosingEventArgs e)
+        protected override async void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);
 
             if (DataContext is AppPropertiesViewModel vm)
             {
-                vm.DeleteDraftIfNotSaved();
+                await vm.DeleteDraftIfNotSaved();
             }
 
         }

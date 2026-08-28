@@ -12,6 +12,10 @@ namespace zennplay_launcher.Views
             InitializeComponent();
             WindowExtensions.ApplyPlatformDecorations(this);
 
+            TitleBar.ShowCloseButton = true;
+            TitleBar.ShowMaximizeButton = false;
+            TitleBar.ShowMinimizeButton = false;
+
             Title = "App Action Properties";
             TitleText.Text = Title.ToUpper();
         }

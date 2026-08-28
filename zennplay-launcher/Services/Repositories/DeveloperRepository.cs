@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -13,31 +13,28 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan developer baru ke database.
+        /// Menambahkan developer baru ke database secara asinkron.
         /// </summary>
-        public Guid AddDeveloper(DeveloperModel developer)
+        public async Task<Guid> AddDeveloperAsync(DeveloperModel developer)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (developer.Id == Guid.Empty)
             {
                 developer.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlDeveloper = @"
+                INSERT INTO developers (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlDeveloper, new
             {
-                string sqlDeveloper = @"
-                    INSERT INTO developers (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = developer.Id.ToString(),
+                developer.Name,
+                developer.Desc
+            });
 
-                conn.Execute(sqlDeveloper, new
-                {
-                    Id = developer.Id.ToString(),
-                    developer.Name,
-                    developer.Desc
-                });
-
-                return developer.Id;
-            }
+            return developer.Id;
         }
 
         #endregion
@@ -45,66 +42,58 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua developer (diurutkan alfabetis).
+        /// Mengambil semua developer (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<DeveloperModel> GetAllDevelopers()
+        public async Task<IEnumerable<DeveloperModel>> GetAllDevelopersAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM developers ORDER BY name ASC;";
-                return conn.Query<DeveloperModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM developers ORDER BY name ASC;";
+            return await conn.QueryAsync<DeveloperModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu developer berdasarkan ID.
+        /// Mengambil detail satu developer berdasarkan ID secara asinkron.
         /// </summary>
-        public DeveloperModel? GetDeveloperById(Guid id)
+        public async Task<DeveloperModel?> GetDeveloperByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM developers WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<DeveloperModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM developers WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<DeveloperModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh developer yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh developer yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<DeveloperModel> GetDevelopersByAppId(Guid appId)
+        public async Task<IEnumerable<DeveloperModel>> GetDevelopersByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT d.* FROM developers d
-                    INNER JOIN app_developers ad ON d.id = ad.developer_id
-                    WHERE ad.app_id = @AppId
-                    ORDER BY d.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT d.* FROM developers d
+                INNER JOIN app_developers ad ON d.id = ad.developer_id
+                WHERE ad.app_id = @AppId
+                ORDER BY d.name ASC;";
 
-                return conn.Query<DeveloperModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<DeveloperModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari developer berdasarkan kata kunci nama.
+        /// Mencari developer berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<DeveloperModel> GetDevelopersFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<DeveloperModel>> GetDevelopersFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM developers";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM developers";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<DeveloperModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<DeveloperModel>(sql, parameters);
         }
 
         #endregion
@@ -112,25 +101,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi developer.
+        /// Mengubah nama dan deskripsi developer secara asinkron.
         /// </summary>
-        public bool UpdateDeveloper(DeveloperModel developer)
+        public async Task<bool> UpdateDeveloperAsync(DeveloperModel developer)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE developers SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE developers SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = developer.Id.ToString(),
-                    developer.Name,
-                    developer.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = developer.Id.ToString(),
+                developer.Name,
+                developer.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -138,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> DEVELOPER)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Developer.
+        /// Menghubungkan game dengan suatu Developer secara asinkron.
         /// </summary>
-        public bool AssignDeveloperToApp(Guid appId, Guid developerId)
+        public async Task<bool> AssignDeveloperToAppAsync(Guid appId, Guid developerId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_developers (app_id, developer_id) VALUES (@AppId, @DeveloperId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_developers (app_id, developer_id) VALUES (@AppId, @DeveloperId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan developer dari game tertentu.
+        /// Menghapus hubungan developer dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemoveDeveloperFromApp(Guid appId, Guid developerId)
+        public async Task<bool> RemoveDeveloperFromAppAsync(Guid appId, Guid developerId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_developers WHERE app_id = @AppId AND developer_id = @DeveloperId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_developers WHERE app_id = @AppId AND developer_id = @DeveloperId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), DeveloperId = developerId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -166,16 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Developer dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_developers').
+        /// Hapus permanen Developer dari database secara asinkron.
         /// </summary>
-        public bool DeleteDeveloper(Guid id)
+        public async Task<bool> DeleteDeveloperAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM developers WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM developers WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

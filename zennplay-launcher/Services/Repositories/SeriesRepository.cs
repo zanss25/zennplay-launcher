@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -13,31 +13,28 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan series baru ke database.
+        /// Menambahkan series baru ke database secara asinkron.
         /// </summary>
-        public Guid AddSeries(SeriesModel series)
+        public async Task<Guid> AddSeriesAsync(SeriesModel series)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (series.Id == Guid.Empty)
             {
                 series.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlSeries = @"
+                INSERT INTO series (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlSeries, new
             {
-                string sqlSeries = @"
-                    INSERT INTO series (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = series.Id.ToString(),
+                series.Name,
+                series.Desc
+            });
 
-                conn.Execute(sqlSeries, new
-                {
-                    Id = series.Id.ToString(),
-                    series.Name,
-                    series.Desc
-                });
-
-                return series.Id;
-            }
+            return series.Id;
         }
 
         #endregion
@@ -45,66 +42,58 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua series (diurutkan alfabetis).
+        /// Mengambil semua series (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<SeriesModel> GetAllSeries()
+        public async Task<IEnumerable<SeriesModel>> GetAllSeriesAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM series ORDER BY name ASC;";
-                return conn.Query<SeriesModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM series ORDER BY name ASC;";
+            return await conn.QueryAsync<SeriesModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu series berdasarkan ID.
+        /// Mengambil detail satu series berdasarkan ID secara asinkron.
         /// </summary>
-        public SeriesModel? GetSeriesById(Guid id)
+        public async Task<SeriesModel?> GetSeriesByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM series WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<SeriesModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM series WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<SeriesModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh series yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh series yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<SeriesModel> GetSeriesByAppId(Guid appId)
+        public async Task<IEnumerable<SeriesModel>> GetSeriesByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT s.* FROM series s
-                    INNER JOIN app_series as ON s.id = as.series_id
-                    WHERE as.app_id = @AppId
-                    ORDER BY s.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT s.* FROM series s
+                INNER JOIN app_series asr ON s.id = asr.series_id
+                WHERE asr.app_id = @AppId
+                ORDER BY s.name ASC;";
 
-                return conn.Query<SeriesModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<SeriesModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari series berdasarkan kata kunci nama.
+        /// Mencari series berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<SeriesModel> GetSeriesFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<SeriesModel>> GetSeriesFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM series";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM series";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<SeriesModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<SeriesModel>(sql, parameters);
         }
 
         #endregion
@@ -112,25 +101,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi series.
+        /// Mengubah nama dan deskripsi series secara asinkron.
         /// </summary>
-        public bool UpdateSeries(SeriesModel series)
+        public async Task<bool> UpdateSeriesAsync(SeriesModel series)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE series SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE series SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = series.Id.ToString(),
-                    series.Name,
-                    series.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = series.Id.ToString(),
+                series.Name,
+                series.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -138,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> SERIES)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Series.
+        /// Menghubungkan game dengan suatu Series secara asinkron.
         /// </summary>
-        public bool AssignSeriesToApp(Guid appId, Guid seriesId)
+        public async Task<bool> AssignSeriesToAppAsync(Guid appId, Guid seriesId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_series (app_id, series_id) VALUES (@AppId, @SeriesId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_series (app_id, series_id) VALUES (@AppId, @SeriesId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan series dari game tertentu.
+        /// Menghapus hubungan series dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemoveSeriesFromApp(Guid appId, Guid seriesId)
+        public async Task<bool> RemoveSeriesFromAppAsync(Guid appId, Guid seriesId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_series WHERE app_id = @AppId AND series_id = @SeriesId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_series WHERE app_id = @AppId AND series_id = @SeriesId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), SeriesId = seriesId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -166,16 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Series dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_series').
+        /// Hapus permanen Series dari database secara asinkron.
         /// </summary>
-        public bool DeleteSeries(Guid id)
+        public async Task<bool> DeleteSeriesAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM series WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM series WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

@@ -7,10 +7,93 @@
         xmlns:viewmodels="using:zennplay_launcher.ViewModels"
         xmlns:views="using:zennplay_launcher.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        Width="650" Height="650"
+        MinWidth="550" MinHeight="300"
         x:Class="zennplay_launcher.Views.NewAppSelectionWindow"
         x:DataType="viewmodels:NewAppSelectionViewModel"
-        Title="NewAppSelectionWindow">
+        Title="NewAppSelectionWindow"
+        
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        
+        ExtendClientAreaToDecorationsHint="True"  
+        ExtendClientAreaTitleBarHeightHint="-1"
+        WindowDecorations="Full">
     
-    <TextBlock Text="Select New App (Manual Input Mode) [WIP]"/>
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto,Auto,Auto,*, Auto">
+        
+        <!-- Title Bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" MinHeight="35"
+                    Background="{DynamicResource CommonTitleBackgroundBrush}"
+                    >
+            <TextBlock x:Name="TitleText" Classes="TitleText"
+                       Text="TitleText" Margin="30,0"/>
+            
+        </StackPanel>
+        
+        <views:TitleBarView Grid.Row="0"/>
+
+        <TextBlock Grid.Row="1" Margin="30,15"
+                   Text="Select from the list of installed apps to add to your library"
+                   Foreground="{DynamicResource TextWindowBrush}"
+                   FontFamily="{DynamicResource FontCommon}"
+                   FontSize="15"/>
+
+        <TextBox Grid.Row="2" HorizontalAlignment="Stretch" Margin="30,0"
+                 MinHeight="40" PlaceholderText="Search apps..."/>
+
+        <Border Grid.Row="3" Margin="30,15"
+                BorderBrush="{DynamicResource BorderCommonBrush}"
+                CornerRadius="4" 
+                BorderThickness="1">
+            <TableView ItemsSource="{Binding ScannedApps}"
+                       CanUserResizeColumns="True"
+                       BorderThickness="0">
+                <TableView.Columns>
+                    <TableViewColumn Header="" Binding="{Binding Title}"
+                                     Width="40" CanUserResize="False">
+                        <TableViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected}"/>
+                            </DataTemplate>
+                        </TableViewColumn.CellTemplate>
+                    </TableViewColumn>
+                    <TableViewColumn Header="" Width="40" CanUserResize="False">
+                        <TableViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding Icon}"
+                                       Width="20"
+                                       Height="20"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </TableViewColumn.CellTemplate>
+                    </TableViewColumn>
+                    <TableViewColumn Header="Title" Binding="{Binding Title}" Width="2*" />
+                    <TableViewColumn Header="Target" Binding="{Binding Target}" Width="3*" />
+                </TableView.Columns>
+            </TableView>
+        </Border>
+
+        <Border Grid.Row="4" BorderBrush="{DynamicResource BorderCommonBrush}" BorderThickness="0,0,0,0">
+            <Grid ColumnDefinitions="*,*" Margin="20,12,20,20">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button x:Name="BrowseManuallyBtn" Classes="ButtonSecondary"
+                            Content="Browse Manually" Margin="0,0,10,0"
+                            Command="{Binding BrowseManuallyCommand}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="AddBtn" Classes="ButtonPrimary"
+                            Content="Add Selected Apps" Margin="10,0,0,0"
+                            Command="{Binding AddSelectedCommand}"/>
+                    <Button x:Name="CancelBtn" Classes="ButtonSecondary"
+                            Content="Cancel" Margin="10,0,0,0"
+                            Command="{Binding CancelCommand}"/>
+                </StackPanel>
+            </Grid>
+                
+        </Border>
+
+     </Grid>
 
 </Window>

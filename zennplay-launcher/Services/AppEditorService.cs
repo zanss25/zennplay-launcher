@@ -1,9 +1,6 @@
-﻿using Avalonia;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services.Repositories;
@@ -12,12 +9,13 @@ namespace zennplay_launcher.Services
 {
     public class AppEditorService
     {
-        // Repositories
-        private readonly AppRepository appRepo = new();
+        private readonly AppRepository _appRepo = new();
 
-        public Guid CreateDraft(string appTitle = "New App",
-                         string appDir = "",
-                         string primaryActionTarget = "")
+        public async Task<Guid> CreateDraftAsync(
+            string appTitle = "New App",
+            string appDir = "",
+            string primaryActionTarget = "",
+            Guid? sectionId = null)
         {
             Guid newAppId = Guid.NewGuid();
             var appDraft = new AppModel
@@ -28,44 +26,42 @@ namespace zennplay_launcher.Services
                 IsGame = true,
                 IsExcluded = false,
                 IsPinned = false,
-                CompletionStatus = "Not Played",
+                CompletionStatus = "not_played",
                 CreatedAt = DateTime.UtcNow.ToString("o")
             };
 
-            AppActionModel? primaryAppAction = null;
+            List<AppActionModel>? appActionList = null;
 
             if (!string.IsNullOrWhiteSpace(primaryActionTarget))
             {
-                string extension = Path.GetExtension(primaryActionTarget).ToLowerInvariant();
                 string primaryActionType = DetectTypeFromExtension.DetectFileType(primaryActionTarget);
-
-                // Ambil nama file tanpa ekstensi untuk dijadikan judul Action (misal: "Dragon Age")
                 string fileName = Path.GetFileNameWithoutExtension(primaryActionTarget);
                 string primaryActionTitle = string.IsNullOrWhiteSpace(fileName) ? "Launch Game" : fileName;
 
-                primaryAppAction = new AppActionModel
+                appActionList = new List<AppActionModel>
                 {
-                    Id = Guid.NewGuid(),
-                    AppId = newAppId,
-                    Title = primaryActionTitle,
-                    Target = primaryActionTarget,
-                    ActionType = primaryActionType
+                    new AppActionModel
+                    {
+                        Id = Guid.NewGuid(),
+                        AppId = newAppId,
+                        Title = primaryActionTitle,
+                        Target = primaryActionTarget,
+                        ActionType = primaryActionType
+                    }
                 };
             }
 
-            // Simpan ke Repository
-            if (primaryAppAction != null)
+            // Siapkan relasi Section jika diberikan
+            List<Guid>? sectionIds = null;
+            if (sectionId.HasValue && sectionId.Value != Guid.Empty)
             {
-                var appActionList = new List<AppActionModel> { primaryAppAction };
-                appRepo.AddApp(appDraft, appActionList);
+                sectionIds = new List<Guid> { sectionId.Value };
             }
-            else
-            {
-                appRepo.AddApp(appDraft);
-            }
+
+            // Simpan ke Repository lengkap dengan Action dan Section
+            await _appRepo.AddAppAsync(appDraft, actions: appActionList, sectionIds: sectionIds);
 
             return newAppId;
         }
-
     }
 }

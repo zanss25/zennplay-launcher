@@ -64,26 +64,42 @@ public class LinuxAppService : IAppPlatformService
         return (title, finalPath, workingDir);
     }
 
-    public string DetectRootGameDirectory(string resolvedTargetPath, string defaultDir)
+    public string DetectRootAppDirectory(string resolvedTargetPath, string defaultDir)
     {
         if (string.IsNullOrWhiteSpace(resolvedTargetPath))
             return defaultDir;
 
-        var currentDirInfo = new DirectoryInfo(Path.GetDirectoryName(resolvedTargetPath) ?? defaultDir);
+        string? dirName = Path.GetDirectoryName(resolvedTargetPath);
 
-        while (currentDirInfo != null && currentDirInfo.Parent != null)
+        string targetPath = !string.IsNullOrWhiteSpace(dirName) 
+            ? dirName 
+            : (!string.IsNullOrWhiteSpace(defaultDir) ? defaultDir : string.Empty);
+
+        if (string.IsNullOrWhiteSpace(targetPath))
+            return defaultDir;
+
+        try
         {
-            if (SubfolderNames.Contains(currentDirInfo.Name))
-            {
-                currentDirInfo = currentDirInfo.Parent;
-            }
-            else
-            {
-                break;
-            }
-        }
+            var currentDirInfo = new DirectoryInfo(targetPath);
 
-        return currentDirInfo?.FullName ?? defaultDir;
+            while (currentDirInfo != null && currentDirInfo.Parent != null)
+            {
+                if (SubfolderNames.Contains(currentDirInfo.Name))
+                {
+                    currentDirInfo = currentDirInfo.Parent;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return currentDirInfo?.FullName ?? defaultDir;
+        }
+        catch
+        {
+            return defaultDir;
+        }
     }
 
     public Task LaunchAppAsync(string targetPath, string workingDir, string arguments)

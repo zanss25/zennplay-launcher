@@ -377,31 +377,31 @@
 
 
     <!-- ============================================================
-         15. DATA GRIDS
+         15. TABLE VIEWS
          ============================================================ -->
-    <Color x:Key="DataGridCommonHeader">#FF221E2C</Color>
-    <SolidColorBrush x:Key="DataGridCommonHeaderBrush" Color="{DynamicResource DataGridCommonHeader}"/>
+    <Color x:Key="TableViewCommonHeader">#FF221E2C</Color>
+    <SolidColorBrush x:Key="TableViewCommonHeaderBrush" Color="{DynamicResource TableViewCommonHeader}"/>
 
-    <Color x:Key="DataGridCommonHeaderHover">#3B4B3E68</Color>
-    <SolidColorBrush x:Key="DataGridCommonHeaderHoverBrush" Color="{DynamicResource DataGridCommonHeaderHover}"/>
+    <Color x:Key="TableViewCommonHeaderHover">#3B4B3E68</Color>
+    <SolidColorBrush x:Key="TableViewCommonHeaderHoverBrush" Color="{DynamicResource TableViewCommonHeaderHover}"/>
 
-    <Color x:Key="DataGridCommonHeaderPressed">#3B4B3E68</Color>
-    <SolidColorBrush x:Key="DataGridCommonHeaderPressedBrush" Color="{DynamicResource DataGridCommonHeaderPressed}"/>
+    <Color x:Key="TableViewCommonHeaderPressed">#3B4B3E68</Color>
+    <SolidColorBrush x:Key="TableViewCommonHeaderPressedBrush" Color="{DynamicResource TableViewCommonHeaderPressed}"/>
 
-    <Color x:Key="DataGridCommonHeaderBorder">#FF594D7B</Color>
-    <SolidColorBrush x:Key="DataGridCommonHeaderBorderBrush" Color="{DynamicResource DataGridCommonHeaderBorder}"/>
+    <Color x:Key="TableViewCommonHeaderBorder">#FF594D7B</Color>
+    <SolidColorBrush x:Key="TableViewCommonHeaderBorderBrush" Color="{DynamicResource TableViewCommonHeaderBorder}"/>
 
-    <Color x:Key="DataGridCommonRowHover">#DD272237</Color>
-    <SolidColorBrush x:Key="DataGridCommonRowHoverBrush" Color="{DynamicResource DataGridCommonRowHover}"/>
+    <Color x:Key="TableViewCommonRowHover">#DD272237</Color>
+    <SolidColorBrush x:Key="TableViewCommonRowHoverBrush" Color="{DynamicResource TableViewCommonRowHover}"/>
 
-    <Color x:Key="DataGridCommonRowActive">#DD302945</Color>
-    <SolidColorBrush x:Key="DataGridCommonRowActiveBrush" Color="{DynamicResource DataGridCommonRowActive}"/>
+    <Color x:Key="TableViewCommonRowActive">#DD302945</Color>
+    <SolidColorBrush x:Key="TableViewCommonRowActiveBrush" Color="{DynamicResource TableViewCommonRowActive}"/>
 
-    <Color x:Key="DataGridCommonRowBorderHover">#00000000</Color>
-    <SolidColorBrush x:Key="DataGridCommonRowBorderHoverBrush" Color="{DynamicResource DataGridCommonRowBorderHover}"/>
+    <Color x:Key="TableViewCommonRowBorderHover">#00000000</Color>
+    <SolidColorBrush x:Key="TableViewCommonRowBorderHoverBrush" Color="{DynamicResource TableViewCommonRowBorderHover}"/>
 
-    <Color x:Key="DataGridCommonRowBorderActive">#BB9083B3</Color>
-    <SolidColorBrush x:Key="DataGridCommonRowBorderActiveBrush" Color="{DynamicResource DataGridCommonRowBorderActive}"/>
+    <Color x:Key="TableViewCommonRowBorderActive">#BB9083B3</Color>
+    <SolidColorBrush x:Key="TableViewCommonRowBorderActiveBrush" Color="{DynamicResource TableViewCommonRowBorderActive}"/>
 
 
     <!-- ============================================================

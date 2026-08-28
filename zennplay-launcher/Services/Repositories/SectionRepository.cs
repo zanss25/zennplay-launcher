@@ -2,7 +2,9 @@
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Services.Repositories
@@ -12,73 +14,61 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. READ (FETCH)
 
         /// <summary>
-        /// Mengambil semua Section/Kategori yang ada, diurutkan berdasarkan sort_order kustom dari user.
+        /// Mengambil semua Section/Kategori yang ada secara asinkron, diurutkan berdasarkan sort_order kustom dari user.
         /// </summary>
-        public IEnumerable<SectionModel> GetAllSections()
+        public async Task<IEnumerable<SectionModel>> GetAllSectionsAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM sections ORDER BY sort_order ASC, created_at ASC;";
-                return conn.Query<SectionModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM sections ORDER BY sort_order ASC, created_at ASC;";
+            return await conn.QueryAsync<SectionModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu Section berdasarkan ID.
+        /// Mengambil detail satu Section berdasarkan ID secara asinkron.
         /// </summary>
-        public SectionModel? GetSectionById(Guid id)
+        public async Task<SectionModel?> GetSectionByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM sections WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<SectionModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM sections WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<SectionModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil jumlah total Section yang tersisa di database.
-        /// Digunakan untuk memastikan tidak boleh menghapus jika tinggal 1.
+        /// Mengambil jumlah total Section yang tersisa di database secara asinkron.
         /// </summary>
-        public int GetSectionCount()
+        public async Task<int> GetSectionCountAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT COUNT(*) FROM sections;";
-                return conn.ExecuteScalar<int>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT COUNT(*) FROM sections;";
+            return await conn.ExecuteScalarAsync<int>(sql);
         }
 
         /// <summary>
-        /// Mengambil semua game yang saat ini "DITITIPKAN" (Sectionless).
-        /// Yaitu game yang tidak memiliki relasi di tabel 'app_sections' dan belum dihapus.
+        /// Mengambil semua game yang saat ini "DITITIPKAN" (Sectionless) secara asinkron.
         /// </summary>
-        public IEnumerable<AppModel> GetUnassignedApps()
+        public async Task<IEnumerable<AppModel>> GetUnassignedAppsAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"SELECT a.* FROM apps a
-                               LEFT JOIN app_sections aps ON a.id = aps.app_id
-                               WHERE aps.section_id IS NULL AND a.is_deleted = 0
-                               ORDER BY a.title ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"SELECT a.* FROM apps a
+                           LEFT JOIN app_sections aps ON a.id = aps.app_id
+                           WHERE aps.section_id IS NULL AND a.is_deleted = 0
+                           ORDER BY a.title ASC;";
 
-                return conn.Query<AppModel>(sql);
-            }
+            return await conn.QueryAsync<AppModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil jumlah total game yang ada di dalam Section tertentu.
+        /// Mengambil jumlah total game yang ada di dalam Section tertentu secara asinkron.
         /// </summary>
-        public int GetAppCountInSection(Guid sectionId)
+        public async Task<int> GetAppCountInSectionAsync(Guid sectionId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"SELECT COUNT(a.id) 
-                               FROM apps a
-                               INNER JOIN app_sections aps ON a.id = aps.app_id
-                               WHERE aps.section_id = @SectionId AND a.is_deleted = 0;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"SELECT COUNT(a.id) 
+                           FROM apps a
+                           INNER JOIN app_sections aps ON a.id = aps.app_id
+                           WHERE aps.section_id = @SectionId AND a.is_deleted = 0;";
 
-                return conn.ExecuteScalar<int>(sql, new { SectionId = sectionId.ToString() });
-            }
+            return await conn.ExecuteScalarAsync<int>(sql, new { SectionId = sectionId.ToString() });
         }
 
         #endregion
@@ -86,71 +76,31 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. CREATE & UPDATE
 
         /// <summary>
-        /// Menambahkan Section baru. Jika SortOrder belum ditentukan, otomatis diletakkan di urutan paling akhir.
+        /// Menambahkan Section baru secara asinkron.
         /// </summary>
-        public Guid AddSection(SectionModel section)
+        public async Task<Guid> AddSectionAsync(SectionModel section)
         {
             if (section.Id == Guid.Empty)
             {
                 section.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            using (var transaction = conn.BeginTransaction())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            await using var transaction = await conn.BeginTransactionAsync();
+
+            try
             {
-                try
+                // Jika sort_order bernilai default (0), otomatis taruh di urutan paling belakang
+                if (section.SortOrder == 0)
                 {
-                    // Jika sort_order bernilai default (0), otomatis taruh di urutan paling belakang
-                    if (section.SortOrder == 0)
-                    {
-                        string getMaxOrderSql = "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM sections;";
-                        section.SortOrder = conn.ExecuteScalar<int>(getMaxOrderSql, transaction: transaction);
-                    }
-
-                    string sql = @"INSERT INTO sections (id, name, desc, icon, app_type, sort_order, is_game_by_default, is_excluded_by_default)
-                                   VALUES (@Id, @Name, @Desc, @Icon, @AppType, @SortOrder, @IsGameByDefault, @IsExcludedByDefault);";
-
-                    conn.Execute(sql, new
-                    {
-                        Id = section.Id.ToString(),
-                        section.Name,
-                        section.Desc,
-                        section.Icon,
-                        section.AppType,
-                        section.SortOrder,
-                        section.IsGameByDefault,
-                        section.IsExcludedByDefault
-                    }, transaction: transaction);
-
-                    transaction.Commit();
-                    return section.Id;
+                    string getMaxOrderSql = "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM sections;";
+                    section.SortOrder = await conn.ExecuteScalarAsync<int>(getMaxOrderSql, transaction: transaction);
                 }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
-        }
 
-        /// <summary>
-        /// Memperbarui metadata Section (termasuk urutan sort_order).
-        /// </summary>
-        public bool UpdateSection(SectionModel section)
-        {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"UPDATE sections SET
-                               name = @Name,
-                               desc = @Desc,
-                               icon = @Icon,
-                               app_type = @AppType,
-                               sort_order = @SortOrder,
-                               is_game_by_default = @IsGameByDefault,
-                               is_excluded_by_default = @IsExcludedByDefault
-                               WHERE id = @Id;";
+                string sql = @"INSERT INTO sections (id, name, desc, icon, app_type, sort_order, is_game_by_default, is_excluded_by_default)
+                               VALUES (@Id, @Name, @Desc, @Icon, @AppType, @SortOrder, @IsGameByDefault, @IsExcludedByDefault);";
 
-                return conn.Execute(sql, new
+                await conn.ExecuteAsync(sql, new
                 {
                     Id = section.Id.ToString(),
                     section.Name,
@@ -160,37 +110,75 @@ namespace zennplay_launcher.Services.Repositories
                     section.SortOrder,
                     section.IsGameByDefault,
                     section.IsExcludedByDefault
-                }) > 0;
+                }, transaction: transaction);
+
+                await transaction.CommitAsync();
+                return section.Id;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
 
         /// <summary>
-        /// Menyimpan urutan baru seluruh Section sekaligus setelah user selesai melakukan drag-and-drop di UI.
+        /// Memperbarui metadata Section secara asinkron.
         /// </summary>
-        public bool UpdateSectionsOrder(IEnumerable<SectionModel> orderedSections)
+        public async Task<bool> UpdateSectionAsync(SectionModel section)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            using (var transaction = conn.BeginTransaction())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"UPDATE sections SET
+                           name = @Name,
+                           desc = @Desc,
+                           icon = @Icon,
+                           app_type = @AppType,
+                           sort_order = @SortOrder,
+                           is_game_by_default = @IsGameByDefault,
+                           is_excluded_by_default = @IsExcludedByDefault
+                           WHERE id = @Id;";
+
+            int rowsAffected = await conn.ExecuteAsync(sql, new
             {
-                try
-                {
-                    string sql = "UPDATE sections SET sort_order = @SortOrder WHERE id = @Id;";
+                Id = section.Id.ToString(),
+                section.Name,
+                section.Desc,
+                section.Icon,
+                section.AppType,
+                section.SortOrder,
+                section.IsGameByDefault,
+                section.IsExcludedByDefault
+            });
 
-                    var parameters = orderedSections.Select((sec, index) => new
-                    {
-                        Id = sec.Id.ToString(),
-                        SortOrder = index // Nomor urut otomatis 0, 1, 2, 3...
-                    });
+            return rowsAffected > 0;
+        }
 
-                    conn.Execute(sql, parameters, transaction: transaction);
-                    transaction.Commit();
-                    return true;
-                }
-                catch
+        /// <summary>
+        /// Menyimpan urutan baru seluruh Section sekaligus setelah drag-and-drop di UI secara asinkron.
+        /// </summary>
+        public async Task<bool> UpdateSectionsOrderAsync(IEnumerable<SectionModel> orderedSections)
+        {
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            await using var transaction = await conn.BeginTransactionAsync();
+
+            try
+            {
+                string sql = "UPDATE sections SET sort_order = @SortOrder WHERE id = @Id;";
+
+                var parameters = orderedSections.Select((sec, index) => new
                 {
-                    transaction.Rollback();
-                    return false;
-                }
+                    Id = sec.Id.ToString(),
+                    SortOrder = index
+                });
+
+                await conn.ExecuteAsync(sql, parameters, transaction: transaction);
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
             }
         }
 
@@ -199,37 +187,37 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. ASSIGNMENT & MOVING (PENITIPAN LOGIC)
 
         /// <summary>
-        /// Memindahkan game dari satu Section ke Section lain.
+        /// Memindahkan game dari satu Section ke Section lain secara asinkron.
         /// </summary>
-        public bool MoveAppToSection(Guid appId, Guid targetSectionId)
+        public async Task<bool> MoveAppToSectionAsync(Guid appId, Guid targetSectionId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"INSERT INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId)
-                               ON CONFLICT(app_id, section_id) DO UPDATE SET section_id = @SectionId;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"INSERT INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId)
+                           ON CONFLICT(app_id, section_id) DO UPDATE SET section_id = @SectionId;";
 
-                return conn.Execute(sql, new
-                {
-                    AppId = appId.ToString(),
-                    SectionId = targetSectionId.ToString()
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                AppId = appId.ToString(),
+                SectionId = targetSectionId.ToString()
+            });
+
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Memasukkan game dari ruang "Penitipan" ke Section tujuan.
+        /// Memasukkan game dari ruang "Penitipan" ke Section tujuan secara asinkron.
         /// </summary>
-        public bool AssignUnassignedAppToSection(Guid appId, Guid targetSectionId)
+        public async Task<bool> AssignUnassignedAppToSectionAsync(Guid appId, Guid targetSectionId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new
             {
-                string sql = "INSERT OR IGNORE INTO app_sections (app_id, section_id) VALUES (@AppId, @SectionId);";
-                return conn.Execute(sql, new
-                {
-                    AppId = appId.ToString(),
-                    SectionId = targetSectionId.ToString()
-                }) > 0;
-            }
+                AppId = appId.ToString(),
+                SectionId = targetSectionId.ToString()
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -244,70 +232,66 @@ namespace zennplay_launcher.Services.Repositories
         }
 
         /// <summary>
-        /// Menghapus Section dengan proteksi keamanan (Aturan Min 1 Section & Pilihan Nasib Game).
+        /// Menghapus Section dengan proteksi keamanan secara asinkron.
         /// </summary>
-        /// <param name="sectionId">ID Section yang akan dihapus</param>
-        /// <param name="mode">Pilihan penanganan game di dalamnya</param>
-        /// <param name="targetSectionId">ID Section tujuan (wajib diisi jika mode = MoveToOtherSection)</param>
-        public bool DeleteSection(Guid sectionId, SectionDeleteMode mode, Guid? targetSectionId = null)
+        public async Task<bool> DeleteSectionAsync(Guid sectionId, SectionDeleteMode mode, Guid? targetSectionId = null)
         {
             // PROTEKSI 1: Cek apakah section tinggal 1
-            if (GetSectionCount() <= 1)
+            if (await GetSectionCountAsync() <= 1)
             {
                 throw new InvalidOperationException("Aplikasi tidak memperbolehkan menghapus Section terakhir! Minimal harus ada 1 Section.");
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            using (var transaction = conn.BeginTransaction())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            await using var transaction = await conn.BeginTransactionAsync();
+
+            try
             {
-                try
+                string secIdStr = sectionId.ToString();
+
+                // A. Tentukan Nasib Game di dalam Section yang akan dihapus
+                switch (mode)
                 {
-                    string secIdStr = sectionId.ToString();
+                    case SectionDeleteMode.MoveToUnassigned:
+                        string sqlUnassign = "DELETE FROM app_sections WHERE section_id = @SectionId;";
+                        await conn.ExecuteAsync(sqlUnassign, new { SectionId = secIdStr }, transaction);
+                        break;
 
-                    // A. Tentukan Nasib Game di dalam Section yang akan dihapus
-                    switch (mode)
-                    {
-                        case SectionDeleteMode.MoveToUnassigned:
-                            string sqlUnassign = "DELETE FROM app_sections WHERE section_id = @SectionId;";
-                            conn.Execute(sqlUnassign, new { SectionId = secIdStr }, transaction);
-                            break;
+                    case SectionDeleteMode.MoveToOtherSection:
+                        if (!targetSectionId.HasValue || targetSectionId.Value == Guid.Empty)
+                            throw new ArgumentException("Target Section ID harus diisi jika memilih memindahkan game.");
 
-                        case SectionDeleteMode.MoveToOtherSection:
-                            if (!targetSectionId.HasValue || targetSectionId.Value == Guid.Empty)
-                                throw new ArgumentException("Target Section ID harus diisi jika memilih memindahkan game.");
+                        string targetSecIdStr = targetSectionId.Value.ToString();
 
-                            string targetSecIdStr = targetSectionId.Value.ToString();
+                        string sqlMoveInsert = @"INSERT OR IGNORE INTO app_sections (app_id, section_id)
+                                                 SELECT app_id, @TargetSectionId FROM app_sections WHERE section_id = @SectionId;";
+                        await conn.ExecuteAsync(sqlMoveInsert, new { SectionId = secIdStr, TargetSectionId = targetSecIdStr }, transaction);
 
-                            string sqlMoveInsert = @"INSERT OR IGNORE INTO app_sections (app_id, section_id)
-                                                     SELECT app_id, @TargetSectionId FROM app_sections WHERE section_id = @SectionId;";
-                            conn.Execute(sqlMoveInsert, new { SectionId = secIdStr, TargetSectionId = targetSecIdStr }, transaction);
+                        string sqlCleanOld = "DELETE FROM app_sections WHERE section_id = @SectionId;";
+                        await conn.ExecuteAsync(sqlCleanOld, new { SectionId = secIdStr }, transaction);
+                        break;
 
-                            string sqlCleanOld = "DELETE FROM app_sections WHERE section_id = @SectionId;";
-                            conn.Execute(sqlCleanOld, new { SectionId = secIdStr }, transaction);
-                            break;
+                    case SectionDeleteMode.SoftDeleteGames:
+                        string sqlSoftDeleteGames = @"UPDATE apps SET is_deleted = 1 
+                                                     WHERE id IN (SELECT app_id FROM app_sections WHERE section_id = @SectionId);";
+                        await conn.ExecuteAsync(sqlSoftDeleteGames, new { SectionId = secIdStr }, transaction);
 
-                        case SectionDeleteMode.SoftDeleteGames:
-                            string sqlSoftDeleteGames = @"UPDATE apps SET is_deleted = 1 
-                                                          WHERE id IN (SELECT app_id FROM app_sections WHERE section_id = @SectionId);";
-                            conn.Execute(sqlSoftDeleteGames, new { SectionId = secIdStr }, transaction);
-
-                            string sqlCleanRel = "DELETE FROM app_sections WHERE section_id = @SectionId;";
-                            conn.Execute(sqlCleanRel, new { SectionId = secIdStr }, transaction);
-                            break;
-                    }
-
-                    // B. Hapus Section itu sendiri dari tabel 'sections'
-                    string sqlDeleteSection = "DELETE FROM sections WHERE id = @SectionId;";
-                    int rowsAffected = conn.Execute(sqlDeleteSection, new { SectionId = secIdStr }, transaction);
-
-                    transaction.Commit();
-                    return rowsAffected > 0;
+                        string sqlCleanRel = "DELETE FROM app_sections WHERE section_id = @SectionId;";
+                        await conn.ExecuteAsync(sqlCleanRel, new { SectionId = secIdStr }, transaction);
+                        break;
                 }
-                catch
-                {
-                    transaction.Rollback();
-                    throw;
-                }
+
+                // B. Hapus Section itu sendiri dari tabel 'sections'
+                string sqlDeleteSection = "DELETE FROM sections WHERE id = @SectionId;";
+                int rowsAffected = await conn.ExecuteAsync(sqlDeleteSection, new { SectionId = secIdStr }, transaction);
+
+                await transaction.CommitAsync();
+                return rowsAffected > 0;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
             }
         }
 

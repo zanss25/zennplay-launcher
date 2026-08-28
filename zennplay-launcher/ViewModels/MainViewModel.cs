@@ -5,34 +5,31 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services.Messages;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Themes;
-using zennplay_launcher.Views;
-using zennplay_launcher.Views.Tabs;
 
 namespace zennplay_launcher.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     // ============================================================
-    // VARIABLES
+    // VARIABLES & VIEWMODELS
     // ============================================================
 
-    // Properti untuk menampung View/Halaman yang sedang aktif
+    // Menampung ViewModel dari halaman/tab yang sedang aktif
     [ObservableProperty]
-    object? _currentView;
+    private object? _currentView;
 
-    // Properti untuk menampung sections
+    // Repositories
     private readonly SectionRepository _sectionRepo = new();
 
-    // Tab View Instances
-    private readonly WorkInProgress _workInProgress = new();
-
-    // Section tabs
+    // Child ViewModels
     private readonly SectionViewModel _sectionViewModel = new();
-    private readonly SectionView _sectionView;
+    // Ganti ini ke ViewModel WorkInProgress jika sudah dibuat terpisah
+    private readonly object _workInProgressViewModel = new();
 
     // Static tabs list
     [ObservableProperty]
@@ -42,29 +39,31 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private SidebarTabModel? _selectedSidebarTab;
 
+    // 1. Koleksi yang di-bind ke ListBox Sidebar Sections
+    [ObservableProperty]
+    private ObservableCollection<SectionModel> _sections = [];
+
+    // 2. Menampung Section yang sedang dipilih user
+    [ObservableProperty]
+    private SectionModel? _selectedSection;
+
     public MainViewModel()
     {
-        // Hubungkan View dengan ViewModel-nya
-        _sectionView = new SectionView
-        {
-            DataContext = _sectionViewModel
-        };
-
-        // Load Sections list
-        LoadSections();
-
-        // LISTENER BROADCAST
-        WeakReferenceMessenger.Default.Register<SectionsUpdatedMessage>(this, (r, m) =>
-        {
-            LoadSections();
-        });
-
         // Load static tabs list
         SidebarTabs = new ObservableCollection<SidebarTabModel>(SidebarTabsList.DefaultTabs);
+
+        // Inisialisasi load data secara aman dari konstruktor
+        _ = LoadSectionsAsync();
+
+        // LISTENER BROADCAST (Asinkron)
+        WeakReferenceMessenger.Default.Register<SectionsUpdatedMessage>(this, async (_, _) =>
+        {
+            await LoadSectionsAsync();
+        });
     }
 
     // ============================================================
-    // THEME FUNCTIONS (WILL BE MOVED LATER)
+    // THEME FUNCTIONS
     // ============================================================
     public void SetTheme()
     {
@@ -78,22 +77,13 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
-
     // ============================================================
     // SECTION LOADING FUNCTIONS
     // ============================================================
 
-    // 1. Koleksi yang di-bind ke ListBox Sidebar di XAML
-    [ObservableProperty]
-    private ObservableCollection<SectionModel> _sections = [];
-
-    // 2. Menampung Section yang sedang dipilih/diklik user di sidebar
-    [ObservableProperty]
-    private SectionModel? _selectedSection;
-
-    public void LoadSections()
+    public async Task LoadSectionsAsync()
     {
-        var dbSections = _sectionRepo.GetAllSections();
+        var dbSections = await _sectionRepo.GetAllSectionsAsync();
 
         Sections.Clear();
         foreach (var section in dbSections)
@@ -102,7 +92,7 @@ public partial class MainViewModel : ViewModelBase
         }
 
         // Set item pertama sebagai default selected jika list tidak kosong
-        if (Sections.Any())
+        if (Sections.Any() && SelectedSection == null && SelectedSidebarTab == null)
         {
             SelectedSection = Sections.First();
         }
@@ -118,7 +108,7 @@ public partial class MainViewModel : ViewModelBase
 
         Debug.WriteLine("Selected Section ID: " + value.Id);
         _sectionViewModel.CurrentSection = value;
-        CurrentView = _sectionView;
+        CurrentView = _sectionViewModel;
     }
 
     // ============================================================
@@ -128,31 +118,21 @@ public partial class MainViewModel : ViewModelBase
     {
         if (value == null) return;
 
-        // Reset seleksi pada SidebarSections secara otomatis
+        // Reset seleksi pada Section list
         SelectedSection = null;
 
-        if (value != null) Debug.WriteLine("Selected Static Tab ID: " + value.Id);
+        Debug.WriteLine("Selected Static Tab ID: " + value.Id);
 
         // Eksekusi Logika Navigasi UI
         switch (value.Id)
         {
             case "library":
-                Debug.WriteLine("Switch case: " + value.Name);
-                CurrentView = _workInProgress;
-                break;
             case "favorites":
-                Debug.WriteLine("Switch case: " + value.Name);
-                CurrentView = _workInProgress;
-                break;
             case "boards":
-                Debug.WriteLine("Switch case: " + value.Name);
-                CurrentView = _workInProgress;
-                break;
             case "relics":
                 Debug.WriteLine("Switch case: " + value.Name);
-                CurrentView = _workInProgress;
+                CurrentView = _workInProgressViewModel;
                 break;
         }
     }
-
 }

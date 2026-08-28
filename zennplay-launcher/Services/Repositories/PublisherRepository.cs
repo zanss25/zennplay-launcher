@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -13,31 +13,28 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan publisher baru ke database.
+        /// Menambahkan publisher baru ke database secara asinkron.
         /// </summary>
-        public Guid AddPublisher(PublisherModel publisher)
+        public async Task<Guid> AddPublisherAsync(PublisherModel publisher)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (publisher.Id == Guid.Empty)
             {
                 publisher.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlPublisher = @"
+                INSERT INTO publishers (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlPublisher, new
             {
-                string sqlPublisher = @"
-                    INSERT INTO publishers (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = publisher.Id.ToString(),
+                publisher.Name,
+                publisher.Desc
+            });
 
-                conn.Execute(sqlPublisher, new
-                {
-                    Id = publisher.Id.ToString(),
-                    publisher.Name,
-                    publisher.Desc
-                });
-
-                return publisher.Id;
-            }
+            return publisher.Id;
         }
 
         #endregion
@@ -45,66 +42,58 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua publisher (diurutkan alfabetis).
+        /// Mengambil semua publisher (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<PublisherModel> GetAllPublishers()
+        public async Task<IEnumerable<PublisherModel>> GetAllPublishersAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM publishers ORDER BY name ASC;";
-                return conn.Query<PublisherModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM publishers ORDER BY name ASC;";
+            return await conn.QueryAsync<PublisherModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu publisher berdasarkan ID.
+        /// Mengambil detail satu publisher berdasarkan ID secara asinkron.
         /// </summary>
-        public PublisherModel? GetPublisherById(Guid id)
+        public async Task<PublisherModel?> GetPublisherByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM publishers WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<PublisherModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM publishers WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<PublisherModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh publisher yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh publisher yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<PublisherModel> GetPublishersByAppId(Guid appId)
+        public async Task<IEnumerable<PublisherModel>> GetPublishersByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT p.* FROM publishers p
-                    INNER JOIN app_publishers ap ON p.id = ap.publisher_id
-                    WHERE ap.app_id = @AppId
-                    ORDER BY p.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT p.* FROM publishers p
+                INNER JOIN app_publishers ap ON p.id = ap.publisher_id
+                WHERE ap.app_id = @AppId
+                ORDER BY p.name ASC;";
 
-                return conn.Query<PublisherModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<PublisherModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari publisher berdasarkan kata kunci nama.
+        /// Mencari publisher berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<PublisherModel> GetPublishersFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<PublisherModel>> GetPublishersFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM publishers";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM publishers";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<PublisherModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<PublisherModel>(sql, parameters);
         }
 
         #endregion
@@ -112,25 +101,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi publisher.
+        /// Mengubah nama dan deskripsi publisher secara asinkron.
         /// </summary>
-        public bool UpdatePublisher(PublisherModel publisher)
+        public async Task<bool> UpdatePublisherAsync(PublisherModel publisher)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE publishers SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE publishers SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = publisher.Id.ToString(),
-                    publisher.Name,
-                    publisher.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = publisher.Id.ToString(),
+                publisher.Name,
+                publisher.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -138,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> PUBLISHER)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Publisher.
+        /// Menghubungkan game dengan suatu Publisher secara asinkron.
         /// </summary>
-        public bool AssignPublisherToApp(Guid appId, Guid publisherId)
+        public async Task<bool> AssignPublisherToAppAsync(Guid appId, Guid publisherId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_publishers (app_id, publisher_id) VALUES (@AppId, @PublisherId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_publishers (app_id, publisher_id) VALUES (@AppId, @PublisherId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan publisher dari game tertentu.
+        /// Menghapus hubungan publisher dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemovePublisherFromApp(Guid appId, Guid publisherId)
+        public async Task<bool> RemovePublisherFromAppAsync(Guid appId, Guid publisherId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_publishers WHERE app_id = @AppId AND publisher_id = @PublisherId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_publishers WHERE app_id = @AppId AND publisher_id = @PublisherId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), PublisherId = publisherId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -166,16 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Publisher dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_publishers').
+        /// Hapus permanen Publisher dari database secara asinkron.
         /// </summary>
-        public bool DeletePublisher(Guid id)
+        public async Task<bool> DeletePublisherAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM publishers WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM publishers WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion

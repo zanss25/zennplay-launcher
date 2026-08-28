@@ -14,7 +14,6 @@ using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Themes;
 using zennplay_launcher.Views;
 using zennplay_launcher.Views.Tabs;
-using static System.Collections.Specialized.BitVector32;
 
 namespace zennplay_launcher.ViewModels
 {
@@ -35,39 +34,40 @@ namespace zennplay_launcher.ViewModels
         public SectionViewModel(SectionModel section)
         {
             CurrentSection = section;
-            LoadApps();
+            _ = LoadAppsAsync();
         }
 
         partial void OnCurrentSectionChanged(SectionModel value)
         {
             if (value != null && value.Id != Guid.Empty)
             {
-                LoadApps();
+                _ = LoadAppsAsync();
             }
         }
 
-        public void LoadApps()
+        public async Task LoadAppsAsync()
         {
             var criteria = new AppFilterCriteria { SectionIds = new List<Guid> { SectionId } };
 
-            IEnumerable<AppModel> apps = _appRepo.GetAppsFiltered(criteria);
+            IEnumerable<AppModel> apps = await _appRepo.GetAppsFilteredAsync(criteria);
             DisplayedApps = new ObservableCollection<AppModel>(apps);
         }
 
         [RelayCommand]
         private async Task AddGameAsync()
         {
-            // 1. Minta service buka window seleksi
-            Guid? resultAppId = await _dialogService.ShowNewAppSelectionAsync();
-            if (!resultAppId.HasValue || resultAppId.Value == Guid.Empty) return;
+            Guid? resultAppId = await _dialogService.ShowNewAppSelectionAsync(SectionId);
 
-            // 2. Minta service buka properties window
-            bool isSaved = await _dialogService.ShowAppPropertiesAsync(resultAppId.Value, isNew: true, SectionId);
+            if (resultAppId == Guid.Empty) return;
 
-            // 3. ViewModel sendiri yang memutuskan kapan harus reload data
-            if (isSaved)
+            if (resultAppId.HasValue)
             {
-                LoadApps();
+                bool isSaved = await _dialogService.ShowAppPropertiesAsync(resultAppId.Value, isNew: true, SectionId);
+                await LoadAppsAsync();
+            }
+            else
+            {
+                await LoadAppsAsync();
             }
         }
 
@@ -79,27 +79,26 @@ namespace zennplay_launcher.ViewModels
             bool isSaved = await _dialogService.ShowAppPropertiesAsync(app.Id, isNew: false, SectionId);
             if (isSaved)
             {
-                LoadApps();
+                await LoadAppsAsync();
             }
         }
 
         [RelayCommand]
-        private void SoftDeleteApp(AppModel? app)
+        private async Task SoftDeleteAppAsync(AppModel? app)
         {
             if (app == null) return;
 
-            _appRepo.SoftDeleteApp(app.Id);
-            LoadApps();
+            await _appRepo.SoftDeleteAppAsync(app.Id);
+            await LoadAppsAsync();
         }
 
         [RelayCommand]
-        private void HardDeleteApp(AppModel? app)
+        private async Task HardDeleteAppAsync(AppModel? app)
         {
             if (app == null) return;
 
-            _appRepo.HardDeleteApp(app.Id);
-            LoadApps();
+            await _appRepo.HardDeleteAppAsync(app.Id);
+            await LoadAppsAsync();
         }
-
     }
 }

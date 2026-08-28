@@ -54,19 +54,19 @@ namespace zennplay_launcher.ViewModels
         public PropertiesMediaView MediaView { get; } = new();
 
         // Method untuk inisialisasi mode
-        public void Initialize(Guid appId, bool isNew = false, Guid? initialSectionId = null)
+        public async Task Initialize(Guid appId, bool isNew = false, Guid? initialSectionId = null)
         {
             isNewApp = isNew;
             AppId = appId;
-            LoadAppData(appId);
-            LoadTabsData();
+            await LoadAppData(appId);
+            await LoadTabsData();
 
             if (CurrentApp != null)
             {
                 MetadataViewModel.LoadFromModel(CurrentApp);
                 FoldersViewModel.LoadFromModel(CurrentApp);
-                FoldersViewModel.LoadAppActions(AppId);
-                FoldersViewModel.LoadAppLinks(AppId);
+                await FoldersViewModel.LoadAppActions(AppId);
+                await FoldersViewModel.LoadAppLinks(AppId);
                 MediaViewModel.LoadFromModel(CurrentApp);
             }
 
@@ -129,19 +129,19 @@ namespace zennplay_launcher.ViewModels
             }
         }
 
-        public void LoadTabsData(Guid appId = default)
+        public async Task LoadTabsData(Guid appId = default)
         {
-            MetadataViewModel.LoadData(appId);
+            await MetadataViewModel.LoadData(appId);
         }
 
         // ============================================================
         // FETCH APP DATA
         // ============================================================
-        public void LoadAppData(Guid appId)
+        public async Task LoadAppData(Guid appId)
         {
             if (appId != Guid.Empty)
             {
-                AppModel? app = _appRepo.GetAppById(appId);
+                AppModel? app = await _appRepo.GetAppByIdAsync(appId);
 
                 if (app != null)
                 {
@@ -156,7 +156,7 @@ namespace zennplay_launcher.ViewModels
         public event Action? RequestClose;
 
         [RelayCommand]
-        private void Save()
+        private async Task Save()
         {
             if (_appRepo == null || CurrentApp == null) return;
 
@@ -171,7 +171,7 @@ namespace zennplay_launcher.ViewModels
             }
 
             // 2. Eksekusi UpdateApp ke database
-            bool isSuccess = _appRepo.UpdateApp(
+            bool isSuccess = await _appRepo.UpdateAppAsync(
                 app: CurrentApp,
                 actions: [.. FoldersViewModel.AppActions],
                 links: [.. FoldersViewModel.AppLinks],
@@ -198,7 +198,7 @@ namespace zennplay_launcher.ViewModels
             }
         }
 
-        public void DeleteDraftIfNotSaved()
+        public async Task DeleteDraftIfNotSaved()
         {
             // Jika user menutup window tanpa klik Save
             if (!IsSaved)
@@ -208,7 +208,7 @@ namespace zennplay_launcher.ViewModels
 
             if (isNewApp && !IsSaved && _appRepo != null && AppId != Guid.Empty)
             {
-                _appRepo.HardDeleteApp(AppId);
+                await _appRepo.HardDeleteAppAsync(AppId);
             }
         }
 

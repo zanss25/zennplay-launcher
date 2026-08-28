@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 
@@ -13,31 +13,28 @@ namespace zennplay_launcher.Services.Repositories
         #region 1. CREATE (INSERT)
 
         /// <summary>
-        /// Menambahkan platform baru ke database.
+        /// Menambahkan platform baru ke database secara asinkron.
         /// </summary>
-        public Guid AddPlatform(PlatformModel platform)
+        public async Task<Guid> AddPlatformAsync(PlatformModel platform)
         {
-            // Pastikan entitas memiliki ID sebelum disimpan
             if (platform.Id == Guid.Empty)
             {
                 platform.Id = Guid.NewGuid();
             }
 
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sqlPlatform = @"
+                INSERT INTO platforms (id, name, desc) 
+                VALUES (@Id, @Name, @Desc);";
+
+            await conn.ExecuteAsync(sqlPlatform, new
             {
-                string sqlPlatform = @"
-                    INSERT INTO platforms (id, name, desc) 
-                    VALUES (@Id, @Name, @Desc);";
+                Id = platform.Id.ToString(),
+                platform.Name,
+                platform.Desc
+            });
 
-                conn.Execute(sqlPlatform, new
-                {
-                    Id = platform.Id.ToString(),
-                    platform.Name,
-                    platform.Desc
-                });
-
-                return platform.Id;
-            }
+            return platform.Id;
         }
 
         #endregion
@@ -45,66 +42,58 @@ namespace zennplay_launcher.Services.Repositories
         #region 2. READ (FETCH & QUERY)
 
         /// <summary>
-        /// Mengambil semua platform (diurutkan alfabetis).
+        /// Mengambil semua platform (diurutkan alfabetis) secara asinkron.
         /// </summary>
-        public IEnumerable<PlatformModel> GetAllPlatforms()
+        public async Task<IEnumerable<PlatformModel>> GetAllPlatformsAsync()
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM platforms ORDER BY name ASC;";
-                return conn.Query<PlatformModel>(sql);
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM platforms ORDER BY name ASC;";
+            return await conn.QueryAsync<PlatformModel>(sql);
         }
 
         /// <summary>
-        /// Mengambil detail satu platform berdasarkan ID.
+        /// Mengambil detail satu platform berdasarkan ID secara asinkron.
         /// </summary>
-        public PlatformModel? GetPlatformById(Guid id)
+        public async Task<PlatformModel?> GetPlatformByIdAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "SELECT * FROM platforms WHERE id = @Id LIMIT 1;";
-                return conn.QueryFirstOrDefault<PlatformModel>(sql, new { Id = id.ToString() });
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "SELECT * FROM platforms WHERE id = @Id LIMIT 1;";
+            return await conn.QueryFirstOrDefaultAsync<PlatformModel>(sql, new { Id = id.ToString() });
         }
 
         /// <summary>
-        /// Mengambil seluruh platform yang dimiliki oleh game tertentu.
+        /// Mengambil seluruh platform yang dimiliki oleh game tertentu secara asinkron.
         /// </summary>
-        public IEnumerable<PlatformModel> GetPlatformsByAppId(Guid appId)
+        public async Task<IEnumerable<PlatformModel>> GetPlatformsByAppIdAsync(Guid appId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    SELECT p.* FROM platforms p
-                    INNER JOIN app_platforms ap ON p.id = ap.platform_id
-                    WHERE ap.app_id = @AppId
-                    ORDER BY p.name ASC;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                SELECT p.* FROM platforms p
+                INNER JOIN app_platforms ap ON p.id = ap.platform_id
+                WHERE ap.app_id = @AppId
+                ORDER BY p.name ASC;";
 
-                return conn.Query<PlatformModel>(sql, new { AppId = appId.ToString() });
-            }
+            return await conn.QueryAsync<PlatformModel>(sql, new { AppId = appId.ToString() });
         }
 
         /// <summary>
-        /// Mencari platform berdasarkan kata kunci nama.
+        /// Mencari platform berdasarkan kata kunci nama secara asinkron.
         /// </summary>
-        public IEnumerable<PlatformModel> GetPlatformsFiltered(string? searchQuery = null)
+        public async Task<IEnumerable<PlatformModel>> GetPlatformsFilteredAsync(string? searchQuery = null)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            var sql = "SELECT * FROM platforms";
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
             {
-                var sql = "SELECT * FROM platforms";
-                var parameters = new DynamicParameters();
-
-                if (!string.IsNullOrWhiteSpace(searchQuery))
-                {
-                    sql += " WHERE name LIKE @Query";
-                    parameters.Add("Query", $"%{searchQuery}%");
-                }
-
-                sql += " ORDER BY name ASC;";
-
-                return conn.Query<PlatformModel>(sql, parameters);
+                sql += " WHERE name LIKE @Query";
+                parameters.Add("Query", $"%{searchQuery}%");
             }
+
+            sql += " ORDER BY name ASC;";
+
+            return await conn.QueryAsync<PlatformModel>(sql, parameters);
         }
 
         #endregion
@@ -112,25 +101,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 3. UPDATE
 
         /// <summary>
-        /// Mengubah nama dan deskripsi platform.
+        /// Mengubah nama dan deskripsi platform secara asinkron.
         /// </summary>
-        public bool UpdatePlatform(PlatformModel platform)
+        public async Task<bool> UpdatePlatformAsync(PlatformModel platform)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = @"
-                    UPDATE platforms SET
-                        name = @Name,
-                        desc = @Desc
-                    WHERE id = @Id;";
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = @"
+                UPDATE platforms SET
+                    name = @Name,
+                    desc = @Desc
+                WHERE id = @Id;";
 
-                return conn.Execute(sql, new
-                {
-                    Id = platform.Id.ToString(),
-                    platform.Name,
-                    platform.Desc
-                }) > 0;
-            }
+            int rowsAffected = await conn.ExecuteAsync(sql, new
+            {
+                Id = platform.Id.ToString(),
+                platform.Name,
+                platform.Desc
+            });
+
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -138,27 +127,25 @@ namespace zennplay_launcher.Services.Repositories
         #region 4. RELATIONAL MANAGEMENT (APP <-> PLATFORM)
 
         /// <summary>
-        /// Menghubungkan game dengan suatu Platform.
+        /// Menghubungkan game dengan suatu Platform secara asinkron.
         /// </summary>
-        public bool AssignPlatformToApp(Guid appId, Guid platformId)
+        public async Task<bool> AssignPlatformToAppAsync(Guid appId, Guid platformId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "INSERT OR IGNORE INTO app_platforms (app_id, platform_id) VALUES (@AppId, @PlatformId);";
-                return conn.Execute(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "INSERT OR IGNORE INTO app_platforms (app_id, platform_id) VALUES (@AppId, @PlatformId);";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() });
+            return rowsAffected > 0;
         }
 
         /// <summary>
-        /// Menghapus hubungan platform dari game tertentu.
+        /// Menghapus hubungan platform dari game tertentu secara asinkron.
         /// </summary>
-        public bool RemovePlatformFromApp(Guid appId, Guid platformId)
+        public async Task<bool> RemovePlatformFromAppAsync(Guid appId, Guid platformId)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM app_platforms WHERE app_id = @AppId AND platform_id = @PlatformId;";
-                return conn.Execute(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM app_platforms WHERE app_id = @AppId AND platform_id = @PlatformId;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { AppId = appId.ToString(), PlatformId = platformId.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
@@ -166,16 +153,14 @@ namespace zennplay_launcher.Services.Repositories
         #region 5. DELETE
 
         /// <summary>
-        /// Hapus permanen Platform dari database.
-        /// (ON DELETE CASCADE pada DB akan otomatis membersihkan relasi di 'app_platforms').
+        /// Hapus permanen Platform dari database secara asinkron.
         /// </summary>
-        public bool DeletePlatform(Guid id)
+        public async Task<bool> DeletePlatformAsync(Guid id)
         {
-            using (var conn = DatabaseHelper.GetOpenConnection())
-            {
-                string sql = "DELETE FROM platforms WHERE id = @Id;";
-                return conn.Execute(sql, new { Id = id.ToString() }) > 0;
-            }
+            await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
+            string sql = "DELETE FROM platforms WHERE id = @Id;";
+            int rowsAffected = await conn.ExecuteAsync(sql, new { Id = id.ToString() });
+            return rowsAffected > 0;
         }
 
         #endregion
