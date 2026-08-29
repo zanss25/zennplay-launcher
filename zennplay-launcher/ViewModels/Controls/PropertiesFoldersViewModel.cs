@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
 using zennplay_launcher.Services;
+using zennplay_launcher.Services.Platforms;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Views;
 using static Microsoft.IO.RecyclableMemoryStreamManager;
@@ -220,6 +221,9 @@ namespace zennplay_launcher.ViewModels.Controls
             // 4. Tentukan Sort Order
             int nextSortOrder = AppActions.Count;
 
+            string? savedActionIconPath = IconExtractor.ExtractAndSaveIconToStorage
+                                            (AppId, selectedPath, DatabaseHelper.GetActionAssetsDataPath(AppId));
+
             // 5. Buat Model Action Baru
             var newAction = new AppActionModel
             {
@@ -228,6 +232,7 @@ namespace zennplay_launcher.ViewModels.Controls
                 Title = fileTitle,
                 ActionType = actionType,
                 Target = selectedPath,
+                ActionIconPath = savedActionIconPath,
                 IsGame = isExecutable, // Otomatis true jika executable, false jika config/dokumen
                 SortOrder = nextSortOrder
             };

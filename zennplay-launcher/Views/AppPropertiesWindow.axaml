@@ -63,7 +63,14 @@
         </Grid>
 
         <Border Grid.Row="2" BorderBrush="{DynamicResource BorderCommonBrush}" BorderThickness="0,0,0,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,12,20,20">
+            <Grid ColumnDefinitions="*,*" Margin="20,12,20,20">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button x:Name="DownloadMetadataBtn" Classes="ButtonSecondary"
+                            Content="Download Metadata..." Margin="0,0,10,0"
+                            Command="{Binding DownloadMetadataCommand}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button x:Name="SaveBtn" Classes="ButtonSecondary"
                             Content="Save" Margin="10,0,0,0"
                             Command="{Binding SaveCommand}"/>
@@ -71,6 +78,7 @@
                             Content="Cancel" Margin="10,0,0,0"
                             Click="CancelBtn_Click"/>
                 </StackPanel>
+            </Grid>
         </Border>
 
     </Grid>

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Avalonia.Platform.Storage;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
+using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Services.Platforms;
 
@@ -100,6 +101,12 @@ public class LinuxAppService : IAppPlatformService
         {
             return defaultDir;
         }
+    }
+
+    public List<ScannedAppModel> ScanInstalledApps()
+    {
+        var scanner = new LinuxAppScanner();
+        return scanner.GetInstalledApps();
     }
 
     public Task LaunchAppAsync(string targetPath, string workingDir, string arguments)

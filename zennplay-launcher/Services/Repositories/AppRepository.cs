@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using zennplay_launcher.Models;
@@ -644,7 +645,29 @@ namespace zennplay_launcher.Services.Repositories
         {
             await using var conn = (DbConnection)DatabaseHelper.GetOpenConnection();
             string sql = "DELETE FROM apps WHERE id = @Id;";
-            return await conn.ExecuteAsync(sql, new { Id = id.ToString() }) > 0;
+
+            bool isDeleted = await conn.ExecuteAsync(sql, new { Id = id.ToString() }) > 0;
+
+            if (isDeleted)
+            {
+                string deleteDirectory = Path.Combine(DatabaseHelper.GetAssetsDataPath(), id.ToString());
+
+                try
+                {
+                    // Pastikan folder ada dan hapus seluruh isi beserta subfoldernya (recursive: true)
+                    if (Directory.Exists(deleteDirectory))
+                    {
+                        Directory.Delete(deleteDirectory, recursive: true);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Catat log jika file sedang terkunci oleh proses lain (misal sedang di-preview)
+                    System.Diagnostics.Debug.WriteLine($"Failed to delete app asset directory: {ex.Message}");
+                }
+            }
+
+            return isDeleted;
         }
 
         #endregion

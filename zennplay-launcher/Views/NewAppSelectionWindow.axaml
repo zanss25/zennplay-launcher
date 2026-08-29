@@ -40,7 +40,8 @@
                    FontSize="15"/>
 
         <TextBox Grid.Row="2" HorizontalAlignment="Stretch" Margin="30,0"
-                 MinHeight="40" PlaceholderText="Search apps..."/>
+                 MinHeight="40" PlaceholderText="Search apps..."
+                 Text="{Binding SearchQuery}"/>
 
         <Border Grid.Row="3" Margin="30,15"
                 BorderBrush="{DynamicResource BorderCommonBrush}"
@@ -79,7 +80,7 @@
             <Grid ColumnDefinitions="*,*" Margin="20,12,20,20">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button x:Name="BrowseManuallyBtn" Classes="ButtonSecondary"
-                            Content="Browse Manually" Margin="0,0,10,0"
+                            Content="Browse Manually..." Margin="0,0,10,0"
                             Command="{Binding BrowseManuallyCommand}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">

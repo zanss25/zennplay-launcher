@@ -13,6 +13,7 @@ namespace zennplay_launcher.Models
         [ObservableProperty] private bool _isSelected;
 
         public Bitmap? Icon { get; set; }
+        public string? IconSourcePath { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Target { get; set; } = string.Empty;
         public string AppDir { get; set; } = string.Empty;

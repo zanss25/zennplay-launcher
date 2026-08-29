@@ -72,6 +72,21 @@ namespace zennplay_launcher.Services
 
             return assetsFolderPath;
         }
+
+        public static string GetActionAssetsDataPath(Guid appId)
+        {
+            if (appId == Guid.Empty) return "";
+            string stringId = Convert.ToString(appId);
+            string actionAssetsFolderPath = Path.Combine(GetAssetsDataPath(), stringId, "actions");
+
+            if (!Directory.Exists(actionAssetsFolderPath))
+            {
+                Directory.CreateDirectory(actionAssetsFolderPath);
+            }
+
+            return actionAssetsFolderPath;
+        }
+
         public static string GetSectionIconsDataPath()
         {
             string dir = GetAssetsDataPath();

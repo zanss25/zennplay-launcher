@@ -14,7 +14,7 @@ namespace zennplay_launcher.Views
             InitializeComponent();
 
             DataContext = new NewAppSelectionViewModel();
-            Title = "Select Installed Games/Apps";
+            Title = "Select Installed Apps";
             TitleText.Text = Title.ToUpper();
         }
 

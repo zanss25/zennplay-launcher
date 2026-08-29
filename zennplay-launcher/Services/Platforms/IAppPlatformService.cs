@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Avalonia.Platform.Storage;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Avalonia.Platform.Storage;
+using zennplay_launcher.Models;
 
 namespace zennplay_launcher.Services;
 
@@ -17,6 +18,9 @@ public interface IAppPlatformService
 
     // Deteksi root game directory untuk keperluan kalkulasi size & scanning
     string DetectRootAppDirectory(string resolvedTargetPath, string defaultDir);
+
+    // Scan app terinstall
+    List<ScannedAppModel> ScanInstalledApps();
 
     // Logika menjalankan game / program di OS bersangkutan
     Task LaunchAppAsync(string targetPath, string workingDir, string arguments);
