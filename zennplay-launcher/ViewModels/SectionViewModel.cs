@@ -26,10 +26,21 @@ namespace zennplay_launcher.ViewModels
         private readonly AppRepository _appRepo = new();
         [ObservableProperty] private ObservableCollection<AppModel> _displayedApps = new();
 
+        // Properti untuk menampung view modes
+        [ObservableProperty]
+        private ObservableCollection<BasicTabModel> _appViewModes = new(AppViewModesList.AppViewModes);
+
+        // Active static view mode
+        [ObservableProperty]
+        private BasicTabModel? _selectedViewMode;
+
         public Guid SectionId => CurrentSection.Id;
         public string SectionName => CurrentSection.Name;
 
-        public SectionViewModel() { }
+        public SectionViewModel() 
+        {
+            SelectedViewMode = AppViewModes.First();
+        }
 
         public SectionViewModel(SectionModel section)
         {

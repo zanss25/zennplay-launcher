@@ -24,4 +24,14 @@ namespace zennplay_launcher.Models
 
     }
 
+    public partial class AppViewModesList
+    {
+        public static List<BasicTabModel> AppViewModes =>
+        [
+            new BasicTabModel { Id = "grid", Name = "GR" },
+            new BasicTabModel { Id = "list", Name = "LS" },
+            new BasicTabModel { Id = "pane", Name = "PN" }
+        ];
+    }
+
 }
