@@ -351,7 +351,7 @@ namespace zennplay_launcher.Services.Repositories
                 AppSortBy.ReleaseDate => "a.release_date",
                 AppSortBy.UserRating => "a.user_rating",
                 AppSortBy.CreatedAt => "a.created_at",
-                AppSortBy.LastPlayed => "a.last_launched",
+                AppSortBy.LastLaunched => "a.last_launched",
                 _ => "COALESCE(NULLIF(a.sorting_title, ''), a.title) COLLATE NOCASE"
             };
 

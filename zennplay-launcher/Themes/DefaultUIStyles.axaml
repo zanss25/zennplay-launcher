@@ -706,26 +706,36 @@
     </Style>
 
     <Style Selector="MenuItem.MenuItemPrimary">
-        <Setter Property="Background" Value="{DynamicResource BtnPrimaryBorderBrush}"/>
+        <Style.Resources>
+            <LinearGradientBrush x:Key="PrimaryGradNormal" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Color="{DynamicResource BtnPrimaryA}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BtnPrimaryB}" Offset="1"/>
+            </LinearGradientBrush>
+
+            <LinearGradientBrush x:Key="PrimaryGradHover" StartPoint="0%,0%" EndPoint="100%,0%">
+                <GradientStop Color="{DynamicResource BtnPrimaryHoverA}" Offset="0"/>
+                <GradientStop Color="{DynamicResource BtnPrimaryHoverB}" Offset="1"/>
+            </LinearGradientBrush>
+        </Style.Resources>
+
+        <Setter Property="Background" Value="{StaticResource PrimaryGradNormal}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextCommonBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBorderBrush}"/>
         <Setter Property="FontFamily" Value="{DynamicResource FontCommon}"/>
+        <Setter Property="FontWeight" Value="Regular"/>
         <Setter Property="FontSize" Value="12"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="Padding" Value="15,8"/>
+        <Setter Property="MinWidth" Value="120"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="4"/>
 
         <Style Selector="^:pointerover /template/ Border#PART_LayoutRoot">
-            <Setter Property="Background" Value="{DynamicResource BtnPrimaryBorderHoverBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource BtnPrimaryBorderHoverBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryGradHover}"/>
         </Style>
 
         <Style Selector="^:pointerover">
             <Setter Property="Foreground" Value="{DynamicResource TextCommonActiveBrush}"/>
             <Setter Property="Cursor" Value="Hand"/>
-        </Style>
-
-        <Style Selector="^:disabled">
-            <Setter Property="Opacity" Value="0.5"/>
         </Style>
     </Style>
 

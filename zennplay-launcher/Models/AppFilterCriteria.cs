@@ -35,7 +35,7 @@ namespace zennplay_launcher.Models
         ReleaseDate,
         UserRating,
         CreatedAt,
-        LastPlayed
+        LastLaunched
     }
 
     public enum SortDirection

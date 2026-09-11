@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using Bitmap = Avalonia.Media.Imaging.Bitmap;
@@ -14,6 +15,7 @@ namespace zennplay_launcher.Services.Platforms
 {
     public static class IconExtractor
     {
+        [SupportedOSPlatform("windows")]
         public static Bitmap? ExtractFromWindowsExecutable(string exeOrIcoPath)
         {
             if (string.IsNullOrWhiteSpace(exeOrIcoPath) || !File.Exists(exeOrIcoPath))
@@ -44,6 +46,7 @@ namespace zennplay_launcher.Services.Platforms
             return null;
         }
 
+        [SupportedOSPlatform("linux")]
         public static Bitmap? LoadLinuxIcon(string? iconNameOrPath)
         {
             if (string.IsNullOrWhiteSpace(iconNameOrPath))

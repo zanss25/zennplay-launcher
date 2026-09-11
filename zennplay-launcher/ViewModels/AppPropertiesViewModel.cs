@@ -155,11 +155,11 @@ namespace zennplay_launcher.ViewModels
         // ============================================================
         public event Action? RequestClose;
 
-        [RelayCommand]
-        private async Task DownloadMetadata()
-        {
+        //[RelayCommand]
+        //private async Task DownloadMetadata()
+        //{
 
-        }
+        //}
 
         [RelayCommand]
         private async Task Save()

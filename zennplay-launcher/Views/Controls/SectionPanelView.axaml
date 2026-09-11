@@ -1,0 +1,105 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:zennplay_launcher.Views.Controls"
+             xmlns:converters="using:zennplay_launcher.Converters"
+             xmlns:models="using:zennplay_launcher.Models"
+             xmlns:viewmodels="using:zennplay_launcher.ViewModels"
+             xmlns:views="using:zennplay_launcher.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="zennplay_launcher.Views.Controls.SectionPanelView"
+             x:DataType="viewmodels:SectionViewModel">
+  
+    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto,*">
+        <Border Grid.ColumnSpan="2" Grid.Row="0" BorderThickness="0,1,0,0" BorderBrush="#303030"/>
+        <ListBox Grid.Column="0"
+                 Grid.Row="1"
+                 Width="350"
+                 ItemsSource="{Binding DisplayedApps}"
+                 SelectedItem="{Binding SelectedApp, Mode=TwoWay}"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Margin" Value="10,2"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListBox.Styles>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="models:AppModel">
+            
+                    <Border Padding="10,5" 
+                            Background="Transparent" 
+                            CornerRadius="0"
+                            HorizontalAlignment="Stretch">
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" 
+                                        Orientation="Horizontal" 
+                                        HorizontalAlignment="Left" 
+                                        VerticalAlignment="Center">
+                                <Image Source="{Binding IconPath, Converter={x:Static converters:BitmapAssetValueConverter.Instance}}" 
+                                       Height="24" Width="24" 
+                                       Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Title}" 
+                                           FontFamily="{DynamicResource FontCommon}"
+                                           FontSize="14" 
+                                           FontWeight="Regular" 
+                                           Margin="0,0,10,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="(P)" FontFamily="{DynamicResource FontCommon}" FontSize="14"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding IsPinned}"
+                                           Foreground="{DynamicResource TextCommonBrush}"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" 
+                                        Orientation="Horizontal" 
+                                        HorizontalAlignment="Right" 
+                                        VerticalAlignment="Center" 
+                                        Spacing="10">
+                            </StackPanel>
+                        </Grid>
+
+                        <Border.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="LAUNCH"
+                                          CommandParameter="{Binding}"
+                                          Classes="MenuItemPrimary"
+                                          FontWeight="DemiBold"/>
+                                <MenuItem Header="Pin to the Top" CommandParameter="{Binding}"/>
+                                <MenuItem Header="Add to >" CommandParameter="{Binding}"/>
+                                <MenuItem Header="Customize >" CommandParameter="{Binding}"/>
+                                <MenuItem Header="Browse Folder" 
+                                          Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).OpenAppFolderCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Properties"
+                                          Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).EditAppCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Soft Delete"
+                                          Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).SoftDeleteAppCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <MenuItem Header="Hard Delete" 
+                                          Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).HardDeleteAppCommand}"
+                                          CommandParameter="{Binding}"/>
+                                <Separator/>
+                                <MenuItem Header="* * * * *"/>
+                            </ContextMenu>
+                        </Border.ContextMenu>
+
+                    </Border>
+
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Border Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                Background="#50000000"/>
+    </Grid>
+
+</UserControl>

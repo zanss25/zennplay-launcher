@@ -24,7 +24,24 @@ namespace zennplay_launcher.ViewModels
 
         // Properti untuk menampung apps
         private readonly AppRepository _appRepo = new();
-        [ObservableProperty] private ObservableCollection<AppModel> _displayedApps = new();
+        [ObservableProperty] private ObservableCollection<AppModel> _displayedApps = [];
+
+        // Properti app terpilih
+        [ObservableProperty] private AppModel? _selectedApp;
+
+        // Properti untuk menampung sort by
+        [ObservableProperty]
+        private ObservableCollection<UISortCriteriaModel> _sortByCriterias = new(UISortByList.UISortBy);
+
+        // Properti sort by terpilih
+        [ObservableProperty] private UISortCriteriaModel? _selectedSortBy;
+
+        // Properti untuk menampung sort by
+        [ObservableProperty]
+        private ObservableCollection<UISortCriteriaModel> _sortDirections = new(UISortDirectionList.UISortDirection);
+
+        // Properti Asc/Desc terpilih
+        [ObservableProperty] private UISortCriteriaModel? _selectedSortDirection;
 
         // Properti untuk menampung view modes
         [ObservableProperty]
@@ -34,12 +51,19 @@ namespace zennplay_launcher.ViewModels
         [ObservableProperty]
         private BasicTabModel? _selectedViewMode;
 
+        // Properti pembantu untuk binding IsVisible
+        public bool IsGridMode => SelectedViewMode?.Id == "grid";
+        public bool IsListMode => SelectedViewMode?.Id == "list";
+        public bool IsPanelMode => SelectedViewMode?.Id == "panel";
+
         public Guid SectionId => CurrentSection.Id;
         public string SectionName => CurrentSection.Name;
 
         public SectionViewModel() 
         {
             SelectedViewMode = AppViewModes.First();
+            SelectedSortBy = SortByCriterias.FirstOrDefault();
+            SelectedSortDirection = SortDirections.FirstOrDefault();
         }
 
         public SectionViewModel(SectionModel section)
@@ -58,14 +82,49 @@ namespace zennplay_launcher.ViewModels
 
         public async Task LoadAppsAsync()
         {
-            var criteria = new AppFilterCriteria { SectionIds = new List<Guid> { SectionId } };
+            AppSortBy currentSortBy = AppSortBy.Title;
+            SortDirection currentSortDirection = SortDirection.Ascending;
+            if (SelectedSortBy != null) currentSortBy = (AppSortBy)SelectedSortBy.CriteriaId;
+            if (SelectedSortDirection != null) currentSortDirection = (SortDirection)SelectedSortDirection.CriteriaId;
+
+            var criteria = new AppFilterCriteria { SectionIds = new List<Guid> { SectionId },
+                                                   SortBy = currentSortBy, 
+                                                   SortDirection = currentSortDirection};
 
             IEnumerable<AppModel> apps = await _appRepo.GetAppsFilteredAsync(criteria);
-            DisplayedApps = new ObservableCollection<AppModel>(apps);
+            var sortedApps = apps.OrderByDescending(a => a.IsPinned);
+
+            DisplayedApps = new ObservableCollection<AppModel>(sortedApps);
+        }
+
+        partial void OnSelectedAppChanged(AppModel? value)
+        {
+            if (value == null) return;
+
+            // Logika saat game dipilih (misal: load screenshot, update detail pane)
+            Debug.WriteLine($"Selected game: {value.Title}");
+        }
+
+        partial void OnSelectedSortByChanged(UISortCriteriaModel? value)
+        {
+            _ = LoadAppsAsync();
+        }
+
+        partial void OnSelectedSortDirectionChanged(UISortCriteriaModel? value)
+        {
+            _ = LoadAppsAsync();
+        }
+
+        partial void OnSelectedViewModeChanged(BasicTabModel? value)
+        {
+            // Beritahu UI untuk mengevaluasi ulang ketiga properti boolean
+            OnPropertyChanged(nameof(IsGridMode));
+            OnPropertyChanged(nameof(IsListMode));
+            OnPropertyChanged(nameof(IsPanelMode));
         }
 
         [RelayCommand]
-        private async Task AddGameAsync()
+        private async Task AddAppAsync()
         {
             Guid? resultAppId = await _dialogService.ShowNewAppSelectionAsync(SectionId);
 
@@ -91,6 +150,33 @@ namespace zennplay_launcher.ViewModels
             if (isSaved)
             {
                 await LoadAppsAsync();
+            }
+        }
+
+        [RelayCommand]
+        private async Task PinAppAsync(AppModel? app)
+        {
+            if (app == null) return;
+            bool isPinned = app.IsPinned;
+            if (!isPinned)
+            {
+                app.IsPinned = true;
+            }
+            else
+            {
+                app.IsPinned = false;
+            }
+
+            await _appRepo.UpdateAppAsync(app);
+            await LoadAppsAsync();
+        }
+
+        [RelayCommand]
+        private static void OpenAppFolder(AppModel? app)
+        {
+            if (app != null && app.AppDir != null)
+            {
+                DirectoryService.OpenDirectory(app.AppDir);
             }
         }
 

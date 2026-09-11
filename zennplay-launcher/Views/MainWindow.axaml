@@ -6,7 +6,7 @@
         xmlns:models="using:zennplay_launcher.Models"
         xmlns:views="using:zennplay_launcher.Views"
         mc:Ignorable="d"
-        MinWidth="1100" MinHeight="670"
+        MinWidth="500" MinHeight="370"
         Width="1100" Height="670"
         d:DesignWidth="1100" d:DesignHeight="670"
         x:Class="zennplay_launcher.Views.MainWindow"

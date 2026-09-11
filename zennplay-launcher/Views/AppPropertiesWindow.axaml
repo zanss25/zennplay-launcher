@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:controls="using:zennplay_launcher.Views.Controls"
         xmlns:models="using:zennplay_launcher.Models"
         xmlns:viewmodels="using:zennplay_launcher.ViewModels"
         xmlns:views="using:zennplay_launcher.Views"
@@ -66,8 +65,7 @@
             <Grid ColumnDefinitions="*,*" Margin="20,12,20,20">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button x:Name="DownloadMetadataBtn" Classes="ButtonSecondary"
-                            Content="Download Metadata..." Margin="0,0,10,0"
-                            Command="{Binding DownloadMetadataCommand}"/>
+                            Content="Download Metadata..." Margin="0,0,10,0"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">

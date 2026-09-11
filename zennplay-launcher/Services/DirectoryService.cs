@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Path = System.IO.Path;
 
 namespace zennplay_launcher.Services
 {
@@ -43,5 +44,37 @@ namespace zennplay_launcher.Services
                 }
             });
         }
+
+        public static void OpenDirectory(string targetPath)
+        {
+            if (targetPath == null) return;
+
+            string? folderPath = File.Exists(targetPath)
+                ? Path.GetDirectoryName(targetPath)
+                : targetPath;
+
+            if (folderPath == null) return;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = folderPath,
+                    UseShellExecute = true
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "xdg-open",
+                    ArgumentList = { folderPath },
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
+            }
+
+
+        }
+
     }
 }

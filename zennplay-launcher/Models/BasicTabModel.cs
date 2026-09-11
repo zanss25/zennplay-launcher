@@ -30,7 +30,7 @@ namespace zennplay_launcher.Models
         [
             new BasicTabModel { Id = "grid", Name = "GR" },
             new BasicTabModel { Id = "list", Name = "LS" },
-            new BasicTabModel { Id = "pane", Name = "PN" }
+            new BasicTabModel { Id = "panel", Name = "PN" }
         ];
     }
 

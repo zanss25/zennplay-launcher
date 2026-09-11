@@ -272,9 +272,12 @@ namespace zennplay_launcher.ViewModels.Controls
         }
 
         [RelayCommand]
-        private async Task RemoveActionAsync(AppActionModel? action)
+        private void RemoveAction(AppActionModel? action)
         {
-            AppActions.Remove(action);
+            if (action != null)
+            {
+                AppActions.Remove(action);
+            }
         }
 
         [RelayCommand]
