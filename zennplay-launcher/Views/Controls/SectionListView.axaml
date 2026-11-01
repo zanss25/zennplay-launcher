@@ -16,23 +16,38 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="models:AppModel">
                         
+                    <!--    <Border Background="Transparent"
+                                xmlns:i="using:Avalonia.Xaml.Interactivity"
+                                xmlns:ia="using:Avalonia.Xaml.Interactions.Core">
+                            <i:Interaction.Behaviors>
+                                <ia:EventTriggerBehavior EventName="DoubleTapped">
+                                    <ia:InvokeCommandAction 
+                                        Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).LaunchAppCommand}"
+                                        CommandParameter="{Binding}" />
+                                </ia:EventTriggerBehavior>
+                            </i:Interaction.Behaviors>
+
+                            
+                        </Border> -->
+
                         <Button Margin="10,5" 
                                 Padding="12" 
                                 Background="#1AFFFFFF" 
                                 CornerRadius="6"
                                 HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Stretch">
+                                HorizontalContentAlignment="Stretch"
+                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).ShowAppDetailCommand}">
 
                             <Grid ColumnDefinitions="*,*">
                                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
                                     <Image Source="{Binding IconPath, Converter={x:Static converters:BitmapAssetValueConverter.Instance}}" 
-                                           Height="32" Width="32" Margin="0,0,10,0"/>
+                                            Height="32" Width="32" Margin="0,0,10,0"/>
                                     <TextBlock Text="{Binding Title}" FontFamily="{DynamicResource FontCommon}"
-                                               FontSize="15" FontWeight="Regular" VerticalAlignment="Center"/>
+                                                FontSize="15" FontWeight="Regular" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                                     <TextBlock Text="Pinned" FontFamily="{DynamicResource FontCommon}" FontSize="14" Foreground="{DynamicResource TextCommonBrush}"
-                                               VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding IsPinned}"/>
+                                                VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding IsPinned}"/>
                                     <Button Content="|>" Margin="10,0,0,0"/>
                                     <Button Content=":" Margin="10,0,0,0"/>
                                 </StackPanel>
@@ -41,28 +56,28 @@
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="LAUNCH"
-                                              CommandParameter="{Binding}"
-                                              Classes="MenuItemPrimary"
-                                              FontWeight="DemiBold"/>
+                                                CommandParameter="{Binding}"
+                                                Classes="MenuItemPrimary"
+                                                FontWeight="DemiBold"/>
                                     <MenuItem Header="Toggle Pin to Top"
-                                              Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).PinAppCommand}"
-                                              CommandParameter="{Binding}"/>
+                                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).PinAppCommand}"
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Add to >"
-                                              CommandParameter="{Binding}"/>
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Customize >"
-                                              CommandParameter="{Binding}"/>
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Browse Folder"
-                                              Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).OpenAppFolderCommand}"
-                                              CommandParameter="{Binding}"/>
+                                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).OpenAppFolderCommand}"
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Properties"
-                                              Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).EditAppCommand}"
-                                              CommandParameter="{Binding}"/>
+                                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).EditAppCommand}"
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Soft Delete"
-                                              Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).SoftDeleteAppCommand}"
-                                              CommandParameter="{Binding}"/>
+                                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).SoftDeleteAppCommand}"
+                                                CommandParameter="{Binding}"/>
                                     <MenuItem Header="Hard Delete" 
-                                              Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).HardDeleteAppCommand}"
-                                              CommandParameter="{Binding}"/>
+                                                Command="{Binding $parent[UserControl].((viewmodels:SectionViewModel)DataContext).HardDeleteAppCommand}"
+                                                CommandParameter="{Binding}"/>
                                     <Separator/>
                                     <MenuItem Header="* * * * *"/>
                                 </ContextMenu>

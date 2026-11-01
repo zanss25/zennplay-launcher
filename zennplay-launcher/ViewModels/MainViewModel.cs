@@ -10,6 +10,7 @@ using zennplay_launcher.Models;
 using zennplay_launcher.Services.Messages;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Themes;
+using zennplay_launcher.ViewModels.Controls;
 
 namespace zennplay_launcher.ViewModels;
 
@@ -29,7 +30,7 @@ public partial class MainViewModel : ViewModelBase
     // Child ViewModels
     private readonly SectionViewModel _sectionViewModel = new();
     // Ganti ini ke ViewModel WorkInProgress jika sudah dibuat terpisah
-    private readonly object _workInProgressViewModel = new();
+    private readonly WorkInProgressViewModel _workInProgressViewModel = new();
 
     // Static tabs list
     [ObservableProperty]

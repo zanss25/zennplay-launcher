@@ -10,58 +10,9 @@
              x:Class="zennplay_launcher.Views.SectionView"
              x:DataType="viewmodels:SectionViewModel">
   
-                    <Grid RowDefinitions="Auto,*">
-                        
-                        <Border Grid.Row="0" Padding="40,50,40,20">
-                            <Grid ColumnDefinitions="Auto, Auto, Auto, *, Auto"
-                                  MaxHeight="40">
-                            
-                                <TextBox Grid.Column="0" 
-                                         Width="260"
-                                         PlaceholderText="Search.." 
-                                         Classes="TextBoxSearchBar"/>
-
-                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="20,0,0,0" VerticalAlignment="Center">
-                                    <TextBlock Text="Sort by" VerticalAlignment="Center" Foreground="{DynamicResource TextWindowBrush}" FontSize="13"/>
-                                    <ComboBox Width="140"
-                                              ItemsSource="{Binding SortByCriterias}"
-                                              DisplayMemberBinding="{Binding DisplayName}"
-                                              SelectedItem="{Binding SelectedSortBy}"/>
-                                    <ComboBox MaxWidth="100"
-                                              ItemsSource="{Binding SortDirections}"
-                                              DisplayMemberBinding="{Binding DisplayName}"
-                                              SelectedItem="{Binding SelectedSortDirection}"/>
-                                </StackPanel>
-
-                                <ListBox Grid.Column="2" Background="Transparent" 
-                                         Classes="TabListBox" Margin="20,0,0,0"
-                                         ItemsSource="{Binding AppViewModes}"
-                                         SelectedItem="{Binding SelectedViewMode}"
-                                         ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                         IsVisible="True">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate DataType="models:BasicTabModel"> 
-                                            <StackPanel Orientation="Horizontal" Spacing="0"> 
-                                                <TextBlock Text="{Binding Name}"/> 
-                                            </StackPanel>  
-                                        </DataTemplate> 
-                                    </ListBox.ItemTemplate> 
-
-                                </ListBox>
-
-                                <Button Grid.Column="4" 
-                                        Content="+ Add Game" 
-                                        Classes="ButtonPrimary" 
-                                        VerticalAlignment="Stretch"
-                                        Command="{Binding AddAppCommand}"/>
-                            </Grid>
-                        </Border>
-
-                        <controls:SectionGridView x:Name="GridView" Grid.Row="1" IsVisible="{Binding IsGridMode}"/>
-                        <controls:SectionListView x:Name="ListView" Grid.Row="1" IsVisible="{Binding IsListMode}"/>
-                        <controls:SectionPanelView x:Name="PanelView" Grid.Row="1" IsVisible="{Binding IsPanelMode}"/>
-
-                    </Grid>
+    <Grid>
+        <controls:AppListControl IsVisible="{Binding !IsViewingDetail}"/>
+        <controls:AppDetailControl IsVisible="{Binding IsViewingDetail}"/>
+    </Grid>
 
 </UserControl>

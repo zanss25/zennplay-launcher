@@ -13,7 +13,6 @@ using zennplay_launcher.Services;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.ViewModels.Controls;
 using zennplay_launcher.Views.Controls;
-using zennplay_launcher.Views.Tabs;
 
 namespace zennplay_launcher.ViewModels
 {

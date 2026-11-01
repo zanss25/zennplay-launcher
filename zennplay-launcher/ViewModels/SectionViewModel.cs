@@ -13,12 +13,14 @@ using zennplay_launcher.Services;
 using zennplay_launcher.Services.Repositories;
 using zennplay_launcher.Themes;
 using zennplay_launcher.Views;
-using zennplay_launcher.Views.Tabs;
+using zennplay_launcher.Views.Controls;
 
 namespace zennplay_launcher.ViewModels
 {
     public partial class SectionViewModel : ViewModelBase
     {
+        [ObservableProperty] private bool _isViewingDetail = false;
+
         [ObservableProperty] private SectionModel _currentSection = new();
         private readonly IDialogService _dialogService = new DialogService();
 
@@ -151,6 +153,27 @@ namespace zennplay_launcher.ViewModels
             {
                 await LoadAppsAsync();
             }
+        }
+
+        [RelayCommand]
+        private void ShowAppDetail(AppModel? app)
+        {
+            if (app == null) return;
+            SelectedApp = app;
+            IsViewingDetail = true;
+        }
+
+        [RelayCommand]
+        private void BackToList()
+        {
+            IsViewingDetail = false;
+        }
+
+        [RelayCommand]
+        private void LaunchApp(AppModel? app)
+        {
+            if (app == null) return;
+            Debug.WriteLine($"Launching Game '{app.Title}'...");
         }
 
         [RelayCommand]

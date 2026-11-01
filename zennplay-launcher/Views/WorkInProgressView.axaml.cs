@@ -2,11 +2,11 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace zennplay_launcher.Views.Tabs
+namespace zennplay_launcher.Views.Controls
 {
-    public partial class WorkInProgress : UserControl
+    public partial class WorkInProgressView : UserControl
     {
-        public WorkInProgress()
+        public WorkInProgressView()
         {
             InitializeComponent();
 
